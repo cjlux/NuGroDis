@@ -1,0 +1,122 @@
+format 208
+
+classcanvas 128002 class_ref 128002 // Material
+  classdiagramsettings member_max_width 0 end
+  xyz 262.132 43.7149 2000
+end
+classcanvas 128130 class_ref 128130 // SSGrain
+  classdiagramsettings member_max_width 0 end
+  xyzwh 238.129 151.023 2000 133 223
+end
+classcanvas 128386 class_ref 128258 // Precipitate
+  classdiagramsettings member_max_width 0 end
+  xyz 223.316 403.603 2000
+end
+classcanvas 130050 class_ref 128642 // Boundary
+  classdiagramsettings member_max_width 0 end
+  xyz 100.866 230.728 2000
+end
+classcanvas 131458 class_ref 129026 // ChemicalComposition
+  classdiagramsettings member_max_width 0 end
+  xyz 569.582 177.105 2000
+end
+note 132610 "A precipitate can be in 1 or (2 or more) grain(s).
+- If it is in 1 grain : it is include strictly inside the grain;
+- if it is in 2 or more grains, it is at the boundary between the grains."
+  xyzwh 479.129 421.835 2000 330 100
+note 134402 "Computed from"
+  xyzwh 34.715 776.88 2000 131 43
+classcanvas 134914 class_ref 135554 // GuinierPreston
+  classdiagramsettings member_max_width 0 end
+  xyz 170.922 671.325 3005
+end
+classcanvas 135170 class_ref 135682 // Sprime
+  classdiagramsettings member_max_width 0 end
+  xyz 302.391 656.382 2011
+end
+note 136066 "Material composition"
+  xyzwh 661.685 108.239 2000 163 40
+note 136322 "Supersaturated solid solution composition"
+  xyzwh 459.061 283.28 2000 129 83
+relationcanvas 128258 relation_ref 128002 // <aggregation>
+  from ref 128002 z 2001 to ref 128130
+  no_role_a no_role_b
+  multiplicity_a_pos 281 124 3000 no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 128130 // <generalisation>
+  from ref 128386 z 2001 to ref 128130
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 131842 relation_ref 128898 // <aggregation>
+  decenter_begin 224
+  decenter_end 512
+  from ref 128130 z 2001 to ref 131458
+  no_role_a no_role_b
+  multiplicity_a_pos 551 207 3000 no_multiplicity_b
+end
+relationcanvas 131970 relation_ref 129026 // <aggregation>
+  decenter_end 432
+  from ref 128002 z 2001 to point 633 70
+  line 132098 z 2001 to ref 131458
+  no_role_a no_role_b
+  multiplicity_a_pos 618 147 3000 no_multiplicity_b
+end
+relationcanvas 132226 relation_ref 129154 // <aggregation>
+  decenter_begin 520
+  decenter_end 512
+  from ref 128130 z 2001 to point 435 263
+  line 132354 z 2001 to point 435 515
+  line 132482 z 2001 to ref 128386
+  no_role_a no_role_b
+  multiplicity_a_pos 407 527 3000 multiplicity_b_pos 380 276 3000
+end
+relationcanvas 133122 relation_ref 129282 // <association>
+  decenter_begin 74
+  decenter_end 248
+  from ref 128130 z 2001 to point 82 166
+  line 128450 z 2001 to point 82 203
+  line 133378 z 2001 to ref 128130
+  no_role_a no_role_b
+  multiplicity_a_pos 222 216 3000 multiplicity_b_pos 222 177 3000
+end
+relationcanvas 133634 relation_ref 129410 // <aggregation>
+  from ref 128002 z 2001 to point 34 72
+  line 133762 z 2001 to point 30 510
+  line 134018 z 2001 to ref 128386
+  no_role_a no_role_b
+  multiplicity_a_pos 207 521 3000 no_multiplicity_b
+end
+relationcanvas 135042 relation_ref 135938 // <generalisation>
+  decenter_end 238
+  from ref 134914 z 3006 to ref 128386
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135298 relation_ref 136066 // <generalisation>
+  decenter_begin 166
+  from ref 135170 z 2012 to ref 128386
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135426 relation_ref 136194 // <aggregation>
+  decenter_begin 440
+  decenter_end 246
+  from ref 130050 z 2001 to ref 128386
+  no_role_a no_role_b
+  multiplicity_a_pos 187 431 3000 no_multiplicity_b
+end
+line 132994 -_-_ decenter_begin 786
+  from ref 132354 z 2004 to ref 132610
+line 133506 -_-_ decenter_begin 437 decenter_end 385
+  from ref 133378 z 2002 to ref 130050
+line 134530 -_-_ decenter_begin 308 decenter_end 432
+  from ref 134018 z 2006 to ref 134402
+line 134658 -_-_ decenter_begin 699
+  from ref 132482 z 2006 to point 423 794
+  line 128120 z 2006 to ref 134402
+line 136194 -_-_
+  from ref 136066 z 2002 to ref 132098
+line 136450 -_-_ decenter_begin 765
+  from ref 131842 z 2002 to ref 136322
+end

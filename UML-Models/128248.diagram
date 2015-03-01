@@ -1,0 +1,7 @@
+format 75
+
+classcanvas 128120 class_ref 134648 // user
+  class_drawing_mode default show_context_mode default show_stereotype_properties default
+  xyz 128 34 2000
+end
+end

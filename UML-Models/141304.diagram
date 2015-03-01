@@ -1,0 +1,56 @@
+format 208
+
+classcanvas 128120 class_ref 149250 // Computation
+  classdiagramsettings member_max_width 0 end
+  xyz 219 164 2000
+end
+classcanvas 128248 class_ref 141176 // Quenching
+  classdiagramsettings member_max_width 0 end
+  xyz 156 270 2000
+end
+classcanvas 128376 class_ref 142466 // ThermalLoading
+  classdiagramsettings member_max_width 0 end
+  xyz 372 279 2000
+end
+classcanvas 128504 class_ref 142338 // Hardening
+  classdiagramsettings member_max_width 0 end
+  xyz 263 275 2000
+end
+classcanvas 129016 class_ref 142594 // RadiusDistribution
+  classdiagramsettings member_max_width 0 end
+  xyz 222 372 2006
+end
+relationcanvas 128632 relation_ref 134648 // <association>
+  from ref 128120 z 2001 to ref 128504
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128760 relation_ref 134776 // <association>
+  from ref 128120 z 2001 to ref 128248
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128888 relation_ref 134904 // <association>
+  from ref 128120 z 2001 to ref 128376
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129272 relation_ref 149506 // <aggregation>
+  from ref 128376 z 2007 to point 423 388
+  line 129912 z 2007 to ref 129016
+  no_role_a no_role_b
+  multiplicity_a_pos 364 402 3000 no_multiplicity_b
+end
+relationcanvas 129400 relation_ref 149378 // <aggregation>
+  from ref 128504 z 2007 to ref 129016
+  no_role_a no_role_b
+  multiplicity_a_pos 276 345 3000 no_multiplicity_b
+end
+relationcanvas 129528 relation_ref 135032 // <association>
+  from ref 128120 z 2007 to point 79 184
+  line 129656 z 2007 to point 78 388
+  line 129784 z 2007 to ref 129016
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

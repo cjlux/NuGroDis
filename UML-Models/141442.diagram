@@ -1,0 +1,25 @@
+format 208
+
+classcanvas 128002 class_ref 142466 // ThermalLoading
+  classdiagramsettings member_max_width 0 end
+  xyz 163 94.2 2000
+end
+classcanvas 128130 class_ref 142594 // RadiusDistribution
+  classdiagramsettings member_max_width 0 end
+  xyz 518.3 75.8 2000
+end
+classcanvas 128386 class_ref 128130 // SSGrain
+  classdiagramsettings hide_attributes yes hide_operations yes member_max_width 0 end
+  xyz 355 22 3005
+end
+relationcanvas 128258 relation_ref 149506 // <aggregation>
+  from ref 128002 z 2001 to ref 128130
+  no_role_a no_role_b
+  multiplicity_a_pos 502 217 3000 no_multiplicity_b
+end
+relationcanvas 128898 relation_ref 156034 // <association>
+  from ref 128386 z 3006 to ref 128130
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

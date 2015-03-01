@@ -1,0 +1,29 @@
+format 208
+
+classcanvas 128504 class_ref 129026 // ChemicalComposition
+  classdiagramsettings member_max_width 0 end
+  xyz 61.2 113.2 2000
+end
+classcanvas 128632 class_ref 128386 // ChemicalElement
+  classdiagramsettings member_max_width 0 end
+  xyz 553 44.6 2000
+end
+classcanvas 128760 class_ref 128514 // Concentration
+  classdiagramsettings member_max_width 0 end
+  xyz 354.8 225.4 2005
+end
+relationcanvas 128888 relation_ref 128770 // <aggregation>
+  from ref 128504 z 2001 to ref 128632
+  no_role_a no_role_b
+  multiplicity_a_pos 522 192 3000 no_multiplicity_b
+end
+relationcanvas 129016 relation_ref 128642 // <association>
+  from ref 128632 z 2001 to point 522.5 48
+  line 129144 z 2001 to point 522.5 78
+  line 129272 z 2001 to ref 128632
+  no_role_a no_role_b
+  multiplicity_a_pos 519 110 3000 multiplicity_b_pos 519 87 3000
+end
+line 129400 -_-_
+  from ref 128888 z 2006 to ref 128760
+end

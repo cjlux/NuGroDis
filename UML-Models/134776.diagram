@@ -1,0 +1,41 @@
+format 208
+
+classinstance 128760 class_ref 135682 // Sprime
+  name ""   xyz 466 24 2005 life_line_z 2000
+classinstance 128888 class_ref 135554 // GuinierPreston
+  name ""   xyz 281 25 2010 life_line_z 2000
+classinstance 130552 class_ref 128002 // Material
+  name "Al2024"   xyz 123 22 2005 life_line_z 2000
+classinstance 130680 class_ref 149250 // Computation
+  name ""   xyz 17 18 2010 life_line_z 2000
+durationcanvas 130808 classinstance_ref 130680 // :Computation
+  xyzwh 57 93 2010 11 40
+end
+durationcanvas 130936 classinstance_ref 130552 // Al2024:Material
+  xyzwh 170 95 2010 11 445
+end
+durationcanvas 131192 classinstance_ref 128888 // :GuinierPreston
+  xyzwh 328 125 2010 11 25
+end
+durationcanvas 131448 classinstance_ref 128760 // :Sprime
+  xyzwh 489 377 2010 11 25
+end
+msg 131064 synchronous
+  from durationcanvas_ref 130808
+  to durationcanvas_ref 130936
+  yz 95 2015 msg operation_ref 143608 // "ReadData()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 85 77
+msg 131320 synchronous
+  from durationcanvas_ref 130936
+  to durationcanvas_ref 131192
+  yz 125 2015 msg operation_ref 143352 // "ReadDataValue()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 202 107
+msg 131576 synchronous
+  from durationcanvas_ref 130936
+  to durationcanvas_ref 131448
+  yz 377 2015 msg operation_ref 142840 // "ReadDataValue(in fileName : string)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 282 359
+end

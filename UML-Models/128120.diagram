@@ -1,0 +1,214 @@
+format 208
+
+classinstance 128120 class_ref 149250 // Computation
+  name "master"   xyz 104.036 7.30107 2005 life_line_z 2000
+classinstance 128248 class_ref 134648 // user
+  name ""   xyz 2.21007 11.7471 2000 life_line_z 2000
+classinstance 128760 class_ref 142594 // RadiusDistribution
+  name ""   xyz 266.034 97.987 2010 life_line_z 2000
+classinstance 129144 class_ref 142722 // Vacancy
+  name ""   xyz 445.728 96.7127 2005 life_line_z 2000
+note 129528 "read some values
+"
+  xyzwh 228.543 48.4577 2015 171 35
+note 130040 "CellParam"
+  xyzwh 200.648 184.435 2020 91 37
+note 130168 "VacancyParam"
+  xyzwh 185.595 265.279 2000 119 37
+fragment 130936 "ThermalLoading"
+  color lightorange form "cccc" xyzwh 29.5746 644.955 1995 618 289
+end
+classinstance 131576 class_ref 142466 // ThermalLoading
+  name ""   xyz 522.603 651.1 2005 life_line_z 2000
+fragment 134648 "Hardening"
+  color lightmediumgreen xyzwh 31.1528 468.137 0 777 160
+end
+classinstance 138872 class_ref 128258 // Precipitate
+  name ""   xyz 861.055 5.4 2000 life_line_z 2000
+classinstance 139384 class_ref 128002 // Material
+  name "Al2024"   xyz 682.593 766.9 2005 life_line_z 2000
+fragment 139768 "Quenching"
+  color mediumyellow xyzwh 33.5528 325.637 0 580 131
+end
+classinstance 139896 class_ref 141176 // Quenching
+  name ""   xyz 521.3 275.1 2020 life_line_z 2000
+note 140280 "QuenchingParam"
+  xyzwh 188.5 364.5 2020 135 43
+classinstance 141048 class_ref 142338 // Hardening
+  name ""   xyz 655.3 414.2 2005 life_line_z 2000
+durationcanvas 128376 classinstance_ref 128248 // :user
+  xyzwh 13 70.8 2010 11 43
+end
+durationcanvas 128504 classinstance_ref 128120 // master:Computation
+  xyzwh 165 55.8 2010 11 993
+  overlappingdurationcanvas 130680
+    xyzwh 171 968 2020 11 26
+  end
+  overlappingdurationcanvas 131064
+    xyzwh 171 682.8 2020 11 228
+  end
+  overlappingdurationcanvas 134776
+    xyzwh 171 500 2020 11 102
+  end
+end
+durationcanvas 128888 classinstance_ref 128760 // :RadiusDistribution
+  xyzwh 323 163.6 2010 11 28
+end
+durationcanvas 129272 classinstance_ref 129144 // :Vacancy
+  xyzwh 472 232.2 2010 11 45
+end
+durationcanvas 135288 classinstance_ref 131576 // :ThermalLoading
+  xyzwh 573 699.6 2010 11 37
+end
+durationcanvas 135544 classinstance_ref 131576 // :ThermalLoading
+  xyzwh 573 737 2010 11 188
+  overlappingdurationcanvas 137720
+    xyzwh 579 843 2020 11 25
+  end
+end
+durationcanvas 135800 classinstance_ref 128760 // :RadiusDistribution
+  xyzwh 323 801.8 2010 11 30
+end
+durationcanvas 136440 classinstance_ref 128760 // :RadiusDistribution
+  xyzwh 323 537.8 2010 11 38
+end
+durationcanvas 137464 classinstance_ref 128760 // :RadiusDistribution
+  xyzwh 323 768 2010 11 26
+end
+durationcanvas 137976 classinstance_ref 129144 // :Vacancy
+  xyzwh 472 873.8 2010 11 26
+end
+durationcanvas 139512 classinstance_ref 139384 // Al2024:Material
+  xyzwh 729 977 2010 11 67
+end
+durationcanvas 140024 classinstance_ref 139896 // :Quenching
+  xyzwh 556 337 2010 11 28
+end
+durationcanvas 140536 classinstance_ref 129144 // :Vacancy
+  xyzwh 472 420.4 2010 11 27
+end
+durationcanvas 140792 classinstance_ref 128760 // :RadiusDistribution
+  xyzwh 323 590.6 2010 11 25
+end
+durationcanvas 141432 classinstance_ref 141048 // :Hardening
+  xyzwh 688 482.2 2010 11 25
+end
+msg 128632 synchronous
+  from durationcanvas_ref 128376
+  to durationcanvas_ref 128504
+  yz 72 2015 msg operation_ref 128248 // "ReadDataFile(in fileName : string)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 20 54
+msg 129016 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 128888
+  yz 169 2015 msg operation_ref 135160 // "RadiusDistribution(in deltar : double, in r1 : double)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 183 150
+msg 129400 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 129272
+  yz 234 2015 msg operation_ref 135288 // "Vacancy(in deltaHF : double, in deltaSF : double, in deltaHM : double, in fE : double, in Dlac0 : double, in halfSinkD : double, in Tf : double, in EVacCu : double, in EVacMg : double)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 325 215
+reflexivemsg 130808 synchronous
+  to durationcanvas_ref 130680
+  yz 968 2025 msg operation_ref 135416 // "ComputeDuration()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 130 949
+reflexivemsg 131192 synchronous
+  to durationcanvas_ref 131064
+  yz 682 2025 msg operation_ref 142072 // "ProcessThermalLoadingData()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 115 667
+reflexivemsg 134904 synchronous
+  to durationcanvas_ref 134776
+  yz 500 2025 msg operation_ref 142328 // "ProcessMaturationData()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 116 512
+msg 135416 synchronous
+  from durationcanvas_ref 131064
+  to durationcanvas_ref 135288
+  yz 699 3005 msg operation_ref 142200 // "ReadTemperatureLoading()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 286 683
+msg 135672 synchronous
+  from durationcanvas_ref 131064
+  to durationcanvas_ref 135544
+  yz 742 2025 msg operation_ref 147970 // "ReadDistributionFile()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 306 723
+msg 135928 synchronous
+  from durationcanvas_ref 135544
+  to durationcanvas_ref 135800
+  yz 804 2015 msg operation_ref 141944 // "SetAllItemNumbers(in NP1 : double *)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 388 785
+msg 136056 return
+  from durationcanvas_ref 135544
+  to durationcanvas_ref 131064
+  yz 897 2025 unspecifiedmsg
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+msg 136568 synchronous
+  from durationcanvas_ref 134776
+  to durationcanvas_ref 136440
+  yz 555 2025 msg operation_ref 142456 // "SetClassNumber(in n : int)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 193 539
+msg 137592 synchronous
+  from durationcanvas_ref 135544
+  to durationcanvas_ref 137464
+  yz 775 3005 msg operation_ref 142456 // "SetClassNumber(in n : int)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 394 757
+reflexivemsg 137848 synchronous
+  to durationcanvas_ref 137720
+  yz 843 2025 msg operation_ref 142584 // "ReadVCAH()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 553 826
+msg 138104 synchronous
+  from durationcanvas_ref 135544
+  to durationcanvas_ref 137976
+  yz 880 2030 msg operation_ref 156920 // "SetConcentrationAfterHardening(in C : double)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 418 865
+msg 139640 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 139512
+  yz 1031 2015 msg operation_ref 143608 // "ReadData()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 416 1013
+msg 140152 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 140024
+  yz 341 2015 msg operation_ref 150264 // "Quenching(in Tsol : double, in Tfinal : double, in coolRate : double)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 329 321
+msg 140664 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 140536
+  yz 435 2025 msg operation_ref 141186 // "ComputeConcentrationBeforeQuenching() : double"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 195 414
+msg 140920 synchronous
+  from durationcanvas_ref 134776
+  to durationcanvas_ref 140792
+  yz 591 2025 msg operation_ref 141944 // "SetAllItemNumbers(in NP1 : double *)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 187 569
+msg 141560 synchronous
+  from durationcanvas_ref 128504
+  to durationcanvas_ref 141432
+  yz 483 2015 msg operation_ref 184312 // "GetInfo() : string"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 404 462
+line 129656 -_-_ decenter_begin 87 decenter_end 52
+  from ref 128504 z 2016 to point 198 65.6
+  line 130552 z 2016 to ref 129528
+line 130296 -_-_
+  from ref 130040 z 2021 to ref 129016
+line 130424 -_-_ decenter_begin 221
+  from ref 129400 z 2016 to ref 130168
+line 140408 -_-_ decenter_begin 208
+  from ref 140152 z 2021 to ref 140280
+end
