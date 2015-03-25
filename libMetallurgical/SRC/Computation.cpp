@@ -12,13 +12,14 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#include <boost/python.hpp>
+#include <iostream>
+#include <cassert>
+
 #include "Computation.hpp"
 #include "Hardening.hpp"
 #include "ThermalLoading.hpp"
 #include "Quenching.hpp"
-
-#include <iostream>
-#include <cassert>
 
 Computation::Computation()
   : radiusDistribution_(0),
@@ -68,4 +69,14 @@ Computation::Run()
       assert(thermalLoading_ != 0);
       //
     }
+}
+
+
+// Python Wrapper
+BOOST_PYTHON_MODULE(Metallurgical)
+{
+  boost::python::class_<Computation>("Computation", boost::python::init<>() )
+    .add_property("type", &Computation::GetType, &Computation::SetType)
+    .def("Run", &Computation::Run) 
+    ;
 }

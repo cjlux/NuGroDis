@@ -31,9 +31,10 @@ public:
   ~Computation();
 
   // Setters:
-  void SetType(std::string);
+  void SetType(const std::string &);
+  std::string GetType() const;
   void SetRadiusDistribution(RadiusDistribution *);
-
+  RadiusDistribution * GetRadiusDistribution() const;
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
   void ComputeDuration();
 
@@ -59,7 +60,13 @@ private:
 };
 
 inline void
-Computation::SetType(std::string t)
+Computation::SetType(const std::string & t)
 {
   type_ = t;
+}
+
+inline std::string 
+Computation::GetType() const
+{
+  return type_;
 }

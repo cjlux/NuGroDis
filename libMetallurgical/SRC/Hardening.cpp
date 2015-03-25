@@ -22,19 +22,14 @@ Hardening::~Hardening()
 {
 }
 
-std::string 
-Hardening::GetInfo()
-{
-}
-
 double
 Hardening::GetMinTimeStep()
 {
+  return 1.67;
 }
 
 std::string 
 Hardening::GetInfo()
-
 {
   return std::string("Bonjour");
 }

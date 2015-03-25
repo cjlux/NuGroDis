@@ -7,7 +7,8 @@
                CXX = g++
 
           INCDIRS  = -I$(TOP_DIR) \
-		     -I$(LIB_DIR)/SRC
+		     -I$(LIB_DIR)/SRC\
+		     -I$(PYTHON_INC_DIR)
 
 SRC_FILE_LIST = Computation.cpp \
 	        Hardening.cpp \
@@ -21,6 +22,10 @@ OBJ_FILE_LIST = $(SRC_FILE_LIST:%.cpp=$(OBJ_DIR)/%.o)
          SYSTEM := $(shell uname -o)
 
 	ARCHI_FLAG = -m64
+
+    PYTHON_VERSION = 2.7
+    PYTHON_INC_DIR = /usr/include/python$(PYTHON_VERSION)
+    PYTHON-BINDING = ./PythonB
 
 	  TOP_DIR = $(PWD)/..
           LIB_DIR = $(TOP_DIR)/lib$(NAME)
@@ -53,13 +58,13 @@ ifeq ($(mode), PROFILE)
 endif
 
 ifeq ($(mode), RELEASE) 
-        CXXFLAGS  = -c -O2 -Wall -MMD -frounding-math
+        CXXFLAGS  = -c -O2 -Wall -MMD -frounding-math -fPIC
 endif
 ifeq ($(mode), DEBUG) 
-        CXXFLAGS  = -c -g -Wall -DVERIF_ASSERT -MMD -frounding-math
+        CXXFLAGS  = -c -g -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
 endif
 ifeq ($(mode), PROFILE) 
-        CXXFLAGS  = -c -O2 -pg -Wall -DVERIF_ASSERT -MMD -frounding-math
+        CXXFLAGS  = -c -O2 -pg -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
 endif
 
 CXXFLAGS := $(CXXFLAGS) $(ARCHI_FLAG) -pipe
@@ -75,11 +80,13 @@ $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp Makefile
 	@echo "###################################################################################"
 	$(CXX) $(CXXFLAGS) $(EXTRACXXFLAGS) $(INCDIRS) -o $@ $<
 
-all: obj_dir $(OBJ_DIR)/lib$(NAME).a
-
+all: obj_dir $(OBJ_DIR)/lib$(NAME).a $(PYTHON-BINDING)/$(NAME).so
 
 $(OBJ_DIR)/lib$(NAME).a: $(OBJ_FILE_LIST)
 	ar -rs $@ $?
+
+$(PYTHON-BINDING)/$(NAME).so: $(OBJ_DIR)/lib$(NAME).a
+	$(CXX) -shared -Wl,--whole-archive $? -Wl,--no-whole-archive -lboost_python -lboost_serialization -lboost_system -lboost_filesystem -L/usr/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) -o $@
 
 clean: purge
 	-rm -f *.[oad] 
@@ -119,6 +126,9 @@ help:
 obj_dir:
 	@if [ ! -d $(OBJ_DIR) ]; then \
 	    mkdir -p $(OBJ_DIR); \
+        fi; \
+	if [ ! -d $(PYTHON-BINDING) ]; then \
+	    mkdir -p $(PYTHON-BINDING); \
         fi; \
 
 include ${wildcard $(OBJ_DIR)/*.d}
