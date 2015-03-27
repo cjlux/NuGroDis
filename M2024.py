@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 ################################################################################################################################# 
 ##################################################       ALLOY 2024 DATA       ##################################################
 #################################################################################################################################  
 
 
-from nugrodis import Al 
+from nugrodis import Al
+import Utils
 #ALL CONCENTRATIONS MUST BE THOSE AFTER SOLUTIONIZING
 
 Cu={
@@ -23,12 +26,12 @@ GP={
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "solvusActivationEnergy":(36000,"J.mol^-1"), # DeltaHP1
-"molarVolume":(Al["molarVolume"][0]*SumOfCoefficients(GP["chemicalComposition"][0]),"m^3.mol^-1"), # volume of one mole of precipitates, Find attribute in class SSGrain
 "surfaceEnergyPolynomialModel":([0.044],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(0,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP
 "deltaCell":(1/100,"m.m^-1") , # difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate)
-"distorsionEnergy":(  (GP["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3" ) #elastic distorsion energy due to the difference of cell size.(was deltageP) 
 }
+GP["distorsionEnergy"] = ((GP["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3") #elastic distorsion energy due to the difference of cell size.(was deltageP) 
+GP["molarVolume"] = (Al["molarVolume"][0]*Utils.SumOfCoefficients(GP["chemicalComposition"][0]),"m^3.mol^-1") # volume of one mole of precipitates, Find attribute in class SSGrain
 
 Sprime={
 "chemicalComposition": ("Al2CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
@@ -41,9 +44,9 @@ Sprime={
 "surfaceEnergyPolynomialModel":([-0.10985+0.1,8.31E-4,-8.71E-7],"J.m^-2"), #  for example, if degree of polynom is 3 then we write:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(20,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP2
 "deltaCell":(1/100,"m.m^-1") , #difference between precipitate and solid solution cell size , was deltamailleP2
-"distorsionEnergy":(  (Sprime["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3" ), #elastic distorsion energy due to the difference of cell size.(was deltageP2)
 "wettingAngle":(30,"degree") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
 }
+Sprime["distorsionEnergy"] = ((Sprime["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3" ), #elastic distorsion energy due to the difference of cell size.(was deltageP2)
 
 
 VacanciesParam={

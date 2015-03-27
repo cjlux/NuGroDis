@@ -17,9 +17,16 @@
 class Quenching
 {
 public:
-  Quenching(double Tsol, double Tfinal, double coolingRate, double deltaT=1.);
+  Quenching(double Tsol, double Tfinal, double coolingRate, double deltaT = 1.);
   ~Quenching();
 
+  void Info() const;
+
+  double GetCoolingRate() const        { return coolingRate_; }
+  double GetTotIterationNumber() const { return totIterationNumber_; }
+  double GetFinalTemp() const          { return finalTemp_; }
+
+  void SetCoolingRate(double x) { assert(x > 0); coolingRate_ = x; }
   void SetTotIterationNumber(double);
 
 protected:

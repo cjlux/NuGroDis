@@ -12,12 +12,27 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#include <iostream>
+#include <cassert>
+
 #include "ThermoDynamicsConstant.hpp"
 
-ThermoDynamicsConstant::ThermoDynamicsConstant()
+ThermoDynamicsConstant::ThermoDynamicsConstant(double r, double k, double n)
+  : R_(r),
+    kB_(k),
+    Na_(n)
 {
 }
 
 ThermoDynamicsConstant::~ThermoDynamicsConstant()
 {
+}
+
+void
+ThermoDynamicsConstant::Info() const
+{
+  std::cout <<  "ThermoDynamicsConstant::Info" << std::endl;
+  std::cout <<  "      R: " << R_  << " SI unit" << std::endl;
+  std::cout <<  "     kB: " << kB_ << " SI unit" << std::endl;
+  std::cout <<  "     Na: " << Na_ << " SI unit" << std::endl;
 }

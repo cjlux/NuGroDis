@@ -16,20 +16,26 @@ class ThermoDynamicsConstant
 {
 
 public:
-    ThermoDynamicsConstant();
-    ~ThermoDynamicsConstant();
+  ThermoDynamicsConstant(double R, double kB, double Na);
+  ~ThermoDynamicsConstant();
+  
+  void Info() const;
 
+  double GetR()   const { return R_;  };
+  double Get_kB() const { return kB_; };
+  double GetNa()  const { return Na_; };
+  
 protected:
 
 private:
 
-    //Perfect gas constant. Unit: J/mol.K 
-    const double R_;
+  //Perfect gas constant. Unit: J/mol.K 
+  const double R_;
     
-    //Boltzman constant. Unit: J/K
-    const double kB_;
+  //Boltzman constant. Unit: J/K
+  const double kB_;
     
-    //Avogadro's number. Unit: at/mol
-    const double Na_;
+  //Avogadro's number. Unit: at/mol
+  const double Na_;
 
 };

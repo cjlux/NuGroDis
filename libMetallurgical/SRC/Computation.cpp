@@ -72,11 +72,3 @@ Computation::Run()
 }
 
 
-// Python Wrapper
-BOOST_PYTHON_MODULE(Metallurgical)
-{
-  boost::python::class_<Computation>("Computation", boost::python::init<>() )
-    .add_property("type", &Computation::GetType, &Computation::SetType)
-    .def("Run", &Computation::Run) 
-    ;
-}

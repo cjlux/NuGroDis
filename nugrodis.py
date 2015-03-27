@@ -1,9 +1,9 @@
 NuGroDisVersion="1.0"  
 
-ComputationParam={"Type": "Quenching>Hardening", "Material": "2024" } #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
-                                                                #Hardening=maturation or tempering
-
-
+ComputationParam={"Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
+                                                 #Hardening=maturation or tempering
+                  "Material": "M2024" } 
+                                                               
 ################################################################################################################################# 
 ##################################################      PHYSICAL DATA       #####################################################
 #################################################################################################################################  
@@ -38,7 +38,6 @@ Al["molarVolume"] = (PhysicalConstants["Na"][0]*Al["cellSize"][0]**3/Al["atomsPe
 #*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
 
 
-
 TemperatureParam ={ 
 "T0" : (20,"Celsius degree")#Initial temperature, [Celsius degree] 
 }
@@ -64,14 +63,12 @@ ThermalLoadingParam={
 }
 
 
-
 TimeParam ={
 
 }
 
 InitialGlobalData={
 }
-
 
 
 ################################################################################################################################# 
