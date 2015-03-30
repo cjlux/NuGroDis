@@ -22,6 +22,8 @@ public:
     
     ~Polynomial();
     
+    void Info() const;
+    
     //Gives P(x)
     void ComputeValue(double x);
 

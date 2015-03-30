@@ -9,7 +9,7 @@
 //                - Ivan IORDANOFF, I2M/ENSAM Talence France
 //                  <ivan.iordanoff@ensam.eu>
 //
-// Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
+// Copyright (C) 2014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
 #include "Precipitate.hpp"

@@ -29,6 +29,8 @@ public:
     //The destructor
     ~Sprime();
     
+    void Info() const;
+    
     //Compute the number of nucleation sites using  the Guinier-Preston RadiusDistribution::ComputeTotNbOfIte
     void ComputeNucleationSiteNb();
     

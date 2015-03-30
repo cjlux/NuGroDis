@@ -6,7 +6,8 @@
 			PythonBindings.cpp \
 			Quenching.cpp \
 			ThermalLoading.cpp \
-			ThermoDynamicsConstant.cpp
+			ThermoDynamicsConstant.cpp \
+			Vacancy.cpp
 
 
 .SUFFIXES:

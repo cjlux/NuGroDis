@@ -19,6 +19,7 @@ public:
     ChemicalComposition();
     ~ChemicalComposition();
     
+    void Info() const;
     void UpdateVolumicValues();
 
 

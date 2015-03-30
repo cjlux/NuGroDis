@@ -41,11 +41,12 @@ private:
   double deltaT_;
 };
 
+//Set totIterationNumber and use it to compute corrct values of deltaT, and timeStep_. Maybe, this part has TO BE REFINED
 inline void
 Quenching::SetTotIterationNumber(double tin)
 {
   // Preconditions:
-  assert(tin > 0);	// TODO : affiner 
+  assert(tin > 0);	// TODO : refine
 
   totIterationNumber_ = tin;
   deltaT_ = (solutionizingTemp_ - finalTemp_)/totIterationNumber_;

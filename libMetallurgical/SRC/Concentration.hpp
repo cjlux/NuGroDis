@@ -22,6 +22,9 @@ public:
      
     ~Concentration();
     
+    
+    void Info() const;
+    
     //Compute the atomic concentration from  current volumic value. 
     //Because current atomic concentration is not stored , it is computed using chemicalElement::ConvertVolumicToAtomicConcentration
     void ComputeAtomicValue();
@@ -41,6 +44,10 @@ public:
     
     //This method return the value of the volumic concentration
     double GetVolumicValue() const;
+    
+    double GetInitialAtomicValue() const;
+    
+    double GetInitialMassicValue() const;
 
 
 protected:
@@ -48,10 +55,10 @@ protected:
 private:
 
     //The initial atomic concentration of the chemical element. Unit: ratio in the range [0,1]
-    const double initialAtomicValue_; 
+    double initialAtomicValue_; 
     
     //The initial massic concentration of the chemical element. Unit: ratio in the range [0,1]
-    const double initialMassicValue_;
+    double initialMassicValue_;
     
     // new double[NbElements][NbElement] stoechiometricCoef_;
     
@@ -73,6 +80,18 @@ Concentration::SetInitialAtomicValue()
 inline void
 Concentration::SetVolumicValue()
 {
+}
+
+inline double
+Concentration::GetInitialAtomicValue() const
+{
+  return initialAtomicValue_;
+}
+
+inline double
+Concentration::GetInitialMassicValue() const
+{
+  return initialMassicValue_;
 }
 
 inline double

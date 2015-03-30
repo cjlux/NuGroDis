@@ -22,6 +22,8 @@ public:
 
     ~ThermalLoading();
     
+    void Info() const;
+    
     //Read the File giving the radius distribution of precipitates (NP1, NP2, ...
     void ReadDistributionFile(std::string);
     

@@ -21,6 +21,7 @@ public:
     ChemicalElement();
     ~ChemicalElement();
     
+    void Info() const;
     void ConvertMassicToVolumicConcentration()
     void ConvertVolumicToMassicConcentration()
     void ConvertAtomicToVolumicConcentration()

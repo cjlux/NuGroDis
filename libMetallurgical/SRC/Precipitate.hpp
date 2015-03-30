@@ -29,6 +29,8 @@ public:
     //the destructor
     ~Precipitate();
     
+    void Info() const;
+    
     //elastic distorsion energy due to the difference of cell size.(was deltageP) . unit: J/m^3
     double ComputeDistorsionEnergy();
     

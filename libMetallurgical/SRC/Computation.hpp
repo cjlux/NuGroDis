@@ -33,6 +33,8 @@ public:
   // Setters:
   void SetType(const std::string &);
   std::string GetType() const;
+  void SetMaxComputationTime(const double &); 
+  double GetMaxComputationTime() const;
   void SetRadiusDistribution(RadiusDistribution *);
   RadiusDistribution * GetRadiusDistribution() const;
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
@@ -70,3 +72,17 @@ Computation::GetType() const
 {
   return type_;
 }
+
+inline void
+Computation::SetMaxComputationTime(const double & maxCompTime) 
+{
+  maxComputationTime_= maxCompTime;
+}
+
+inline double
+Computation::GetMaxComputationTime() const
+{
+  return maxComputationTime_;
+}
+
+

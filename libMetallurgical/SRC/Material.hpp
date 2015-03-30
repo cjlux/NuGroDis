@@ -19,6 +19,8 @@ public:
     Material();
     ~Material();
 
+    void Info() const;
+    
     void ReadData(std::string dataFileName);
 
 protected:

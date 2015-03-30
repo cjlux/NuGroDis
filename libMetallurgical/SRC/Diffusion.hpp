@@ -19,6 +19,8 @@ public:
     Diffusion();
     ~Diffusion();
     
+    void Info() const;
+    
     //Computes the diffusion coefficient for the given value of the temperature . Unit: K
     void ComputeCoefValue();
 

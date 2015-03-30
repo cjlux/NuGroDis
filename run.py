@@ -6,7 +6,8 @@ sys.path.append("libMetallurgical/PythonB")
 
 from Metallurgical import Computation, \
                           Quenching, \
-                          ThermoDynamicsConstant 
+                          ThermoDynamicsConstant ,\
+                          Vacancy
                           
                               
 
@@ -26,9 +27,21 @@ print("  > Computation.type : ", c.type)
 # Create an object of type ThermoDynamicsConstant:
 thermoDynConst = ThermoDynamicsConstant(nugrodis.PhysicalConstants['R'][0],
                                         nugrodis.PhysicalConstants['kB'][0],
-                                        nugrodis.PhysicalConstants['Na'][0],)
+                                        nugrodis.PhysicalConstants['Na'][0])
 
 thermoDynConst.Info();
+
+# Create an object of type Vacancy:
+Vcy= Vacancy(nugrodis.VacanciesParam['deltaHF'][0],
+             nugrodis.VacanciesParam['deltaSF'][0],
+             nugrodis.VacanciesParam['deltaHM'][0],
+             nugrodis.VacanciesParam['fE'][0],
+             nugrodis.VacanciesParam['Dlac0'][0],
+             nugrodis.VacanciesParam['halfSinkD'][0], 
+             M2024.VacanciesParam['Tsol'][0],
+             nugrodis.VacanciesParam['EVacCu'][0],
+             nugrodis.VacanciesParam['EVacMg'][0])
+Vcy.Info();
 
 ComputationList = c.type.split(">")
 for computation in ComputationList:
@@ -40,7 +53,8 @@ for computation in ComputationList:
                               nugrodis.QuenchingParam["Tfinal"][0],
                               nugrodis.QuenchingParam["v"][0])
         Quenching.Info();
-    if computation is "Hardening":
+    if computation == "Hardening":
+        # Create on object of type Hardening:
         pass
     
 # some stuff.... for Moubarak !

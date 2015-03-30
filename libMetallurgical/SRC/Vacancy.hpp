@@ -24,11 +24,35 @@ public:
     
     ~Vacancy();
     
+    void Info() const;
+    
+    void SetHalfSinkDistance(const double &);
+    void SetJumpFrequency(const double &);
+    void SetVacCreationEnthalpy(const double &);
+    void SetVacCreationEntropy(const double &);
+    void SetConcentration(const double &);
+    void SetCopperVacInteractionEnergy(const double &);
+    void SetMagnesiumVacInteractionEnergy(const double &);
+    void SetMigrationEnthalpy(const double &);
+    void SetSolutionisingTemp(const double &);
+    void SetPreExpDiffusionValue(const double &);
+    
+    double GetHalfSinkDistance() const;
+    double GetJumpFrequency() const;
+    double GetVacCreationEnthalpy() const;
+    double GetVacCreationEntropy() const;
+    double GetConcentration() const;
+    double GetCopperVacInteractionEnergy() const;
+    double GetMagnesiumVacInteractionEnergy() const;
+    double GetMigrationEnthalpy() const;
+    double GetSolutionisingTemp() const;
+    double GetPreExpDiffusionValue() const;
+    
     //Compute and save equilibrium concentration of vacancies after solutionising. Was Xlacavtremp.  To do: check validity of the equation
     void ComputeConcentrationBeforeQuenching();
     
     //get equilibrium concentration of vacancies after solutionising.  was Xlacavtremp
-    double GetConcentrationBeforeQuenching();
+    double GetConcentrationBeforeQuenching() const ;
     
     //save the concentration (atomic fraction or molar fraction)  of vacancies at the end of the quenching. (was at the end of quenching, was Xlacfinmat). Unit: Vacancy nb/atoms nb
     void SaveQuenchingFinalConcentration(std::string);
@@ -42,57 +66,187 @@ public:
     // Compute and save the evolution of vacancies based on analytical solution of the differential equation 
     double SolveConcentrationEvolutionEquation();
     
-    void SetConcentrationBeforeQuenching(double);
+    void SetConcentrationBeforeQuenching(const double &);
     
-    //Set the vacancy concentration  value after hardening  (maturation or tempering). Set XlacFinmat
-    void SetConcentrationAfterHardening(double);
+    //Set the vacancy concentration  value after hardening  (maturation or tempering). Set XlacFinmat. Last Current value of concentration_ can be  Concentratrion  After hardening.
+    void SetConcentrationAfterHardening(double &);
 
 protected:
 
 private:
 
     //Free Energy(Was DeltaHF). Enthalpy of vacancy formation. Unit: J/mol
-    const double vacCreationEnthalpy_;
+    double vacCreationEnthalpy_;
     
     //Free Energy(Was DeltaSF). Entropy of vacancy formation. Unit: J/mol/K
-    const double vacCreationEntropy_;
+    double vacCreationEntropy_;
     
     //save current concentration value. Last Current value can be  Concentratrion  After hardening. 
     double concentration_;
     
     //The value of vacancies concentration before quenching (was Xlacavtrempe) .Unit: number of vacancies/m^3
-    const double concentrationBeforeQuenching_;
+    double concentrationBeforeQuenching_;
     
     //Semi Distance between vacancy sinks (was l) .Unit: m
-    const double halfSinkDistance_;
+    double halfSinkDistance_;
     
     //Frequency of vacancy's jumps (was fE). Unit: s^(-1)
-    const double jumpFrequency_;
+    double jumpFrequency_;
     
     
     //Preexponential term of vacancy diffusion expression(was Dlac0). Unit: m^2/s
-    const double preExpDiffusionValue_;
+    double preExpDiffusionValue_;
     
     //Interaction energy between magnesium and vacancies. Unit: J
-    const double magnesiumVacInteractionEnergy_;
+    double magnesiumVacInteractionEnergy_;
     
     //Enthalpy of vacancy migration (Was DeltaHM). Unit: J/mol
-    const double migrationEnthalpy_;
+    double migrationEnthalpy_;
     
     //Solutionising temperature: temperature at which the metal is heated before quenching (was Tf). Unit: K
-    const double solutionisingTemp_;
+    double solutionisingTemp_;
     
     //Interaction energy between copper and vacancies. Unit: J
-    const double copperVacInteractionEnergy_;
+    double copperVacInteractionEnergy_;
 
 };
 
+
+
 inline void
-Vacancy::SetConcentrationBeforeQuenching(double C)
+Vacancy::SetConcentrationAfterHardening(double &C)
 {
 }
 
+//Setters
 inline void
-Vacancy::SetConcentrationAfterHardening(double C)
+Vacancy::SetConcentrationBeforeQuenching(const double &cBQ)
 {
+  concentrationBeforeQuenching_=cBQ;
 }
+
+inline void
+Vacancy::SetHalfSinkDistance(const double &hSD)
+{
+  halfSinkDistance_=hSD;
+}
+
+inline void
+Vacancy::SetJumpFrequency(const double &jF)
+{
+  jumpFrequency_=jF;
+}
+
+inline void
+Vacancy::SetVacCreationEnthalpy(const double &vCEnthalpy)
+{
+  vacCreationEnthalpy_=vCEnthalpy;
+}
+
+inline void
+Vacancy::SetVacCreationEntropy(const double &vCEntropy)
+{
+  vacCreationEntropy_=vCEntropy;
+}
+
+inline void
+Vacancy::SetConcentration(const double &C)
+{
+  concentration_=C;
+}
+
+inline void
+Vacancy::SetCopperVacInteractionEnergy(const double &CuVIE)
+{
+ copperVacInteractionEnergy_= CuVIE;
+}
+
+inline void
+Vacancy::SetMagnesiumVacInteractionEnergy(const double &MgVIE)
+{
+ magnesiumVacInteractionEnergy_ =MgVIE;
+}
+
+inline void
+Vacancy::SetMigrationEnthalpy(const double &migrationEnth)
+{
+  migrationEnthalpy_=migrationEnth;
+}
+
+inline void
+Vacancy::SetSolutionisingTemp(const double &solT)
+{
+  solutionisingTemp_=solT;
+}
+
+inline void
+Vacancy::SetPreExpDiffusionValue(const double &pEDV)
+{
+ preExpDiffusionValue_ =pEDV;
+}
+
+
+
+//Getters
+inline double 
+Vacancy::GetHalfSinkDistance() const
+{
+  return halfSinkDistance_;
+}
+
+inline double 
+Vacancy::GetJumpFrequency() const
+{
+  return jumpFrequency_;
+}
+
+inline double 
+Vacancy::GetVacCreationEnthalpy() const
+{
+  return vacCreationEnthalpy_;
+}
+
+inline double 
+Vacancy::GetVacCreationEntropy() const
+{
+  return vacCreationEntropy_;
+}
+
+inline double 
+Vacancy::GetConcentration() const
+{
+  return concentration_;
+}
+
+inline double
+Vacancy::GetCopperVacInteractionEnergy() const
+{
+  return copperVacInteractionEnergy_;
+}
+
+inline double 
+Vacancy::GetSolutionisingTemp() const
+{
+  return solutionisingTemp_;
+}
+
+inline double 
+Vacancy::GetMigrationEnthalpy() const
+{
+  return migrationEnthalpy_;
+}
+
+inline double 
+Vacancy::GetMagnesiumVacInteractionEnergy() const
+{
+  return magnesiumVacInteractionEnergy_;
+}
+
+inline double 
+Vacancy::GetPreExpDiffusionValue() const
+{
+  return preExpDiffusionValue_;
+}
+
+
+

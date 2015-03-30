@@ -92,6 +92,9 @@ VacanciesParam={
 "fE": (10**13,"s^-1"), #Frequency of vacancy's jumps
 "halfSinkD": (30E-6,"m") #Semi-distance between vacancy sinks
 }
-VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2,Al["cellSize"][1]+"."+VacanciesParam["fE"][1]), #Preexponential term of vacancy diffusion expression
- # avant on avait: "Dlac0": (Al["cellSize"]**2,"m^2.s^-1")
+VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2, Al["cellSize"][1]+"."+VacanciesParam["fE"][1])# Preexponential term value of vacancy diffusion expression. 
+                                                                          # Once upon a time... (^_^)  : "Dlac0": (Al["cellSize"]**2,"m^2.s^-1")
+ #Unit of Preexponential term of vacancy diffusion expression.  
+                                                                            
+ 
 

@@ -21,6 +21,8 @@ public:
     SSGrain();
     ~SSGrain();
     
+    void Info() const;
+    
     //Compute the molar volume of (precipitates, solid solution,...).The result is written in molar volume[m^3/mol] (was VmP1,VmP2). Unit: m^3/mol
     void ComputeMolarVolume();
     

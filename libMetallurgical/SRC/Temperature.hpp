@@ -22,6 +22,8 @@ class Temperature
 public:
     Temperature();
     ~Temperature();
+    
+    void Info() const;
 
 protected:
 

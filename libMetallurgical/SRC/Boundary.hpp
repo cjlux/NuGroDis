@@ -18,6 +18,8 @@ class Boundary
 public:
     Boundary();
     ~Boundary();
+    
+    void Info() const;
 
 protected:
 
