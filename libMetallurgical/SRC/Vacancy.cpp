@@ -72,7 +72,7 @@ Vacancy::Info() const
 {
   std::cout <<  "############################ Vacancy::Info ############################" 	<< std::endl;
   std::cout <<  "                vacCreationEnthalpy : " << vacCreationEnthalpy_ << " SI unit" << std::endl;
-  std::cout <<  "      		  vacCreationEntropy : " << vacCreationEntropy_<< " SI unit" << std::endl;
+  std::cout <<  "                 vacCreationEntropy : " << vacCreationEntropy_<< " SI unit" << std::endl;
   std::cout <<  "                      concentration : " << concentration_ << " SI unit" << std::endl;
   std::cout <<  "       concentrationBeforeQuenching : " << concentrationBeforeQuenching_ << " SI unit" << std::endl;
   std::cout <<  "                   halfSinkDistance : " << halfSinkDistance_ << " SI unit" << std::endl;
