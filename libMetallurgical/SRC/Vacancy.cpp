@@ -27,7 +27,7 @@ Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double D
     solutionisingTemp_(Tf), 
     copperVacInteractionEnergy_(EVacCu)
 {
-  
+  std::cout <<  "Building object <Vacancy> " << std::endl;
 }
 
 Vacancy::~Vacancy()
@@ -70,15 +70,16 @@ Vacancy::SolveConcentrationEvolutionEquation()
 void
 Vacancy::Info() const
 {
-  std::cout <<  "############################ Vacancy::Info ############################" 	<< std::endl;
-  std::cout <<  "                vacCreationEnthalpy : " << vacCreationEnthalpy_ << " SI unit" << std::endl;
-  std::cout <<  "                 vacCreationEntropy : " << vacCreationEntropy_<< " SI unit" << std::endl;
-  std::cout <<  "                      concentration : " << concentration_ << " SI unit" << std::endl;
-  std::cout <<  "       concentrationBeforeQuenching : " << concentrationBeforeQuenching_ << " SI unit" << std::endl;
-  std::cout <<  "                   halfSinkDistance : " << halfSinkDistance_ << " SI unit" << std::endl;
-  std::cout <<  "                      jumpFrequency : " << jumpFrequency_ << " SI unit" << std::endl;
-  std::cout <<  "      magnesiumVacInteractionEnergy : " << magnesiumVacInteractionEnergy_ << " SI unit" << std::endl;
-  std::cout <<  "                  migrationEnthalpy : " << migrationEnthalpy_ << " SI unit" << std::endl;
-  std::cout <<  "                  solutionisingTemp : " << solutionisingTemp_ << " SI unit" << std::endl;
-  std::cout <<  "         copperVacInteractionEnergy : " << copperVacInteractionEnergy_ << " SI unit" << std::endl;
+  std::cout <<  "################################### Vacancy::Info ###################################" 	<< std::endl;
+  std::cout <<  "                        vacCreationEnthalpy: " << vacCreationEnthalpy_ << " SI unit" << std::endl;
+  std::cout <<  "                         vacCreationEntropy: " << vacCreationEntropy_<< " SI unit" << std::endl;
+  std::cout <<  "                              concentration: " << concentration_ << " SI unit" << std::endl;
+  std::cout <<  "               concentrationBeforeQuenching: " << concentrationBeforeQuenching_ << " SI unit" << std::endl;
+  std::cout <<  "                           halfSinkDistance: " << halfSinkDistance_ << " SI unit" << std::endl;
+  std::cout <<  "                              jumpFrequency: " << jumpFrequency_ << " SI unit" << std::endl;
+  std::cout <<  "              magnesiumVacInteractionEnergy: " << magnesiumVacInteractionEnergy_ << " SI unit" << std::endl;
+  std::cout <<  "                          migrationEnthalpy: " << migrationEnthalpy_ << " SI unit" << std::endl;
+  std::cout <<  "                          solutionisingTemp: " << solutionisingTemp_ << " SI unit" << std::endl;
+  std::cout <<  "                 copperVacInteractionEnergy: " << copperVacInteractionEnergy_ << " SI unit" << std::endl;
+  std::cout << std::endl;
 }

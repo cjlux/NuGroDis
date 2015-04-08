@@ -29,7 +29,7 @@ Computation::Computation()
     maxComputationTime_(0),
     type_("")
 {
-  std::cout << "Lancement du constructeur <Computation>" << std::endl;
+  std::cout << "Building Object <Computation>" << std::endl;
 
 }
 

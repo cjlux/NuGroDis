@@ -18,60 +18,85 @@ class RadiusDistribution
 {
 
 public:
+  
+  
+  //     |classItemsValues |value or item of class1|value or item of class2|        ...         |value or item of classN| 
+  //     |classNumbers     |        class1         |        class2         |        ...         |   classN=classNumber_ |
 
- //the constructor. Builds an instance with given parameters deltar and r1 (all the histogram values are initialized to 0)
- RadiusDistribution(double deltar, double r1);
+ //the constructor. Builds an instance with given parameters spatialStep deltar and minimum radius r1 (all the histogram values are initialized to 0)
+ RadiusDistribution(double deltar, double r1, double initialClassNb);
+ 
+ /*comment by MG: i think, we should have another constructor, to instantiate radiusDistribution read from a dataFile. This constructor will not take as argument a initialClassNumber,
+  *but will use dataFile to compute and initialize initialClassNumber_, etc    */
+ 
 
  //The destructor
  ~RadiusDistribution();
+ 
+ void Info() const;
 
- //Computes the total number of  items. Use to find nucleation site number
+ //Computes the total number(value) of items. Use to find nucleation site number
  void ComputeTotNbOfItems();
 
- //Return the item number for class i 
- int getItemNumberForClass();
+ //Return the item value for a  given class i 
+ int getItemValueForClass(int i);
 
  //An object of this class will be devoted to GP and will read the initial GP Distribution needed for Thermal Loading Computing only.
  void ReadInitialDistribution(std::string);
 
- //Set the item number for class i. 
- void SetItemNumberForClass(int i, int itemNumber);
+ //Set the item value for a given class i. 
+ void SetItemValueForClass(int i, int itemValue);
 
- //Gives values for all the item numbers. Values can be the same for all classes or a list of values
- void SetAllItemsNumbers(double *);
-
- //Set the number of distibution classes
+ //Set the number of distibution classes. /* comment by MG: I think, this method should only increment the number of class, NOT decrease the number of class */
  void SetClassNumber(int );
-
+ 
+ //Set values for all items. Values can be the same for all classes or a list of values. /*comment by MG: SetAllItemsNumbers can also be called SetItemsValues*/
+ void SetAllItemsValues(double *); 
+ 
+ 
+ double GetMinRadius() const { return minRadius_; };
+ int GetInitialClassNumber() const { return initialClassNumber_; }; 
+ double GetSpatialStep() const { return spatialStep_; };
+ double * GetItemsValues() { return itemsValues_; };//Gives values for all items. Values can be the same for all classes or a list of values
+ 
 protected:
 
 private:
 
-    //Values of the class distribution (was NP1).Initialise to 0 at construction. Unit: Number of precipitates /m^3
-    double * classValues_;
+    //Values of the class distribution (was NP1).Initialise to 0 at construction. (This attribute was previously named classValue)  Unit: Number of precipitates /m^3
+    double * itemsValues_; //or Values of all items:   itemsValues or classItemsValues ====>|value or item of class1|value or item of class2|  ...  |value or item of classN| <====
     
-    //number of class at the beginning of maturation or thermal loading. Unit: No unit.Number of classes
-    int initialClassNumber_;
+    //number of class at the beginning of hardening or thermal loading. Unit: No unit.Number of classes
+    int const initialClassNumber_; // comment by MG:  When a file radiusDistribution is read, we create a new object radiusDistribution, and the number of class of the read file radiusDistribution becomes
+                                   //                 the initialClassNumber of the new created object radiusDistribution.
+     
+    // int classNb_;  /* comment by MG: maybe this attribute is unuseful */
     
     //Value of the first class in the histogramme. Unit: m
-    double minRadius_;
+    double const minRadius_;
     
     //Spatial discretisation step. unit: m
-    double spatialStep_;
+    double const spatialStep_;
+    
+    
 
 };
 
+
 inline void
-RadiusDistribution::SetItemNumberForClass(int i, int itemNumber)
+RadiusDistribution::SetItemValueForClass(int i, int itemValue)
 {
 }
 
 inline void
-RadiusDistribution::SetAllItemsNumbers(double * NP1)
+RadiusDistribution::SetClassNumber(int n)  //Set the number of class in the distribution using itemsValues_  /* comment by MG: I think, this method should only increment the number of class, NOT decrease the number of class */
 {
 }
 
+//Setter
 inline void
-RadiusDistribution::SetClassNumber(int n)
+RadiusDistribution::SetAllItemsValues(double * NP1)//TO DO   /*comment by MG: SetAllItemsNumbers can also be called SetItemsValues*/
 {
+  // itemsValues_=...
 }
+

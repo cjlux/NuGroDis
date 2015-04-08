@@ -9,11 +9,15 @@ from nugrodis import Al
 import Utils
 #ALL CONCENTRATIONS MUST BE THOSE AFTER SOLUTIONIZING
 
+
+##################################################    Copper DATA       ##########################################################
+
 Cu={
 "initialConcentration": (1.22/100,"m^3.m^-3"), #Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic). Copper initial concentration, in range [0,1]
 "Q": (135000,"J.mol^-1"), #Activation energy of diffusion for copper
 "preExpDiffusionCoef": (6.5E-5,"m^2.s^-1") #initial diffusion value for copper, pre-exponential diffusion coeffcient
 }
+##################################################   Magnesium DATA     ##########################################################
 
 Mg={
 "initialConcentration": (2.08/100,"m^3.m^-3"),#Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic) . Magnesium initial concentration, in range [0,1]
@@ -21,6 +25,8 @@ Mg={
 "preExpDiffusionCoef": (1.2E-4,"m^2.s^-1") #initial diffusion value for magnesium, pre-exponential diffusion coeffcient
 }
 
+
+################################################## Guinier-Preston DATA ##########################################################
 GP={
 "chemicalComposition": ("Al8CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1
@@ -33,6 +39,7 @@ GP={
 GP["distorsionEnergy"] = ((GP["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3") #elastic distorsion energy due to the difference of cell size.(was deltageP) 
 GP["molarVolume"] = (Al["molarVolume"][0]*Utils.SumOfCoefficients(GP["chemicalComposition"][0]),"m^3.mol^-1") # volume of one mole of precipitates, Find attribute in class SSGrain
 
+##################################################    Sprime DATA     ##########################################################
 Sprime={
 "chemicalComposition": ("Al2CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "preExpTermForSolvus":(49.746,"m^6.m^-6"),  # was KP2
@@ -49,6 +56,13 @@ Sprime={
 Sprime["distorsionEnergy"] = ((Sprime["deltaCell"][0]**2)*(Al["youngModulus"][0]*10**6)/(1-Al["poissonCoef"][0]),"J.m^-3" ), #elastic distorsion energy due to the difference of cell size.(was deltageP2)
 
 
+################################################################################################################################# 
+####################################      solutionazing Temperature, VACANCIES PARAMETERS       #################################
+#################################################################################################################################
+
 VacanciesParam={
 "Tsol": (495,"°C") #solutionazingTemp=InitialQuenching Temperature, [°C]
 }
+
+#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
+#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~ 

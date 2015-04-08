@@ -11,11 +11,19 @@
 //
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
-
+#include <iostream>
+#include <string>
 #include "ChemicalElement.hpp"
 
-ChemicalElement::ChemicalElement()
+ChemicalElement::ChemicalElement(double density, double molarMass, double yModulus, double poissonCoef, std::string elementName)
+  :density_(density),
+   molarMass_(molarMass),
+   youngModulus_(yModulus),
+   poissonCoefficient_(poissonCoef),
+   elementName_(elementName)
 {
+  std::cout <<  "building an ChemicalElement Object <" << elementName_<<">" << std::endl;
+  std::cout <<  std::endl;
 }
 
 ChemicalElement::~ChemicalElement()
@@ -63,5 +71,17 @@ ChemicalElement::ConvertVolumicToAtomicConcentration()
 void
 ChemicalElement::ConvertStoechiometricCoefficient2VolumicConcentration()
 {
+}
+
+void
+ChemicalElement::Info() const
+{
+  std::cout <<  "#########################   ChemicalElement::Info ###########################"<< std::endl;
+  std::cout <<  "                        chemicalElementName: " << elementName_  << std::endl;
+  std::cout <<  "                                    density: " << density_  << " SI unit" << std::endl;
+  std::cout <<  "                                  molarMass: " << molarMass_ << " SI unit" << std::endl;
+  std::cout <<  "                               youngModulus: " << youngModulus_ << " SI unit" << std::endl;
+  std::cout <<  "                         poissonCoefficient: " << poissonCoefficient_ << " SI unit" << std::endl;
+  std::cout <<  std::endl;
 }
 

@@ -1,9 +1,13 @@
 #include <boost/python.hpp>
 
+#include <string>
 #include "ThermoDynamicsConstant.hpp"
 #include "Computation.hpp"
 #include "Quenching.hpp"
 #include "Vacancy.hpp"
+#include "RadiusDistribution.hpp"
+#include "Hardening.hpp"
+#include "ChemicalElement.hpp"
 
 // Python Wrapper
 BOOST_PYTHON_MODULE(Metallurgical)
@@ -29,7 +33,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("Info", &Quenching::Info)
     ;
     
-     boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, double, double >() )
+  boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, double, double >() )
     .add_property("vacCreationEnthalpy", &Vacancy::GetVacCreationEnthalpy, &Vacancy::SetVacCreationEnthalpy)
     .add_property("vacCreationEntropy", &Vacancy::GetVacCreationEntropy, &Vacancy::SetVacCreationEntropy)
     .add_property("migrationEnthalpy", &Vacancy::GetMigrationEnthalpy, &Vacancy::SetMigrationEnthalpy)
@@ -42,4 +46,27 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("Info", &Vacancy::Info)
     ;
     
+    
+  boost::python::class_<RadiusDistribution>("RadiusDistribution", boost::python::init<double, double, double >() )
+    .add_property("spatialStep", &RadiusDistribution::GetSpatialStep)
+    .add_property("minRadius", &RadiusDistribution::GetMinRadius)
+    .add_property("initialClassNumber", &RadiusDistribution::GetInitialClassNumber)
+    //.add_property("itemsValues", &RadiusDistribution::GetItemsValues, &RadiusDistribution::SetAllItemsValues) // itemsValues is a pointer PROBLEM
+    .def("Info", &RadiusDistribution::Info)
+    ;
+    
+  boost::python::class_<Hardening>("Hardening", boost::python::init<double, double >() )
+    .add_property("maxTimeStep", &Hardening::GetMaxTimeStep, &Hardening::SetMaxTimeStep)
+    .add_property("duration", &Hardening::GetDuration)
+    .def("Info", &Hardening::Info)
+    ;
+    
+  boost::python::class_<ChemicalElement>("ChemicalElement", boost::python::init<double, double, double, double, std::string >() )
+    .add_property("density", &ChemicalElement::GetDensity)
+    .add_property("poissonCoefficient", &ChemicalElement::GetPoissonCoefficient)
+    .add_property("youngModulus", &ChemicalElement::GetYoungModulus)
+    .add_property("molarMass", &ChemicalElement::GetMolarMass)
+    .add_property("elementName", &ChemicalElement::GetElementName)
+    .def("Info", &ChemicalElement::Info)
+    ;
 }

@@ -11,11 +11,16 @@
 //
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
-
+#include <iostream>
 #include "RadiusDistribution.hpp"
 
-RadiusDistribution::RadiusDistribution()
+RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialClassNb)
+  :itemsValues_(0),
+   initialClassNumber_(initialClassNb),
+   minRadius_(r1),
+   spatialStep_(deltar)
 {
+  std::cout <<  "Building object <RadiusDistribution> " << std::endl;
 }
 
 RadiusDistribution::~RadiusDistribution()
@@ -28,7 +33,7 @@ RadiusDistribution::ComputeTotNbOfItems()
 }
 
 int
-RadiusDistribution::getItemNumberForClass()
+RadiusDistribution::getItemValueForClass(int)
 {
 }
 
@@ -37,4 +42,14 @@ RadiusDistribution::ReadInitialDistribution(std::string dataFile)
 {
 }
 
+void
+RadiusDistribution::Info() const
+{
+  std::cout <<  "######################## RadiusDistribution::Info ######################" 	<< std::endl;
+  std::cout <<  "                                itemsValues: " <<itemsValues_ << " SI unit" << std::endl;
+  std::cout <<  "                         initialClassNumber: " << initialClassNumber_<< " SI unit" << std::endl;
+  std::cout <<  "                                  minRadius: " << minRadius_<< " SI unit" << std::endl;
+  std::cout <<  "                                spatialStep: " << spatialStep_<< " SI unit" << std::endl;
+  std::cout <<  "                                                                 " 	<< std::endl;
+}
 

@@ -17,21 +17,35 @@
 class Hardening
 {
 public:
-  Hardening();
+  Hardening(double hardeningDuration , double initialTimeStep);
   ~Hardening();
 
   std::string GetInfo();
   
-  //The maximum value allowed for any computed Time step. Also can be used as initial value for time step. (was deltati). Unit: s
-  double GetMinTimeStep();  
+  void Info() const;
+  
+  //compute and set the maximum value allowed for any computed Time step. This value is computed Unit: s
+  double ComputeTimeStep();
+  
+  double GetMaxTimeStep() const { return maxTimeStep_; };
+  double GetDuration()    const { return duration_;    }; 
+  
+  void SetMaxTimeStep(const double &maxTimeStep);
 
 protected:
 
 private:
 
-    //Maturation duration in second[s]. (was tmat). Unit: s    
-    double duration_;
+    //Hardening duration in second[s]. (was tmat). Unit: s    
+    double const duration_;
     
     //The maximum value allowed for any computed Time step. Also can be used as initial value for time step. (was deltati). Unit: s
     double maxTimeStep_;
 };
+
+inline void
+Hardening::SetMaxTimeStep(const double &maxTimeStep)
+{
+  maxTimeStep_=maxTimeStep;
+}
+

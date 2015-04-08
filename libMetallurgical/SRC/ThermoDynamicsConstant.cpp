@@ -22,6 +22,7 @@ ThermoDynamicsConstant::ThermoDynamicsConstant(double r, double k, double n)
     kB_(k),
     Na_(n)
 {
+  std::cout <<  "Building object <ThermoDynamicsConstant> " << std::endl;
 }
 
 ThermoDynamicsConstant::~ThermoDynamicsConstant()
@@ -31,8 +32,9 @@ ThermoDynamicsConstant::~ThermoDynamicsConstant()
 void
 ThermoDynamicsConstant::Info() const
 {
-  std::cout <<  "ThermoDynamicsConstant::Info" << std::endl;
-  std::cout <<  "      R: " << R_  << " SI unit" << std::endl;
-  std::cout <<  "     kB: " << kB_ << " SI unit" << std::endl;
-  std::cout <<  "     Na: " << Na_ << " SI unit" << std::endl;
+  std::cout <<  "#################### ThermoDynamicsConstant::Info #############################"<< std::endl;
+  std::cout <<  "                                          R: " << R_  << " SI unit" << std::endl;
+  std::cout <<  "                                         kB: " << kB_ << " SI unit" << std::endl;
+  std::cout <<  "                                         Na: " << Na_ << " SI unit" << std::endl;
+  std::cout <<  std::endl;
 }
