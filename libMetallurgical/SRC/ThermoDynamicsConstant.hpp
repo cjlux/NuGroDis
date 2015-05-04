@@ -12,6 +12,10 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __ThermoDynamicsConstant__hpp__
+#define __ThermoDynamicsConstant__hpp__
+
 class ThermoDynamicsConstant
 {
 
@@ -39,3 +43,5 @@ private:
   const double Na_;
 
 };
+
+#endif

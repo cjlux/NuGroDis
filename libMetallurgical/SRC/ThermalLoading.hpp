@@ -12,6 +12,9 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#ifndef __ThermalLoading__hpp__
+#define __ThermalLoading__hpp__
+
 #include <string>
 
 class ThermalLoading
@@ -33,6 +36,12 @@ public:
     
     //Read Vacancies concentration after hardening (maturation or tempering)
     void ReadVCAH(std::string);
+    
+    //Getter
+    double GetDuration() const {return duration_;};
+    
+    //Setter
+    void SetDuration(const double &duration);
 
 
 protected:
@@ -49,3 +58,11 @@ private:
     double * temperature_;
 
 };
+
+inline void
+ThermalLoading::SetDuration(const double &duration)
+{
+  duration_=duration;
+}
+
+#endif

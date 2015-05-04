@@ -1,15 +1,31 @@
 
                  NAME = Metallurgical
 
-	SRC_FILE_LIST = Computation.cpp \
-			ChemicalElement.cpp \
+	SRC_FILE_LIST = ChemicalComposition.cpp	\
+			ChemicalElement.cpp\
+			Concentration.cpp \
+			Computation.cpp \
+			Diffusion.cpp\
+			Grain.cpp\
+			GuinierPreston.cpp \
 			Hardening.cpp \
-			PythonBindings.cpp \
+			InterfacialConcentration.cpp\
+			Material.cpp \
+			Polynomial.cpp\
+			Precipitate.cpp\
 			Quenching.cpp \
+			RadiusDistribution.cpp \
+			Sprime.cpp \
+			SSGrain.cpp\
+			Temperature.cpp \
 			ThermalLoading.cpp \
 			ThermoDynamicsConstant.cpp \
-			Vacancy.cpp \
-			RadiusDistribution.cpp \
+			Vacancy.cpp\
+			PythonBindings.cpp
+			
+			
+
+#			PythonBindings.cpp \ Diffusion.cpp\ InterfacialConcentration.cpp\
 			
 
 

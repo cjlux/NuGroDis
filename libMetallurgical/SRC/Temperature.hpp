@@ -12,6 +12,12 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Temperature__hpp__
+#define __Temperature__hpp__
+
+#include <vector>
+
 //Class Temperature, defining the current temperature for computing, 
 //Can be an array of Value versus time
 //Unit: K
@@ -20,13 +26,26 @@ class Temperature
 {
 
 public:
-    Temperature();
+    Temperature(double T=293.15); //T=293.15 K,   Standard conditions for temperature and pressure
     ~Temperature();
     
     void Info() const;
 
+    //Getters
+    double GetCurrentTemp() const {return currentTemp_; };
+
+    std::vector<double> & GetTemperatureList() {return temperatureList_; };
+    const std::vector<double> & GetTemperatureList() const {return temperatureList_; };
+    
+    //Setters
+    void SetCurrentTemp(double temp);
+   
 protected:
 
 private:
-
+  double currentTemp_;
+  std::vector<double> temperatureList_;
 };
+
+
+#endif

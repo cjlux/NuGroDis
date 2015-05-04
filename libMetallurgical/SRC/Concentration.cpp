@@ -11,10 +11,19 @@
 //
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
+#include <iostream>
 
 #include "Concentration.hpp"
 
-Concentration::Concentration()
+#include "ChemicalElement.hpp"
+#include "ChemicalComposition.hpp"
+
+Concentration::Concentration(const ChemicalElement& elem,const ChemicalComposition& CC)
+  :chemicalElement_(elem),
+   chemicalComposition_(CC),
+   volumicValue_(-1),
+   initialAtomicValue_(-1),
+   initialMassicValue_(-1)
 {
 }
 
@@ -31,4 +40,16 @@ Concentration::ComputeAtomicValue()
 void
 Concentration::ComputeMassicValue()
 {
+}
+
+void
+Concentration::Info() const
+{
+  std::cout <<  "################################# Concentration::Info #################################" 	<< std::endl;
+  std::cout <<  "                                   volumicValue: " << volumicValue_  << " SI unit" << std::endl;
+  std::cout <<  "                             initialAtomicValue: " << initialAtomicValue_ << " SI unit" << std::endl;
+  std::cout <<  "                             initialMassicValue: " << initialMassicValue_ << " SI unit" << std::endl;
+  //std::cout <<  "                            chemicalComposition: " << chemicalComposition_ << " SI unit" << std::endl;
+  //std::cout <<  "                                chemicalElement: " << chemicalElement_ << " SI unit" << std::endl;
+  std::cout <<  std::endl;
 }

@@ -12,7 +12,19 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __RadiusDistribution__hpp__
+#define __RadiusDistribution__hpp__
+
+
 #include <string>
+#include <vector>
+
+class Precipitate;
+class ChemicalElement;
+class InterfacialConcentration;
+
+
 
 class RadiusDistribution
 {
@@ -23,8 +35,12 @@ public:
   //     |classItemsValues |value or item of class1|value or item of class2|        ...         |value or item of classN| 
   //     |classNumbers     |        class1         |        class2         |        ...         |   classN=classNumber_ |
 
- //the constructor. Builds an instance with given parameters spatialStep deltar and minimum radius r1 (all the histogram values are initialized to 0)
- RadiusDistribution(double deltar, double r1, double initialClassNb);
+ //CONSTRUCTOR. Builds an instance with given parameters spatialStep deltar and minimum radius r1 (all the histogram values are initialized to 0)
+ RadiusDistribution(double deltar, double r1, double initialClassNb, Precipitate& );
+ 
+ //CONSTRUCTOR of RD which does not have any precipitate //initial RD
+ RadiusDistribution(double deltar, double r1, double initialClassNb); 
+ 
  
  /*comment by MG: i think, we should have another constructor, to instantiate radiusDistribution read from a dataFile. This constructor will not take as argument a initialClassNumber,
   *but will use dataFile to compute and initialize initialClassNumber_, etc    */
@@ -59,6 +75,16 @@ public:
  double GetSpatialStep() const { return spatialStep_; };
  double * GetItemsValues() { return itemsValues_; };//Gives values for all items. Values can be the same for all classes or a list of values
  
+ 
+ //RELATIONS
+ //getter
+ std::vector<ChemicalElement *> GetChemicalElementList() const {return chemicalElementList_;};
+ std::vector<InterfacialConcentration *> GetInterfConcentrationObjectList() const {return interfConcentrationObjectList_;};
+ //Setter
+ //IMPORTANT: for  chemicalElementList_ AND interfConcentrationObjectList_ , setters are not needed.  The push_back's are made in other class
+ 
+ 
+ 
 protected:
 
 private:
@@ -74,9 +100,19 @@ private:
     
     //Value of the first class in the histogramme. Unit: m
     double const minRadius_;
-    
+     
     //Spatial discretisation step. unit: m
     double const spatialStep_;
+    
+    
+    Precipitate * precipitate_;// A radius distribution belongs to 0 or one precipitate
+    
+    std::vector<ChemicalElement *> chemicalElementList_;
+    std::vector<InterfacialConcentration *> interfConcentrationObjectList_;
+    
+
+private:
+    void InitializeInterfConc(); //Process Precipitates chemical compo and data, and create interfacialConcentrationObjects associated to each chemicalElement
     
     
 
@@ -100,3 +136,4 @@ RadiusDistribution::SetAllItemsValues(double * NP1)//TO DO   /*comment by MG: Se
   // itemsValues_=...
 }
 
+#endif

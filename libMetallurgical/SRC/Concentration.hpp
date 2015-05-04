@@ -12,13 +12,19 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#ifndef __Concentration__hpp__
+#define __Concentration__hpp__
+
+class ChemicalElement;
+class ChemicalComposition;
+
 class Concentration
 {
 
 public:
 
     //The conctructor, taking as optional argument the initial  volumic concentration value
-    Concentration();
+    Concentration(const ChemicalElement&,const ChemicalComposition& );
      
     ~Concentration();
     
@@ -48,11 +54,24 @@ public:
     double GetInitialAtomicValue() const;
     
     double GetInitialMassicValue() const;
+    
+    //RELATIONS
+    //getter
+    const ChemicalElement& GetChemicalElement() {return chemicalElement_; };
+    const ChemicalComposition& GetChemicalComposition() {return chemicalComposition_;};
 
 
 protected:
 
 private:
+  
+     //Relations
+    const ChemicalElement & chemicalElement_;
+    const ChemicalComposition & chemicalComposition_;
+    
+    
+     //value of the current volumic concentration of the chemical element. Unit : ratio in the range[ 0, 1]. May be computed from massic concentration....
+    double volumicValue_;
 
     //The initial atomic concentration of the chemical element. Unit: ratio in the range [0,1]
     double initialAtomicValue_; 
@@ -60,10 +79,14 @@ private:
     //The initial massic concentration of the chemical element. Unit: ratio in the range [0,1]
     double initialMassicValue_;
     
-    // new double[NbElements][NbElement] stoechiometricCoef_;
+    //TODO new double[NbElements][NbElement] stoechiometricCoef_;
     
-    //value of the current volumic concentration of the chemical element. Unit : ratio in the range[ 0, 1]. May be computed from massic concentration....
-    double volumicValue_;
+    //TODO double equilibriumConcentration_;  //Equilibrium concentration between the solid solution and a planar precipitate.(volumic %)
+				              //Depends on temperature
+					      //Symbol : X_eq_Cu_SS, X_eq_Mg_SS...
+					      //Unit : volumic percentage
+    
+ 
 
 };
 
@@ -97,4 +120,7 @@ Concentration::GetInitialMassicValue() const
 inline double
 Concentration::GetVolumicValue() const
 {
+  return 0;
 }
+
+#endif

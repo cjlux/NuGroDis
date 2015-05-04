@@ -12,12 +12,36 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#include <cassert>
+#include <iostream>
+
 #include "Temperature.hpp"
 
-Temperature::Temperature()
+Temperature::Temperature(double T) //T=293.15 K,   Standard conditions for temperature and pressure (STP)
+  : currentTemp_(T),
+    temperatureList_()
 {
+  assert(currentTemp_ > 0);
+  temperatureList_.push_back(currentTemp_);
 }
 
 Temperature::~Temperature()
 {
+}
+
+void
+Temperature::SetCurrentTemp(const double temp)
+{
+  assert(temp >= 0) ; // unit is Kelvin, 
+  currentTemp_ = temp;
+  temperatureList_.push_back(currentTemp_);
+}
+
+void
+Temperature::Info() const
+{
+
+  std::cout <<  "#########################   Temperature::Info ###########################"<< std::endl;
+  std::cout <<  "                            currentTemp: " << currentTemp_ <<"SI unit" << std::endl;
+   std::cout <<  std::endl;
 }

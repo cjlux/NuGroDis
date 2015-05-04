@@ -12,7 +12,15 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Vacancy__hpp__
+#define __Vacancy__hpp__
+
 #include <string>
+#include <vector>
+
+class Material; 
+class ChemicalElement;
 
 class Vacancy
 {
@@ -20,7 +28,7 @@ class Vacancy
 public:
 
     //The constructor
-    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf,double EVacCu,double EVacMg);
+    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat);
     
     ~Vacancy();
     
@@ -31,8 +39,6 @@ public:
     void SetVacCreationEnthalpy(const double &);
     void SetVacCreationEntropy(const double &);
     void SetConcentration(const double &);
-    void SetCopperVacInteractionEnergy(const double &);
-    void SetMagnesiumVacInteractionEnergy(const double &);
     void SetMigrationEnthalpy(const double &);
     void SetSolutionisingTemp(const double &);
     void SetPreExpDiffusionValue(const double &);
@@ -42,8 +48,6 @@ public:
     double GetVacCreationEnthalpy() const;
     double GetVacCreationEntropy() const;
     double GetConcentration() const;
-    double GetCopperVacInteractionEnergy() const;
-    double GetMagnesiumVacInteractionEnergy() const;
     double GetMigrationEnthalpy() const;
     double GetSolutionisingTemp() const;
     double GetPreExpDiffusionValue() const;
@@ -70,44 +74,45 @@ public:
     
     //Set the vacancy concentration  value after hardening  (maturation or tempering). Set XlacFinmat. Last Current value of concentration_ can be  Concentratrion  After hardening.
     void SetConcentrationAfterHardening(double &);
-
+    
+    
+    
+    
+   //RELATIONS
+   //getter
+   const Material& GetMaterial() const {return material_;};
+   std::vector<const ChemicalElement*> GetSoluteInteractingWithVacList() const {return soluteInteractingWithVacList_;};
+   //setter
+   void AddInteractingSolute(const ChemicalElement& solute);
+   
+   
 protected:
 
 private:
 
     //Free Energy(Was DeltaHF). Enthalpy of vacancy formation. Unit: J/mol
     double vacCreationEnthalpy_;
-    
     //Free Energy(Was DeltaSF). Entropy of vacancy formation. Unit: J/mol/K
     double vacCreationEntropy_;
-    
     //save current concentration value. Last Current value can be  Concentratrion  After hardening. 
     double concentration_;
-    
     //The value of vacancies concentration before quenching (was Xlacavtrempe) .Unit: number of vacancies/m^3
     double concentrationBeforeQuenching_;
-    
     //Semi Distance between vacancy sinks (was l) .Unit: m
     double halfSinkDistance_;
-    
     //Frequency of vacancy's jumps (was fE). Unit: s^(-1)
     double jumpFrequency_;
-    
-    
     //Preexponential term of vacancy diffusion expression(was Dlac0). Unit: m^2/s
     double preExpDiffusionValue_;
-    
-    //Interaction energy between magnesium and vacancies. Unit: J
-    double magnesiumVacInteractionEnergy_;
-    
     //Enthalpy of vacancy migration (Was DeltaHM). Unit: J/mol
     double migrationEnthalpy_;
-    
     //Solutionising temperature: temperature at which the metal is heated before quenching (was Tf). Unit: K
     double solutionisingTemp_;
     
-    //Interaction energy between copper and vacancies. Unit: J
-    double copperVacInteractionEnergy_;
+    
+    //RELATIONS
+    const Material& material_;
+    std::vector<const ChemicalElement*> soluteInteractingWithVacList_;
 
 };
 
@@ -155,17 +160,7 @@ Vacancy::SetConcentration(const double &C)
   concentration_=C;
 }
 
-inline void
-Vacancy::SetCopperVacInteractionEnergy(const double &CuVIE)
-{
- copperVacInteractionEnergy_= CuVIE;
-}
 
-inline void
-Vacancy::SetMagnesiumVacInteractionEnergy(const double &MgVIE)
-{
- magnesiumVacInteractionEnergy_ =MgVIE;
-}
 
 inline void
 Vacancy::SetMigrationEnthalpy(const double &migrationEnth)
@@ -218,11 +213,6 @@ Vacancy::GetConcentration() const
   return concentration_;
 }
 
-inline double
-Vacancy::GetCopperVacInteractionEnergy() const
-{
-  return copperVacInteractionEnergy_;
-}
 
 inline double 
 Vacancy::GetSolutionisingTemp() const
@@ -237,16 +227,19 @@ Vacancy::GetMigrationEnthalpy() const
 }
 
 inline double 
-Vacancy::GetMagnesiumVacInteractionEnergy() const
-{
-  return magnesiumVacInteractionEnergy_;
-}
-
-inline double 
 Vacancy::GetPreExpDiffusionValue() const
 {
   return preExpDiffusionValue_;
 }
 
 
+//RELATIONS
+//Setter
+inline void 
+Vacancy::AddInteractingSolute(const ChemicalElement& solute)
+{
+  soluteInteractingWithVacList_.push_back(&solute);
+}
+
+#endif
 

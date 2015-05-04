@@ -2,7 +2,9 @@
 import os
 
 
-globalSaveDirectory="/home/mgado/diskBasile/phd/PJE9-2014/NuGroDis/libMetallurgical/";
+globalSaveDirectory="/home/users/mgado/phd/biblio/Git/NuGroDis/libMetallurgical/";
+#/home/mgado/diskBasile/phd/PJE9-2014/NuGroDis/libMetallurgical/
+
 
 #Read classNames text file
 listeDesClasses=open(globalSaveDirectory+'listeDesClasses.txt');

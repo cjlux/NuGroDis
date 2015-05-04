@@ -14,8 +14,11 @@
 
 #include "Sprime.hpp"
 
-Sprime::Sprime()
-{
+Sprime::Sprime(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD,double wetA)
+  :Precipitate(mat,CC,initialRD),
+   wettingAngle_(wetA),
+   Stheta_(-1)
+{  
 }
 
 Sprime::~Sprime()
@@ -37,8 +40,4 @@ Sprime::ReadDataValue(std::string dataFile)
 {
 }
 
-void
-Sprime::WettingFunction()
-{
-}
 

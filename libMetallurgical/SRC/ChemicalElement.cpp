@@ -11,18 +11,34 @@
 //
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
+
 #include <iostream>
 #include <string>
-#include "ChemicalElement.hpp"
+#include <cassert>
 
-ChemicalElement::ChemicalElement(double density, double molarMass, double yModulus, double poissonCoef, std::string elementName)
+#include "ChemicalElement.hpp"
+#include "Concentration.hpp"
+#include "ChemicalComposition.hpp"
+
+
+//CONSTRUCTOR
+//build ChemicalElement which has no diffusion parameters, but only mechanical, physical and crystallographic param 
+ChemicalElement::ChemicalElement(double density, 
+				 double molarMass, 
+				 double YModulus, 
+				 double PoissonCoef, 
+				 std::string elementName,
+				 double latticeParameter)
   :density_(density),
    molarMass_(molarMass),
-   youngModulus_(yModulus),
-   poissonCoefficient_(poissonCoef),
-   elementName_(elementName)
+   YoungModulus_(YModulus),
+   PoissonCoefficient_(PoissonCoef),
+   latticeParameter_(latticeParameter),
+   elementName_(elementName),
+   chemicalCompositionList_(),
+   diffusion_(0)
 {
-  std::cout <<  "building an ChemicalElement Object <" << elementName_<<">" << std::endl;
+  std::cout <<  "building an ChemicalElement Object <" << elementName_<<"> which has no diffusion parameters" << std::endl;
   std::cout <<  std::endl;
 }
 
@@ -30,47 +46,43 @@ ChemicalElement::~ChemicalElement()
 {
 }
 
-double 
-ChemicalElement::ComputeInterFacialConcentration(double diameter, double temperature)
+void ChemicalElement::EnterInChemicalComposition(ChemicalComposition& compo)
 {
-    // Preconsitions
-    assert(diameter >0 && temperature > 0);
-    
-    //....
-    
-    
-    // Check:
-    //assert( quelquechose dont je suis certain)
-    
-    // Postconditions
-    assert(interFacialConcentration_ > 0);
-    
-    return interFacialConcentration_;
+  //Enter a CE to chemicalCompositionList
+  Concentration* concentration  = new Concentration(*this, compo);
+  compo.AddChemicalElements(*this, *concentration);
+  chemicalCompositionList_.push_back(& compo);
+}
+
+
+void
+ChemicalElement::ConvertMassicToVolumicConcentration(ChemicalComposition& CC)
+{
+  //TODO assert if CC is in chemicalCompositionList_. If not, abandon 
 }
 
 void
-ChemicalElement::ConvertMassicToVolumicConcentration()
+ChemicalElement::ConvertVolumicToMassicConcentration(ChemicalComposition& CC)
 {
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
 }
 
 void
-ChemicalElement::ConvertVolumicToMassicConcentration()
+ChemicalElement::ConvertAtomicToVolumicConcentration(ChemicalComposition& CC)
 {
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
 }
 
 void
-ChemicalElement::ConvertAtomicToVolumicConcentration()
+ChemicalElement::ConvertVolumicToAtomicConcentration(ChemicalComposition& CC)
 {
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
 }
 
 void
-ChemicalElement::ConvertVolumicToAtomicConcentration()
+ChemicalElement::ConvertStoechiometricCoefficient2VolumicConcentration(ChemicalComposition& CC)
 {
-}
-
-void
-ChemicalElement::ConvertStoechiometricCoefficient2VolumicConcentration()
-{
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
 }
 
 void
@@ -80,8 +92,10 @@ ChemicalElement::Info() const
   std::cout <<  "                        chemicalElementName: " << elementName_  << std::endl;
   std::cout <<  "                                    density: " << density_  << " SI unit" << std::endl;
   std::cout <<  "                                  molarMass: " << molarMass_ << " SI unit" << std::endl;
-  std::cout <<  "                               youngModulus: " << youngModulus_ << " SI unit" << std::endl;
-  std::cout <<  "                         poissonCoefficient: " << poissonCoefficient_ << " SI unit" << std::endl;
+  std::cout <<  "                               youngModulus: " << YoungModulus_ << " SI unit" << std::endl;
+  std::cout <<  "                         poissonCoefficient: " << PoissonCoefficient_ << " SI unit" << std::endl;
+  //  std::cout <<  "                    compositionChimiqueList: " << chemicalCompositionList_ << " SI unit" << std::endl;
   std::cout <<  std::endl;
+  
 }
 

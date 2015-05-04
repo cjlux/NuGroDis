@@ -12,6 +12,10 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Hardening__hpp__
+#define __Hardening__hpp__
+
 #include <string>
 
 class Hardening
@@ -49,3 +53,4 @@ Hardening::SetMaxTimeStep(const double &maxTimeStep)
   maxTimeStep_=maxTimeStep;
 }
 
+#endif

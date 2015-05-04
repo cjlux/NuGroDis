@@ -4,78 +4,106 @@ from __future__ import division, print_function
 import sys
 sys.path.append("libMetallurgical/PythonB")
 
-from Metallurgical import Computation, \
-                          Quenching, \
-                          ThermoDynamicsConstant , \
-                          Vacancy, \
-                          RadiusDistribution, \
-                          Hardening, \
-                          ChemicalElement
+#Bindings
+from Metallurgical import Quenching,\
+                                             Computation,\
+                                             ThermoDynamicsConstant , \
+                                             Vacancy, \
+                                             RadiusDistribution, \
+                                             Hardening, \
+                                             ChemicalElement
                           
                               
 
-# We execute le file Nugrodis.py:
-import nugrodis, Mendeleiev
+# execute file Nugrodis.py:
+import nugrodis
+from MetalUtils.Mendeleiev import PyChemicalElement, PyChemicalComposition #import python Class:  PyChemicalElement, PyChemicalComposition from module MetalUtils
+from MetalUtils.Grain import PyPrecipitate #import python Class: PyPrecipitate module MetalUtils
+from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict #import Physical constants data dictionary from module MetalUtils
+
+print (" ____________________________________________________________________ ")
+print(" |                                                            \    /_ | _ _ ._ _  _  _|_ _                        |") 
+print(" |                                                             \/\/(/_|(_(_)| | |(/_  |_(_)                      |")
+print(" |                                                                         __              __                          |") 
+print(" |                                                               |\ |     |  __  __   __  |  \      _              |")
+print(" |                                                               | \| |_| |__|  |    |__| |_ /  |  /_\           |")
+print ("|___________________________________________________________________   |")
 
 
-# Create on object of type Computation:
+print ("|####################################################################################################|")
+print ("|######################################  WELCOME TO NUGRODIS #########################################|")
+print ("|####################################################################################################|")
+
+
+
+# Create a C++ object of type Computation:
 c = Computation()
 c.type = nugrodis.ComputationParam["Type"]
 
 material = nugrodis.ComputationParam["Material"]
-print("  > importing module",material)
-exec "import "+material
+print("  > importing module                 :",material)
+exec "import "+material #importing module material given by user
+exec 'L = dir('+material+')' #import  L=directory of module material
 
-print("  > Computation.type : ", c.type)
+print("  > material read is                 :",material)
 
-# Create an object of type ThermoDynamicsConstant:
-thermoDynConst = ThermoDynamicsConstant(nugrodis.PhysicalConstants['R'][0],
-                                        nugrodis.PhysicalConstants['kB'][0],
-                                        nugrodis.PhysicalConstants['Na'][0])
+#Reading initial alloy compo
+exec "AlloyInitialComposition="+material+".AlloyInitialComposition" 
+print("  > Alloy composition read is        :", AlloyInitialComposition)
 
+#Find main element of Alloy
+maxConcentrationValue=max(AlloyInitialComposition.values());
+for key,value in AlloyInitialComposition.items():
+    if value==maxConcentrationValue:
+        mainEl=key #mainEl is the main Chemical element of alloy
+        print("  > Alloy main chemical element is   : "+mainEl)
+
+PD={} #a dictionary of precipitates Names as keys with their precipitates python Objects associated. {"precipitate Name": precipitatePyObject}
+#Read Precipitate dictionaries in Module material 
+for e in L: 
+    if e[0] is not '_':
+        exec 'E = '+material+'.'+e
+        if type(E)==dict :
+            nature = E.get('nature', None)
+            if nature is 'Precipitate':
+                print("  > Found Precipitate dico <{:s}> : {:s}".format(e,E))
+                #Build python objects PyPrecipitates according to read dictionnaries
+                PD[e]=PyPrecipitate(E,mainEl) #{"precipitate Name": precipitatePyObject}
+          
+
+#type of the computation: Q 
+print("  > Computation.type                 :", c.type)
+
+# Create a C++ object of type ThermoDynamicsConstant:
+thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
+                                        PhysicalConstantsDict['kB'][0],
+                                        PhysicalConstantsDict['Na'][0])
 thermoDynConst.Info();
 
 #Build the Mendeleiv table
-Mendeleiev.PyChemicalElement.init()
+PyChemicalElement.initFromElementsData()
+ED = PyChemicalElement.GetElementsDict() #a dictionary of chemichal Elements Names as keys with their chemicalElement python Objects associated. {"chemichal Elements Name": chemicalElementPyObject}
 
-#Read Chemical Composition of precipitates which will be involved in the computation
-print("Read Chemical Composition of precipitates which will be involved during the computation")
-    #Read GBP chemical composition
-GP_chemicalC=Mendeleiev.PyChemicalComposition(M2024.GP['chemicalComposition'][0])
-print(GP_chemicalC)
-    #Read Sprime chemical composition
-Sprime_chemicalC=Mendeleiev.PyChemicalComposition(M2024.Sprime['chemicalComposition'][0])
-print(Sprime_chemicalC)
+#A list of chemical elements involded in the computation using chemical Elements read in AlloyInitialComposition dictionary from Module material
+#AlloyInitialComposition.keys() gives the list of chemical elements involded in the computation
+ConcernedPyChemicalElements=[] #a list which will contains python objects of type chemicalElements according to chemical elements involved in the computation
+for symbol in AlloyInitialComposition.keys():
+    ConcernedPyChemicalElements.append(ED[symbol])
 
+#Create C++ objects of type ChemicalElement using Mendeleiv.py
+CppElementsDict={}#a dictionary of chemichal Elements Names as keys with their C++ Objects associated. {"chemichal Element Name": chemicalElementC++Object}
+for pyElement in ConcernedPyChemicalElements:
+    CppElement=pyElement.symbol #Name of C++ chemical Element will be the symbol of the element. Just to be more understandable
+    #Building a C++ objects of type chemicalElement
+    exec (CppElement+"=ChemicalElement( pyElement.density,\
+                                        pyElement.molarMass,\
+                                        pyElement.YoungModulus,\
+                                        pyElement.PoissonCoeff,\
+                                        pyElement.symbol)")
+    exec 'CppElementsDict[pyElement.symbol]='+CppElement
+    exec CppElement+".Info()"
+print("  > C++ Elements Dictionary = ",CppElementsDict)
 
-#Create C++ objects of type chemicalElement: new Method using Mendeleiv.py (using JLC's Mendeleiev.py )
-ConcernedChemicalElements=list(set(GP_chemicalC.composition.keys()) | set(Sprime_chemicalC.composition.keys())) #a list of chemical elements involded in the computation  = {GP} U {Sprime} - { {GP}  inter {Sprime}}
-for chemicalElementName in ConcernedChemicalElements:
-    chemicalElementObjectName=chemicalElementName #Just to be more understandable
-    exec (chemicalElementObjectName+"=ChemicalElement(nugrodis.ChemicalElementsData[chemicalElementName]['density'][0],\
-                                        nugrodis.ChemicalElementsData[chemicalElementName]['molarMass'][0],\
-                                        nugrodis.ChemicalElementsData[chemicalElementName]['youngModulus'][0],\
-                                        nugrodis.ChemicalElementsData[chemicalElementName]['poissonCoef'][0],\
-                                        chemicalElementName)")
-    exec(chemicalElementObjectName+".Info()")
-
-###Create C++ objects of type chemicalElement: old Method (by MG)
-##NamesOfObjectChemEl=[]
-##for key in nugrodis.ChemicalElementsData.keys():
-##    chemicalElementName=key 
-##    chemicalElementObjectName=chemicalElementName #Just to be more understandable
-##    exec (chemicalElementObjectName+"=ChemicalElement(nugrodis.ChemicalElementsData[chemicalElementName]['density'][0],\
-##                                        nugrodis.ChemicalElementsData[chemicalElementName]['molarMass'][0],\
-##                                        nugrodis.ChemicalElementsData[chemicalElementName]['youngModulus'][0],\
-##                                        nugrodis.ChemicalElementsData[chemicalElementName]['poissonCoef'][0],\
-##                                        chemicalElementName)")
-##    exec(chemicalElementObjectName+".Info()")
-
-
-                                        
-                                        
-    
-    
 
 # Create an object type Vacancy:
 Vacancy= Vacancy(nugrodis.VacanciesParam['deltaHF'][0],

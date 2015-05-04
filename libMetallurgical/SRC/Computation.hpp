@@ -12,6 +12,9 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#ifndef __Computation__hpp__
+#define __Computation__hpp__
+
 #include <string>
 
 // Forward declarations, avoid including...
@@ -86,3 +89,4 @@ Computation::GetMaxComputationTime() const
 }
 
 
+#endif

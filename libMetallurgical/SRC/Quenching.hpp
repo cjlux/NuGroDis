@@ -12,6 +12,10 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Quenching__hpp__
+#define __Quenching__hpp__
+
 #include <cassert>
 
 class Quenching
@@ -22,19 +26,24 @@ public:
 
   void Info() const;
 
+  //Getters
   double GetCoolingRate() const        { return coolingRate_; }
   double GetTotIterationNumber() const { return totIterationNumber_; }
   double GetFinalTemp() const          { return finalTemp_; }
+  double GetDuration() const           { return duration_;}
+  double GetTimeStep() const           { return timeStep_;}
+  double GetDeltaT() const             { return deltaT_;}
+  double GetSolutionizingTemp() const  { return solutionizingTemp_;}
 
-  void SetCoolingRate(double x) { assert(x > 0); coolingRate_ = x; }
-  void SetTotIterationNumber(double);
+  //Setters
+  void SetTotIterationNumber(double tin);//Set totIterationNumber_  and compute timeStep_ and deltaT_ 
 
 protected:
 
 private:
-  double solutionizingTemp_;
-  double finalTemp_;
-  double coolingRate_;
+  const double solutionizingTemp_;
+  const double finalTemp_;
+  const double coolingRate_;
   const double duration_;
   double timeStep_;
   double totIterationNumber_;
@@ -56,3 +65,4 @@ Quenching::SetTotIterationNumber(double tin)
   assert(deltaT_ <= 1.);	// tin should give a value of deltaT_ better than 1 degree !
 }
 
+#endif

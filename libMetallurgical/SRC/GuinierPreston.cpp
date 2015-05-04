@@ -14,7 +14,8 @@
 
 #include "GuinierPreston.hpp"
 
-GuinierPreston::GuinierPreston()
+GuinierPreston::GuinierPreston(Material& mat, ChemicalComposition &CC, RadiusDistribution &initialRD)
+  :Precipitate(mat,CC,initialRD)
 {
 }
 

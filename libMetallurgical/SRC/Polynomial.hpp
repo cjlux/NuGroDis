@@ -12,13 +12,19 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Polynomial__hpp__
+#define __Polynomial__hpp__
+
+#include <vector>
+
 class Polynomial
 {
 
 public:
 
     //the constructor takes 2 arguments: degree and coefficients to build the polynomial
-    Polynomial(int degree, double * coefs);
+    Polynomial(int degree);
     
     ~Polynomial();
     
@@ -26,12 +32,21 @@ public:
     
     //Gives P(x)
     void ComputeValue(double x);
+    
+    //Getters
+    const std::vector<double> GetCoefsList() const {return coefsList_;};
+    const int GetDegree() const {return degree_;};
+    
+    //Setters
+    void SetCoefs(std::vector<double> const& coefsVector);
 
 
 protected:
 
 private:
     const int degree_;
-    double * coefs_;
+    std::vector<double> coefsList_;
 
 };
+
+#endif

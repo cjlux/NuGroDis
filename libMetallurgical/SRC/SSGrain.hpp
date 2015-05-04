@@ -12,13 +12,33 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
-#include <string>
 
-class SSGrain
+#ifndef __SSGrain__hpp__
+#define __SSGrain__hpp__
+
+#include <string>
+#include <vector>
+
+#include "Grain.hpp"
+
+class Precipitate;
+class ChemicalComposition;
+class Material;
+
+
+class SSGrain: public Grain
 {
 
 public:
-    SSGrain();
+  
+  //Basic constructor, An SSGrain must Know its ChemicalComposition, its material, its YoungM, Its PoissonCoef, its volNbGP and its volNbSprime
+  //This constructor means, material.YM, material.PoisCoef, material.latticP, and material.ChemicalCompo could be different from those of SSGrain.
+  SSGrain(Material &mat,ChemicalComposition &CC,double YM,double PoissonCoeff, double latticeParam, int volNbGP=0, int volNbSprime=0); 
+  
+  //Special constructor
+  //This constructor means SSGrain.ChemicalCompo, SSGrain.YM, SSGrain.PoisCoef and SSGrain.latticP are the same with those from material.
+  SSGrain(Material &mat,int volNbGP=0, int volNbSprime=0);
+  
     ~SSGrain();
     
     void Info() const;
@@ -28,33 +48,78 @@ public:
     
     //Read Specific data value for the given Alloy. Computes the atomic concentrtaions for the chemical elements in the solid Solution
     void ReadDataValue(std::string);
+    
+    
+    //Setters
+    void SetVolNbGP(const int &);
+    void SetVolNbSprime(const int &);
+    void SetVolNbPrecipitates(const int &);
+    //Getters
+    int    GetVolNbGP()           const {return volNbGP_;          };
+    int    GetVolNbSprime()       const {return volNbSprime_;      };
+    int    GetVolNbPrecipitates() const {return volNbPrecipitates_;};
+    const double GetLatticeParameter()  const {return latticeParameter_; };
+    const double GetYoungModulus()      const {return YoungModulus_;     };
+    const double GetPoissonCoeff()      const {return PoissonCoeff_;     };
+    
+    //RELATIONS
+    //Setter Aggregations
+    
+    //Add in precipitateList.
+    void AddPrecipitate(Precipitate & prec);/*Any precipitate which belongs to a material's SSgrain belongs to the
+     * material. But all precipitates which belongs to the material does not belong to the material's SSGrain*/
+
+    //Getter aggregations
+    std::vector<Precipitate*> GetPrecipitateList() {return precipitateList_;};
 
 protected:
 
 private:
-
-    //The lattice parameter of the main ChemicalElement. Unit: m
-    const double latticeParameter_;
-    
-    //The mean diameter of the grain, or of the bounding sphere of the grain. Unit : m
-    double meanDiameter_;
-    
-    // Volume of one mol of precipitate or  one mol af atoms of SSGrain. Unit : m^3/mol  :    m^3/atomMol (SSGrain) or m^3/precipitatesMol (Precipitates)
-    double molarVolume_;
-    
+   
+    //The Young modulus of the Grain. If not given, can be approximated with the Young modulus of the main chemical element of the grain. Unit: MPa
+    const double & YoungModulus_;
     //The Poisson coefficient of the Grain. If not given, can be approximated with the Poisson coefficient of the main chemical element of the grain. Unit: no unit
-    const double poissonCoeff_;
-    
+    const double & PoissonCoeff_;       
+    //The lattice parameter of the main ChemicalElement. Unit: m
+    const double & latticeParameter_;   
     //volumic number of GP precipitates. Unit: number/m^3
     int volNbGP_;
-    
     //volumic number of Sprime precipitates. Unit: number/m^3
     int volNbSprime_;
-    
     //Volumic number of precipitates in the grain. Unit: number/m^3
     int volNbPrecipitates_;
     
-    //The Young modulus of the Grain. If not given, can be approximated with the Young modulus of the main chemical element of the grain. Unit: MPa
-    const double youngModulus_;
-
+    // RELATIONS
+    std::vector<Precipitate *> precipitateList_; //A SSGrain contains 0 or many Precipitates
 };
+
+
+
+
+inline void
+SSGrain::SetVolNbGP(const int &vNGP)
+{
+  volNbGP_=vNGP;
+}
+
+inline void
+SSGrain::SetVolNbSprime(const int &vNSP)
+{
+  volNbSprime_=vNSP;
+}
+
+inline void
+SSGrain::SetVolNbPrecipitates(const int &vNP)
+{
+  volNbPrecipitates_=vNP;
+}
+
+
+//Aggregation setters
+inline void 
+SSGrain::AddPrecipitate(Precipitate & prec)
+{
+  precipitateList_.push_back(& prec);
+}
+
+#endif

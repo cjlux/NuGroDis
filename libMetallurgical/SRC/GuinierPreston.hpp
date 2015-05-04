@@ -12,11 +12,18 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
-class GuinierPreston
+#ifndef __GuinierPreston__hpp__
+#define __GuinierPreston__hpp__
+
+#include <cassert>
+
+#include "Precipitate.hpp"
+
+class GuinierPreston: public Precipitate
 {
 
 public:
-    GuinierPreston();
+    GuinierPreston(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD);//argument-->Material& because of inheritance with Precipitate
     ~GuinierPreston();
     
     void Info() const;
@@ -29,9 +36,13 @@ public:
     
     void ReadDataValue(std::string fileName);
 
+  double WettingFunction(double theta) { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
+
 
 protected:
 
 private:
 
 };
+
+#endif

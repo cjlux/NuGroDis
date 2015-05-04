@@ -12,19 +12,25 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+
+#ifndef __Sprime__hpp__
+#define __Sprime__hpp__
+
 #include <string>
+
+#include "Precipitate.hpp"
 
 //Precitate of type Sprime
 //There will be 2 instantiations of Sprime, one in boundary and other  in SSGrain
 
 
-class Sprime
+class Sprime: public Precipitate
 {
 
 public:
 
-    //the conctructor
-    Sprime();
+    //the CONSTRUCTOR . //argument-->Material& because of inheritance with Precipitate
+    Sprime(Material& mat, ChemicalComposition &CC, RadiusDistribution &initialRD,double wettingAngle); //argument-->Material& because of inheritance with Precipitate 
     
     //The destructor
     ~Sprime();
@@ -40,19 +46,37 @@ public:
     //Read data concerning SPrime
     void ReadDataValue(std::string);
     
+    
+    //Setter
     //compute value of Stheta
-    void WettingFunction();
+    double WettingFunction(double theta);
+    
+    //Getter
+    double GetWettingAngle() const {return wettingAngle_;};
+    double GetStheta() const {return Stheta_;};
+    
 
 
 protected:
 
 private:
 
-    //(was thetaP2) .Unit: degree
-    double wettingAngle_;
+  //(was thetaP2) .Unit: SI unit
+  const double wettingAngle_;
     
     //(was SthetaP2)
-    double Stheta
+  double Stheta_;
 
 
 };
+
+
+double inline
+Sprime::WettingFunction(double theta)
+{
+  assert( (Stheta_==-1) && "WettingFunction: Stheta has already been computed" );
+  //Stheta_=(2+cos(wettingAngle_))/4*(1-cos(wettingAngle_))**2;
+  return 0; // TODO
+}
+
+#endif

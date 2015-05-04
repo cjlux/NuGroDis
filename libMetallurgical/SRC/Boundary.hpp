@@ -12,6 +12,9 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#ifndef __Boundary__hpp__
+#define __Boundary__hpp__
+
 class Boundary
 {
 
@@ -30,3 +33,5 @@ private:
   
 
 };
+
+#endif
