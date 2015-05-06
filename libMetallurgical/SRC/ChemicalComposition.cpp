@@ -31,13 +31,14 @@ ChemicalComposition::ChemicalComposition(std::string formula)
    chemicalElementList_(),
    concentrationList_()
 {
+  std::cout <<  "Building a simple object <ChemicalComposition> which is not linked to any component yet  " << std::endl;
   //TODO Don't forget to set ChemicalElements because a chemical composition has at least one ChemicalElement. A CC must know the CE it is made of.
        //Maybe constructor can be modified to receive a list of ChemicalElement to initialize chemecalElementList_???
 }
 
 
 
-//SPECIAL CONSTRUCTOR
+//GENERAL CONSTRUCTOR FOR ANY DERIVED CLASS OF VIRTUAL CLASS GRAIN
 //class CC Built only belongs to a Grain(can be -> Precipitate or SSGrain or ... ), and NOT to a material
 //material_=0, means ChemicalComposition is only for Grain and not necessary for material.ssgrain_.GetComposition() 
 //Grain can be a lot of things: SSGrain, Precipitate, ... or somethings else in the future 
@@ -50,13 +51,26 @@ ChemicalComposition::ChemicalComposition(std::string formula, Grain &grain) //A 
    chemicalElementList_(),
    concentrationList_()
 {	
-
+  std::cout <<  "Building object <ChemicalComposition> which belongs exclusively to a Grain " << std::endl;
  
-  //TODO OBSOLETE If grain.type==SSGrain then: material_=grain.GetMaterial() 
+  //TODO If grain.type==SSGrain then: material_=grain.GetMaterial() 
                   // grain.type==Precipitate then: material=0 
-                              
-  
+                               
 }
+
+
+/*//SPECIALIZED CONSTRUCTOR FOR Precipitate which is derived from virtual class Grain
+//Precipitate can be a lot of things GP, Sprime, ...)
+ChemicalComposition::ChemicalComposition(std::string formula, Precipitate &P) //A CC can know the grain its formula is for. grain can be SS or Precipitate
+  :formula_(formula),
+   material_(0),
+   grain_(&P),
+   chemicalElementList_(),
+   concentrationList_()
+{	
+  std::cout <<  "Building object <ChemicalComposition> which belongs to a precipitate " << std::endl;
+ 
+}*/
 
 
 //CC built belongs only to a material, and not to a Grain, thus, not belong to the material's ssgrain
@@ -67,6 +81,7 @@ ChemicalComposition::ChemicalComposition(std::string formula,  Material& mat)
    chemicalElementList_(),
    concentrationList_()
 {
+  
   //TODO Don't forget to set ChemicalElements because a chemical composition has at least one ChemicalElement. A CC must know the CE it is made of.
        //Maybe constructor can be modified to receive a list of ChemicalElement to initialize chemecalElementList_???
 }

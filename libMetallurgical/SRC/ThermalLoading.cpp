@@ -11,10 +11,14 @@
 //
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
+#include <iostream>
 
 #include "ThermalLoading.hpp"
 
 ThermalLoading::ThermalLoading()
+  :duration_(0),
+   time_(0),
+   temperature_(0)
 {
 }
 
@@ -35,4 +39,27 @@ ThermalLoading::ReadTemperatureLoading(std::string fileName)
 void
 ThermalLoading::ReadVCAH(std::string fileName)
 {
+}
+
+void
+ThermalLoading::Info() const
+{
+  std::cout <<  "############################ ThermalLoading::Info ###################################" << std::endl;
+  
+  if (duration_==0)
+ {std::cout <<  "                                   duration: Is not defined yet"<<std::endl;}
+  else
+ {std::cout <<  "                                   duration: " << duration_ << " SI unit" << std::endl;};
+
+  if (time_==0)
+ {std::cout <<  "                                       time: Is not defined yet"<< std::endl;}
+  else
+ {std::cout <<  "                                       time: " << *time_ << " SI unit" << std::endl;};
+ 
+  if (temperature_==0)
+ {std::cout <<  "                                temperature: Is not defined yet"<< std::endl;}
+  else
+ {std::cout <<  "                             temperature: " << *temperature_ << " SI unit" << std::endl;};
+  
+ std::cout << std::endl;
 }

@@ -5,6 +5,7 @@
 #include "ChemicalElement.hpp"
 #include "Concentration.hpp"
 #include "Computation.hpp"
+#include "Diffusion.hpp"
 #include "Grain.hpp"
 #include "GuinierPreston.hpp"
 #include "Hardening.hpp"
@@ -25,8 +26,16 @@
 // Python Wrapper
 BOOST_PYTHON_MODULE(Metallurgical)
 {
-     //TODO some stuff 
+ 
+  //TODO class Boundary Binding !!!!
+  
+  
+
+  //TODO some stuff 
   boost::python::class_<ChemicalComposition>("ChemicalComposition", boost::python::init<std::string, Grain& >() )
+    .def(boost::python::init<std::string >())
+    .def(boost::python::init<std::string, Material& >())
+    .def(boost::python::init<std::string, Material&, SSGrain& >())
     .add_property("formula", &ChemicalComposition::GetFormula)
     //.add_property("material", &ChemicalComposition::GetMaterial)
     //.add_property("grain", &ChemicalComposition::GetGrain)
@@ -63,15 +72,58 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("type", &Computation::GetType, &Computation::SetType)
     .def("Run", &Computation::Run) 
     ;
+    
+    
+    //TODO some stuff
+  boost::python::class_<Diffusion>("Diffusion", boost::python::init<ChemicalElement&, Material&, Vacancy&, double,double, double >() )
+    .def(boost::python::init<ChemicalElement&, Material&, double, double >())
+    .def(boost::python::init<ChemicalElement&, Vacancy&, double >())
+    .add_property("preExpDiffusionCoef", &Diffusion::GetPreExpDiffusionCoef)
+    .add_property("activationEnergy", &Diffusion::GetActivationEnergy)
+    .add_property("interactionEnergyWithVacancy", &Diffusion::GetInteractionEnergyWithVacancy)
+    .def("Info", &Diffusion::Info)
+    ;  
+    
    
   //TODO !!! check no_init correct ?
   boost::python::class_<Grain,boost::noncopyable >("Grain", boost::python::no_init /*<Material&, ChemicalComposition&>()*/ )
     .def("Info", &Grain::Info)
     ;
     
+    
+      boost::python::class_<SSGrain, boost::python::bases<Grain> >("SSGrain", boost::python::init<Material&,boost::python::optional<int, int> >() )
+    .def(boost::python::init<Material&, ChemicalComposition&, double, double, double,boost::python::optional<int, int> >())  
+    .add_property("YoungModulus", &SSGrain::GetYoungModulus)
+    .add_property("PoissonCoeff", &SSGrain::GetPoissonCoeff)
+    .add_property("latticeParameter", &SSGrain::GetLatticeParameter)
+    .add_property("volNbGP", &SSGrain::GetVolNbGP, &SSGrain::SetVolNbGP)
+    .add_property("volNbSprime", &SSGrain::GetVolNbSprime, &SSGrain::SetVolNbSprime)
+    .add_property("volNbPrecipitates", &SSGrain::GetVolNbPrecipitates, &SSGrain::SetVolNbPrecipitates)
+    .def("Info", &SSGrain::Info)
+    ;
+    
+        //TODO !!! check no_init? inherithance of Grain correct? property initialRadiusDistribution?
+  boost::python::class_<Precipitate, boost::python::bases<Grain>, boost::noncopyable >("Precipitate", boost::python::no_init /*<Material&, ChemicalComposition&, RadiusDistribution& >()*/ )
+    .add_property("deltaCell", &Precipitate::GetDeltaCell,&Precipitate::SetDeltaCell)
+    .add_property("solvusActivationEnergy", &Precipitate::GetSolvusActivationEnergy, &Precipitate::SetSolvusActivationEnergy)
+    .add_property("distorsionEnergy", &Precipitate::GetDistorsionEnergy,&Precipitate::SetDistorsionEnergy)
+    .add_property("nucleationSitesNumber", &Precipitate::GetNucleationSitesNumber,&Precipitate::SetNucleationSitesNumber)
+    .add_property("preExpTermForSolvus", &Precipitate::GetPreExpTermForSolvus,&Precipitate::SetPreExpTermForSolvus)
+    .add_property("shapeFactor", &Precipitate::GetShapeFactor,&Precipitate::SetShapeFactor)
+    .add_property("volumicFraction", &Precipitate::GetVolumicFraction,&Precipitate::SetVolumicFraction)
+    //.add_property("initialRadiusDistribution", &Precipitate::GetInitialRadiusDistribution)
+    .def("Info", &Precipitate::Info)
+    ;
+    
   //TODO !!!check if inherithance wrapping is correct --> boost::python::bases<Grain> ? 
   boost::python::class_<GuinierPreston,boost::python::bases<Precipitate> >("GuinierPreston", boost::python::init<Material&, ChemicalComposition&, RadiusDistribution& >() )
     .def("Info", &GuinierPreston::Info)
+    ;
+    
+  boost::python::class_<Sprime,boost::python::bases<Precipitate> >("Sprime", boost::python::init<Material&, ChemicalComposition&, RadiusDistribution&, double>()  )
+    .add_property("wettingAngle", &Sprime::GetWettingAngle)
+    .add_property("Stheta", &Sprime::GetStheta)
+    .def("Info", &Sprime::Info)
     ;
     
   
@@ -80,6 +132,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("duration", &Hardening::GetDuration)
     .def("Info", &Hardening::Info)
     ;
+    
+    
+    //TODO class InterfacialConcentration binding
+    
     
   //TODO some stuff
   boost::python::class_<Material>("Material", boost::python::init<Temperature&, ChemicalElement&, ChemicalComposition& >() )
@@ -95,18 +151,9 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("Info", &Material::Info)
     ;
     
-//TODO !!! check no_init? inherithance of Grain correct? property initialRadiusDistribution?
-  boost::python::class_<Precipitate, boost::python::bases<Grain>, boost::noncopyable >("Precipitate", boost::python::no_init /*<Material&, ChemicalComposition&, RadiusDistribution& >()*/ )
-    .add_property("deltaCell", &Precipitate::GetDeltaCell,&Precipitate::SetDeltaCell)
-    .add_property("solvusActivationEnergy", &Precipitate::GetSolvusActivationEnergy, &Precipitate::SetSolvusActivationEnergy)
-    .add_property("distorsionEnergy", &Precipitate::GetDistorsionEnergy,&Precipitate::SetDistorsionEnergy)
-    .add_property("nucleationSitesNumber", &Precipitate::GetNucleationSitesNumber,&Precipitate::SetNucleationSitesNumber)
-    .add_property("preExpTermForSolvus", &Precipitate::GetPreExpTermForSolvus,&Precipitate::SetPreExpTermForSolvus)
-    .add_property("shapeFactor", &Precipitate::GetShapeFactor,&Precipitate::SetShapeFactor)
-    .add_property("volumicFraction", &Precipitate::GetVolumicFraction,&Precipitate::SetVolumicFraction)
-    //.add_property("initialRadiusDistribution", &Precipitate::GetInitialRadiusDistribution)
-    .def("Info", &Precipitate::Info)
-    ;
+
+    
+    //TODO !!! class Polynomial Binding 
     
     
   boost::python::class_<Quenching>("Quenching", boost::python::init<double, double, double, boost::python::optional<double> >() )
@@ -128,26 +175,6 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("initialClassNumber", &RadiusDistribution::GetInitialClassNumber)
     //.add_property("itemsValues", &RadiusDistribution::GetItemsValues, &RadiusDistribution::SetAllItemsValues) // itemsValues is a pointer PROBLEM
     .def("Info", &RadiusDistribution::Info)
-    ;
-  
-  
-  
-  boost::python::class_<Sprime,boost::python::bases<Precipitate> >("Sprime", boost::python::init<Material&, ChemicalComposition&, RadiusDistribution&, double>()  )
-    .add_property("wettingAngle", &Sprime::GetWettingAngle)
-    .add_property("Stheta", &Sprime::GetStheta)
-    .def("Info", &Sprime::Info)
-    ;
-    
-     
-  boost::python::class_<SSGrain, boost::python::bases<Grain> >("SSGrain", boost::python::init<Material&,boost::python::optional<int, int> >() )
-    .def(boost::python::init<Material&, ChemicalComposition&, double, double, double,boost::python::optional<int, int> >())  
-    .add_property("YoungModulus", &SSGrain::GetYoungModulus)
-    .add_property("PoissonCoeff", &SSGrain::GetPoissonCoeff)
-    .add_property("latticeParameter", &SSGrain::GetLatticeParameter)
-    .add_property("volNbGP", &SSGrain::GetVolNbGP, &SSGrain::SetVolNbGP)
-    .add_property("volNbSprime", &SSGrain::GetVolNbSprime, &SSGrain::SetVolNbSprime)
-    .add_property("volNbPrecipitates", &SSGrain::GetVolNbPrecipitates, &SSGrain::SetVolNbPrecipitates)
-    .def("Info", &SSGrain::Info)
     ;
       
     
@@ -191,6 +218,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
 
                                      //HOW TO SECTION
   //HOw to add Constructor 
+  //For class SSGrain as exemple: 
   //.def(boost::python::init<Material&, ChemicalComposition&, double, double, double,boost::python::optional<int>,boost::python::optional<int> >())
   
   //how to make abstract class?

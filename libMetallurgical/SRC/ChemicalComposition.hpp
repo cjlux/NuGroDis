@@ -44,6 +44,11 @@ public:
     //CONSTRUCTOR: Belongs to a material and to ssgrain. Material and its SSGrain has the same Chemical Composition
     ChemicalComposition(std::string formula,  Material& mat, SSGrain& materialSSgrain);
     
+    
+    //SPECIALIZED CONSTRUCTOR FOR Precipitate which is derived from virtual class Grain
+    //ChemicalComposition(std::string formula, Precipitate &P);
+    
+    
     ~ChemicalComposition();
     
     void Info() const;

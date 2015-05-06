@@ -17,6 +17,8 @@
 
 #include <string>
 
+class Temperature;
+
 class ThermalLoading
 {
 public:

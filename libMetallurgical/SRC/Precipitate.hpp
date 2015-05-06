@@ -114,10 +114,8 @@ public:
   //Must be in SSGrain AND Precipitate ==>//const ChemicalComposition& GetChemicalComposition() const {return chemicalComposition_;};
  
 protected:
-
-private:
   
-    //difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate) 
+  //difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate) 
     double deltaCell_;
     
     //DeltaH
@@ -148,6 +146,8 @@ private:
     
    
     //ChemicalComposition & chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time
+
+private:
   
     
 };

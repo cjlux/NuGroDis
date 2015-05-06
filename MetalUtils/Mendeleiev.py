@@ -133,7 +133,7 @@ class PyChemicalComposition:
             sumOfStoichCoeff+=compo[1][0]
         return sumOfStoichCoeff
             
-    
+    #WARNING: if stoichiometry has more than one digit, parse DOES NOT WORK!!! MG Will Fix it later 
     def __ParseSymbols(self):
         symbolBegins, symbol, coeff = True, "", 1
         for c in self.__symbols:

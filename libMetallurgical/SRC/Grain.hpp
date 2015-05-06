@@ -54,8 +54,6 @@ public:
   //Must be in SSGrain AND Precipitate ==>//const ChemicalComposition& GetChemicalComposition() const {return chemicalComposition_;};
    
 protected:
-
-private:
   
   //The mean diameter of the grain, or of the bounding sphere of the grain. Unit : m
   double meanDiameter_;
@@ -66,6 +64,10 @@ private:
   Material *material_;//A Grain belongs to 1 and only 1 material
   ChemicalComposition& chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time
 
+
+private:
+  
+  
 
 };
 

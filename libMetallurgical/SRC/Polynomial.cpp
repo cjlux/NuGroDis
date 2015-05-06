@@ -21,7 +21,7 @@ Polynomial::Polynomial(int degree)
   :degree_(degree),
    coefsList_()
 {
-  for (int i=0;i<degree_;i++)
+  for (int i=0;i<=degree_;i++)
   {
     coefsList_.push_back(0);
   }

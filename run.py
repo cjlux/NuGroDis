@@ -1,24 +1,42 @@
 # -*- coding: utf-8 -*-
+
+#recurrent bugs Section:
+#extension class wrapper for base class Precipitate has not been created yet: swap the order of the class_ statements, base class before derived class
+
+
+
 from __future__ import division, print_function
 
 import sys
 sys.path.append("libMetallurgical/PythonB")
 
 #Bindings
-from Metallurgical import Quenching,\
-                                             Computation,\
-                                             ThermoDynamicsConstant , \
-                                             Vacancy, \
-                                             RadiusDistribution, \
+from Metallurgical import ChemicalComposition, \
+                                             ChemicalElement, \
+                                             Concentration, \
+                                             Computation, \
+                                             Diffusion, \
+                                             GuinierPreston, \
                                              Hardening, \
-                                             ChemicalElement
+                                             Material, \
+                                             Quenching,\
+                                             RadiusDistribution, \
+                                             Sprime, \
+                                             SSGrain, \
+                                             Temperature, \
+                                             ThermalLoading, \
+                                             ThermoDynamicsConstant , \
+                                             Vacancy
+                                             
+                                             
+                                             
                           
                               
 
 # execute file Nugrodis.py:
 import nugrodis
 from MetalUtils.Mendeleiev import PyChemicalElement, PyChemicalComposition #import python Class:  PyChemicalElement, PyChemicalComposition from module MetalUtils
-from MetalUtils.Grain import PyPrecipitate #import python Class: PyPrecipitate module MetalUtils
+from MetalUtils.Grain import PyPrecipitate, PrecipitateNatureList #import:  python Class PyPrecipitate module MetalUtils, Precipitate nature list
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict #import Physical constants data dictionary from module MetalUtils
 
 print (" ____________________________________________________________________ ")
@@ -34,6 +52,12 @@ print ("|#######################################################################
 print ("|######################################  WELCOME TO NUGRODIS #########################################|")
 print ("|####################################################################################################|")
 
+
+# Create a C++ object of type ThermoDynamicsConstant:
+thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
+                                        PhysicalConstantsDict['kB'][0],
+                                        PhysicalConstantsDict['Na'][0])
+thermoDynConst.Info();
 
 
 # Create a C++ object of type Computation:
@@ -57,28 +81,12 @@ for key,value in AlloyInitialComposition.items():
     if value==maxConcentrationValue:
         mainEl=key #mainEl is the main Chemical element of alloy
         print("  > Alloy main chemical element is   : "+mainEl)
-
-PD={} #a dictionary of precipitates Names as keys with their precipitates python Objects associated. {"precipitate Name": precipitatePyObject}
-#Read Precipitate dictionaries in Module material 
-for e in L: 
-    if e[0] is not '_':
-        exec 'E = '+material+'.'+e
-        if type(E)==dict :
-            nature = E.get('nature', None)
-            if nature is 'Precipitate':
-                print("  > Found Precipitate dico <{:s}> : {:s}".format(e,E))
-                #Build python objects PyPrecipitates according to read dictionnaries
-                PD[e]=PyPrecipitate(E,mainEl) #{"precipitate Name": precipitatePyObject}
           
 
 #type of the computation: Q 
 print("  > Computation.type                 :", c.type)
 
-# Create a C++ object of type ThermoDynamicsConstant:
-thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
-                                        PhysicalConstantsDict['kB'][0],
-                                        PhysicalConstantsDict['Na'][0])
-thermoDynConst.Info();
+
 
 #Build the Mendeleiv table
 PyChemicalElement.initFromElementsData()
@@ -104,24 +112,90 @@ for pyElement in ConcernedPyChemicalElements:
     exec CppElement+".Info()"
 print("  > C++ Elements Dictionary = ",CppElementsDict)
 
+#Create a C++ object ChemicalComposition: Initial Chemical Composition of material
+InitialCCCpp=ChemicalComposition("solide solution");
 
-# Create an object type Vacancy:
-Vacancy= Vacancy(nugrodis.VacanciesParam['deltaHF'][0],
-             nugrodis.VacanciesParam['deltaSF'][0],
-             nugrodis.VacanciesParam['deltaHM'][0],
-             nugrodis.VacanciesParam['fE'][0],
-             nugrodis.VacanciesParam['Dlac0'][0],
-             nugrodis.VacanciesParam['halfSinkD'][0], 
-             M2024.VacanciesParam['Tsol'][0],
-             nugrodis.VacanciesParam['EVacCu'][0],
-             nugrodis.VacanciesParam['EVacMg'][0])
-Vacancy.Info();
 
-#Create an object of type RadiusDistribution
-RadDis=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
-                          nugrodis.CellParam['minimumRadius'][0],
-                          nugrodis.CellParam['initialClassNumber'][0])
-RadDis.Info();
+#reading Temperature parameters and Create a C++ object of type Temperature: Initial Temperature
+TempParam=nugrodis.TemperatureParam
+print("  > Found TemperatureParam           : ", TempParam)
+InitialTempCpp=Temperature(TempParam['T0'][0]);
+
+
+#Create a C++ object of type Material
+CppMaterial=Material(InitialTempCpp,
+                     CppElementsDict[mainEl],
+                     InitialCCCpp);
+
+
+#Reading Vacancies Parameters
+exec "VacParam="+material+".VacanciesParam"
+print("  > Found dico VacancyParam           : ", VacParam)
+exec "CppVacancy= Vacancy("+material+".VacanciesParam['deltaHF'][0],\
+                 "+material+".VacanciesParam['deltaSF'][0],\
+                 "+material+".VacanciesParam['deltaHM'][0],\
+                 "+material+".VacanciesParam['fE'][0],\
+                 "+material+".VacanciesParam['Dlac0'][0],\
+                 "+material+".VacanciesParam['halfSinkD'][0],\
+                 "+material+".VacanciesParam['Tsol'][0],\
+                 CppMaterial)"
+CppVacancy.Info();
+
+
+#Search for DiffusionParam for solute chemicalElements ( any element different from the main chemical Element)
+#Read dictionaries which have a nature of  DiffusionParam
+CppDiffusionDict={} #a dictionary of Chemical Elements names as keys with their C++ diffusion Objects associated. {"ChemicalElementSymbol": diffusionCppObject}
+for e in L: 
+    if e[0] is not '_':
+        exec 'E = '+material+'.'+e
+        if type(E)==dict :
+            nature = E.get('nature', None)
+            if nature is 'DiffusionParam':
+                assert ( (E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None) or (E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None) ),\
+                       "Missing attribute  'preExpDiffusionCoef' or 'Q'  in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E) #       assertion failed:  001, 010, 101,110
+                if (E.get('EVac', None)==None and E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None): #000.
+                    #No Vacancy diffusion(i.e. interaction ) and no atomic diffusion. Build C++ objects Diffusion according to read dictionnaries :
+                    print("  > Chemical Elements <{:s}> has no diffusion parameter (neither atomic diffusion nor Vacancy  interaction)".format(e))
+                elif ( E.get('EVac', None)!=None and E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None ): #111
+                    #Atomic Diffusion and Vacancy diffusion. Therefore, appropriate C++ constructor for Diffusion must be used 
+                    print("  > Found diffusion parameters dico <{:s}> with atomic diffusion and  vacancies interaction energy : {:s}".format(e,E))
+                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
+                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
+                                                  CppMaterial,
+                                                  CppVacancy,
+                                                  E["preExpDiffusionCoef"][0],
+                                                  E["Q"][0],
+                                                  E["EVac"][0])
+                elif ( E.get('EVac', None)!=None and E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None ): #100
+                    #Only vacancies diffusion or interaction , i.e. no Atomic diffusion but only vacancies interaction. Therefore, appropriate C++ constructor for Diffusion must be used
+                    print("  > Found diffusion parameters dico <{:s}> with only vacancies diffusion(interaction energy)  and no atomic diffusion : {:s}".format(e,E))
+                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
+                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
+                                                  CppVacancy,
+                                                  E["EVac"][0])
+                elif ( E.get('EVac', None)==None and E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None ):   #011
+                    #ONLY ATOMIC DIFFUSION, i.e. no vacancy interaction but Atomic diffusion. Therefore, appropriate C++ constructor for Diffusion must be used
+                    print("  > Found diffusion parameters dico <{:s}> with only atomic diffusion and no vacancies interaction : {:s}".format(e,E))
+                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
+                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
+                                                  CppMaterial,
+                                                  E["preExpDiffusionCoef"][0],
+                                                  E["Q"][0])
+                CppDiffusionDict[e].Info()
+print("  > C++ Diffusion Objects Dictionary = ",CppDiffusionDict)
+
+pyPD={} #a dictionary of precipitates Names as keys with their precipitates python Objects associated. {"precipitate Name": precipitatePyObject}
+#Read Precipitate dictionaries in Module material 
+for e in L: 
+    if e[0] is not '_':
+        exec 'E = '+material+'.'+e
+        if type(E)==dict :
+            nature = E.get('nature', None)
+            if nature in PrecipitateNatureList:
+                print("  > Found <"+nature+"> Precipitate dico named <{:s}> : {:s}".format(e,E))
+                #Build python objects PyPrecipitates according to read dictionnaries
+                pyPD[e]=PyPrecipitate(E,mainEl) #{"precipitate Name": precipitatePyObject}
+print("  > PyPrecipitates python Objects  dictionary = ",pyPD)                    
                           
 ComputationList = c.type.split(">")
 for computation in ComputationList:
@@ -134,19 +208,43 @@ for computation in ComputationList:
                               nugrodis.QuenchingParam["v"][0])
         Quenching.Info();
     if computation == "Hardening":
-        # Create an object of type Hardening:
-        Hardening=Hardening(nugrodis.HardeningParam["duration"][0],
+        # Create a C++ object of type Hardening:
+        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0],
                             nugrodis.HardeningParam["initialTimeStep"][0])
-        Hardening.Info()
-        #Create an object of type RadiusDistribution
-        HardeningRadDis=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
+        CppHardening.Info()
+        #Create a C++ object of type RadiusDistribution
+        CppHardeningRadDis=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
                           nugrodis.CellParam['minimumRadius'][0],
                           nugrodis.HardeningParam['initialClassNumber'][0])
-        HardeningRadDis.Info();
-     ##if computation == "ThermalLoading":
-        ### Create an object of type ThermalLoading:
-        ##ThermalLoading=thermalLoading()
+        CppHardeningRadDis.Info();
+        #Create Precipitates C++ object  
+        CppPrecipitateDict={} #a dictionary of precipitates Names as keys with their C++ Precipitate Objects associated. {"precipitate Name": CppPrecipitateObject}
+        
+        for x in pyPD:
+            pyPrecipitateObj=pyPD[x]
+            #Step1: Build A C++ object ChemicalComposition. necessary for building Precipitate CppObject
+            exec "CppChemicalComposition"+x+"=ChemicalComposition(pyPrecipitateObj.chemicalComposition[0])"  # e.g.  CppChemicalCompositionGP, CppChemicalCompositionSprime, ...
+            exec "CppCompo=CppChemicalComposition"+x #just to be more understandable
+            #Step2: Create Precipitates: GuinierPreston , Sprime, and ....
+            if pyPrecipitateObj.nature=="GuinierPreston":
+                #Create a GuinierPreston C++ object
+                print("  > Building a C++ GuinierPreston object  : <"+x+">")
+               #exec "Cpp"+x+"=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)"
+                CppPrecipitateDict[x]=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)
+                #step3: Set CppPrecipitates other properties manually or  with Precipitate.InitializeParameters(...)?
+            if pyPrecipitateObj.nature=="Sprime":
+                #Create a Sprime C++ object
+                print("  > Building a C++ Sprime object               : <"+x+">")
+               #exec "Cpp"+x+"=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])"
+                CppPrecipitateDict[x]=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])
+                #step3: Set CppPrecipitates other properties manually or  with Precipitate.InitializeParameters(...)?
+##    if computation == "ThermalLoading":
+##        #Create an object of type ThermalLoading:
+##        ThermalLoading=thermalLoading()
 
+#toto=PyChemicalComposition("Al2Cu8")
+#print(toto)
+#print(toto.composition)
 
 # some stuff.... for Moubarak !
 

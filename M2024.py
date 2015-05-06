@@ -25,45 +25,55 @@ AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentr
 #INITIAL CONCENTRATION!!!!!!!!!!!!!!!!!!===>    #Question: where to find it in UMl diagram      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                            #Answer: |-->Find In C++ Class Concentration, attribute volumicValue 
 
+
+################################################################################################################################# 
+##################################################      VACANCIES PARAMETERS       ###############################################
+#################################################################################################################################
+ 
+VacanciesParam={
+"deltaHF": (72400,"J.mol^-1"), # Enthalpy of vacancy formation 
+"deltaHM":(62400,"J.mol^-1"), #Enthalpy of vacancy migration 
+"deltaSF": (17,"J.mol^-1.K^-1"), #Entropy of vacancy formation
+"fE": (10**13,"s^-1"), #Frequency of vacancy's jumps
+"halfSinkD": (30E-6,"m"), #Semi-distance between vacancy sinks
+"Tsol": (495,"Celsius degree") #solutionazingTemp=InitialQuenching Temperature, [°C]
+}
+Al=ElementsDataDict["Al"]
+VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2, Al["cellSize"][1]+"."+VacanciesParam["fE"][1])# Preexponential term value of vacancy diffusion expression. 
+                   # Once upon a time... (^_^)  : "Dlac0": (Al["cellSize"]**2,"m^2.s^-1")
+                                                                                                                      
+#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
+#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
+
+
+
+
+
 ##################################################   Diffusion DATA     ##########################################################
 Cu={
              "nature":"DiffusionParam", #Important                  
-                  "Q": (135000,"J.mol^-1"), #Activation energy of diffusion for copper
-"preExpDiffusionCoef": (6.5E-5,"m^2.s^-1") #initial diffusion value for copper, pre-exponential diffusion coeffcient
-             "EVacCu": (19264,"J.mol^-1"), #copper-Vacancy interaction energy #CHECK
-#Following attribute is Not need anymore, now find in dico AlloyInitialComposition,    "initialConcentration": (1.22/100,"m^3.m^-3"), #Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic). Copper initial concentration, in range [0,1]
+"preExpDiffusionCoef": (6.5E-5,"m^2.s^-1"), #Atomic diffusion: initial diffusion value for copper, pre-exponential diffusion coeffcient. If this parameter is not needed, user must write :==> (None,None)                  
+                  "Q": (135000,"J.mol^-1"), #Atomic diffusion: Activation energy of diffusion for copper. If this parameter is not needed, user must write :==> (None,None)
+               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!.  If this parameter is not needed, user must write :==> (None,None)   
+
+#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) OR vacancyDiffusion(Evac). He can also give both
 }
 
 Mg={        
              "nature":"DiffusionParam", #Important  
+"preExpDiffusionCoef": (1.2E-4,"m^2.s^-1"), #initial diffusion value for magnesium, pre-exponential diffusion coeffcient                  
                   "Q": (131000,"J.mol^-1"), #Activation energy of diffusion for magnesium
-"preExpDiffusionCoef": (1.2E-4,"m^2.s^-1") #initial diffusion value for magnesium, pre-exponential diffusion coeffcient
-"             EVacMg": (19264,"J.mol^-1"), #magnesium-Vacancy interaction energy, #CHECK
-#Following attribute is Not need anymore, now find in dico AlloyInitialComposition, "initialConcentration": (2.08/100,"m^3.m^-3"),#Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic) . Magnesium initial concentration, in range [0,1]
+               "EVac": (19264,"J.mol^-1") #magnesium-Vacancy interaction energy, #CHECK. If this parameter is not needed, user must write :==> (None,None)
+
+#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) OR vacancyDiffusion(Evac). He can also give both
 }
-
-#OBSOLETE , now we have "nature"=DiffusionParam
-#DiffusionParam={                          ###################    Copper DATA       ######################
-#                "Cu":{                  "Q": (135000,"J.mol^-1"), #Activation energy of diffusion for copper
-#                      "preExpDiffusionCoef": (6.5E-5,"m^2.s^-1") #initial diffusion value for copper, pre-exponential diffusion coeffcient
-#                                   "EVacCu": (19264,"J.mol^-1"), #copper-Vacancy interaction energy #CHECK
-##Following attribute is Not need anymore, now find in dico AlloyInitialComposition,    "initialConcentration": (1.22/100,"m^3.m^-3"), #Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic). Copper initial concentration, in range [0,1]
-#                      },
-#                                       ####################   Magnesium DATA     #########################
-#                "Mg":{                  "Q": (131000,"J.mol^-1"), #Activation energy of diffusion for magnesium
-#                      "preExpDiffusionCoef": (1.2E-4,"m^2.s^-1") #initial diffusion value for magnesium, pre-exponential diffusion coeffcient
-#                                   "EVacMg": (19264,"J.mol^-1"), #magnesium-Vacancy interaction energy, #CHECK
-##Following attribute is Not need anymore, now find in dico AlloyInitialComposition, "initialConcentration": (2.08/100,"m^3.m^-3"),#Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic) . Magnesium initial concentration, in range [0,1]
-#                      }
-#}
-
 
 
 
 
 ################################################## Guinier-Preston DATA ##########################################################
 GP={
-"nature":"Precipitate", #Important
+"nature":"GuinierPreston", #Important nature can be:  "GuinierPreston" or "Sprime". key words can be found in MetalUtils/Grain.py PrecipitateNatureList
 "chemicalComposition": ("Al8CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1. Is assumed to be the initial number of aluminium atoms/volum unit
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
@@ -76,7 +86,7 @@ GP={
 
 ##################################################    Sprime DATA     ##########################################################
 Sprime={
-"nature":"Precipitate", #important
+"nature":"Sprime", #important nature can be:  "GuinierPreston" or "Sprime" . Key words can be found in MetalUtils/Grain.py PrecipitateNatureList
 "chemicalComposition": ("Al2CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "preExpTermForSolvus":(49.746,"m^6.m^-6"),  # was KP2
 "solvusActivationEnergy":(76000,"J.mol^-1"), #DeltaHP2
@@ -90,14 +100,3 @@ Sprime={
 "wettingAngle":(30,"degree") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
 }
 
-
-################################################################################################################################# 
-####################################      solutionazing Temperature, VACANCIES PARAMETERS       #################################
-#################################################################################################################################
-
-VacanciesParam={
-"Tsol": (495,"°C") #solutionazingTemp=InitialQuenching Temperature, [°C]
-}
-
-#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
-#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~ 

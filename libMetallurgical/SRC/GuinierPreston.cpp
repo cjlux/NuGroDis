@@ -37,3 +37,14 @@ void
 GuinierPreston::ReadDataValue(std::string fileName)
 {
 }
+
+/*void
+GuinierPreston::Info() const
+{
+  std::cout <<  "###########################  GuinierPreston::Info #################################" 	<< std::endl;
+  std::cout <<  "                                molarVolume: " << molarVolume_  << " SI unit" << std::endl;
+  std::cout <<  "                               meanDiameter: " << meanDiameter_ << " SI unit" << std::endl;
+  //std::cout <<  "                                  material_: " << material_ << " SI unit" << std::endl;
+  std::cout <<  std::endl;
+  
+}*/

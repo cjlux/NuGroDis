@@ -26,7 +26,7 @@ public:
     GuinierPreston(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD);//argument-->Material& because of inheritance with Precipitate
     ~GuinierPreston();
     
-    void Info() const;
+    //void Info() const; //not needed here, Already in class Precipitate
     
     //Compute the number of nucleation sites using RadiusDistribution::ComputeTotNbOfItems
     void ComputeNucleationSiteNb();

@@ -114,11 +114,11 @@ Diffusion::Info() const
   std::cout <<  "                            chemicalElement: " << chemicalElement_.GetElementName() << " SI unit" << std::endl;
   if (material_->GetSSGrain()==0) 
   {
-  std::cout <<  "            Diffusion parameter of <  "<< chemicalElement_.GetElementName() <<"> in : material"<< std::endl;
+  std::cout <<  "           Diffusion parameters of <"<< chemicalElement_.GetElementName() <<"> in : material"<< std::endl;
   }
   else
   {
-  std::cout <<  "            Diffusion parameter of <  "<< chemicalElement_.GetElementName() <<"> in : solid solution grains of the material"<< std::endl;
+  std::cout <<  "           Diffusion parameters of <"<< chemicalElement_.GetElementName() <<"> in : solid solution grains of the material"<< std::endl;
   };
   std::cout <<  std::endl;
 }

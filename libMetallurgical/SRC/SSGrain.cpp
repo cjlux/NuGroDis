@@ -103,8 +103,8 @@ SSGrain::Info() const
   std::cout <<  "                                  volNbGP: " << volNbGP_ << " SI unit" << std::endl;
   std::cout <<  "                              volNbSprime: " << volNbSprime_ << " SI unit" << std::endl;
   std::cout <<  "                        volNbPrecipitates: " << volNbPrecipitates_ << " SI unit" << std::endl;
-  std::cout <<  "                             meanDiameter: " << this->GetMeanDiameter() << " SI unit" << std::endl;
-  std::cout <<  "                              molarVolume: " << this->GetMolarVolume() << " SI unit" << std::endl;
+  std::cout <<  "                             meanDiameter: " << meanDiameter_ << " SI unit" << std::endl;
+  std::cout <<  "                              molarVolume: " << molarVolume_ << " SI unit" << std::endl;
   std::cout <<  "                             YoungModulus: " << YoungModulus_ << " SI unit" << std::endl;
   std::cout <<  "                             PoissonCoeff: " << PoissonCoeff_ << " SI unit" << std::endl;
   std::cout <<  "                         latticeParameter: " << latticeParameter_ << " SI unit" << std::endl;

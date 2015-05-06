@@ -34,6 +34,7 @@
 #include "libMetallurgical/SRC/ThermoDynamicsConstant.hpp"
 #include "libMetallurgical/SRC/Vacancy.hpp"
 #include <iostream>
+#include <typeinfo>
 
 
 int main()
@@ -88,7 +89,7 @@ int main()
   Hardening hardening(150000,1);
   //Create a radius Distribution
   RadiusDistribution initialRD(4,1,20);
-  //Create Object: Diffusion parameters
+  //Create Object: Diffusion parameters. Atomic diffusion AND/OR vacancy diffusion
   Diffusion CuDiffusion(Cu,material,vcy,6.5E-5,135000.,19264.),MgDiffusion(Mg,material,vcy,1.2E-4,131000,19264);
   //Create Precipitates: GuinierPreston and Sprime
        //step1  create ChemicalCompositions for precipitates
@@ -121,6 +122,8 @@ int main()
        //But all precipitates which belongs to the material does not belong to the material's SSGrain    
        (material.GetSSGrain())->AddPrecipitate(GP);
        (material.GetSSGrain())->AddPrecipitate(Sp);
+       ChemicalComposition totoGP("Al4Cu2",GP);
+       std::cout<<"GP class name "<<typeid(Sp).name()<<std::endl;
   
 //if(!GPCoefs.empty())
 //{

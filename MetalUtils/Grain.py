@@ -1,15 +1,18 @@
 from Mendeleiev import PyChemicalComposition
 from ElementsData import Dict as ElementsDataDict
 
+PrecipitateNatureList=['GuinierPreston','Sprime']
+
 class PyPrecipitate:
     def __init__(self,dataDict,mainElement):
         #mandatory keys
-        self.__chemicalComposition=dataDict["chemicalComposition"]#Or chemichal Formulation
+        self.__chemicalComposition=dataDict["chemicalComposition"]#the chemichal Formulation
         self.__preExpTermForSolvus=dataDict["preExpTermForSolvus"]
         self.__solvusActivationEnergy=dataDict["solvusActivationEnergy"]
         self.__surfaceEnergyPolynomialModel=dataDict["surfaceEnergyPolynomialModel"]
         self.__shapeFactor=dataDict["shapeFactor"]
         self.__deltaCell=dataDict["deltaCell"]
+        self.__nature=dataDict["nature"]
 
         #Optional keys
         self.__initialNucleationSitesNb=dataDict.get("initialNucleationSitesNb",None) #example : for GP
@@ -35,6 +38,8 @@ class PyPrecipitate:
     def shapeFactor(self): return self.__shapeFactor
     @property
     def deltaCell(self): return self.__deltaCell
+    @property
+    def nature(self): return self.__nature
     @property
     def wettingAngle(self): return self.__wettingAngle
     @property

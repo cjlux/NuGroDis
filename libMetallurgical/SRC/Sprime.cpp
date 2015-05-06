@@ -12,6 +12,8 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 
+#include <iostream>
+
 #include "Sprime.hpp"
 
 Sprime::Sprime(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD,double wetA)
@@ -40,4 +42,24 @@ Sprime::ReadDataValue(std::string dataFile)
 {
 }
 
+void
+Sprime::Info() const
+{
+  std::cout <<  "###################################  Sprime::Info #################################" 	<< std::endl;
+  std::cout <<  "                                molarVolume: " << molarVolume_  << " SI unit" << std::endl;
+  std::cout <<  "                               meanDiameter: " << meanDiameter_ << " SI unit" << std::endl;
+  std::cout <<  "                               wettingAngle: " << wettingAngle_ << " SI unit" << std::endl;
+  std::cout <<  "                                     Stheta: " << Stheta_ << " SI unit" << std::endl;  
+  //std::cout <<  "                                material_: " << material_ << " SI unit" << std::endl;
+  std::cout <<  "                                  deltaCell: " << deltaCell_ << " SI unit" << std::endl;
+  std::cout <<  "                     solvusActivationEnergy: " << solvusActivationEnergy_ << " SI unit" << std::endl;
+  std::cout <<  "                           distorsionEnergy: " << distorsionEnergy_ << " SI unit" << std::endl;
+  std::cout <<  "                      nucleationSitesNumber: " << nucleationSitesNumber_ << " SI unit" << std::endl;
+  std::cout <<  "                        preExpTermForSolvus: " << preExpTermForSolvus_ << " SI unit" << std::endl;
+ // std::cout <<  "               surfaceEnergyPolynomialModel: " << surfaceEnergyPolynomialModel_ << " SI unit" << std::endl;
+  std::cout <<  "                                shapeFactor: " << shapeFactor_ << " SI unit" << std::endl;
+  std::cout <<  "                            volumicFraction: " << volumicFraction_ << " SI unit" << std::endl;
+  std::cout <<  std::endl;
+  
+}
 
