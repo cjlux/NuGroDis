@@ -74,11 +74,11 @@ RadiusDistribution::InitializeInterfConc()
   assert( (precipitate_!=0)&&"Cannot InitializeInterfConc() if RadiusDiustribution precipitate_=0 " );
   
   //Step1: scan precipitates ChemicalCompo
-  const ChemicalComposition& compo=precipitate_->GetChemicalComposition();
+  /*const ChemicalComposition& compo=precipitate_->GetChemicalComposition();
   //BUG//const std::vector<ChemicalElement *> & elementList = compo.GetChemicalElementsList();
   
   //BUG
-  /*//Step2: Add ChemicalElements to chemicalElementList and create interfacialConcentrationObjects associated to each chemicalElement 
+  //Step2: Add ChemicalElements to chemicalElementList and create interfacialConcentrationObjects associated to each chemicalElement 
   for (unsigned int i=0; i<elementList.size(); ++i)
   {
     chemicalElementList_.push_back(elementList[i]);

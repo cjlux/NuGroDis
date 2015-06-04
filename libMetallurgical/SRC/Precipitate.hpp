@@ -18,8 +18,10 @@
 
 #include <cassert>
 #include <vector>
+#include <boost/python.hpp>
 
 #include "SSGrain.hpp"
+
 
 
 //A Precipitate "Is a" Grain.
@@ -29,7 +31,7 @@
 //Instead the volumic number of precipitates is computed in the class Grain thanks to the atribute volNbPrecipitates.
 //Precipitate can be a lot of things: GuinierPreston, Sprime,... or maybe in the future something else
 
-class Polynomial;
+#include "Polynomial.hpp"
 class RadiusDistribution;
 //class Material;
 
@@ -50,7 +52,7 @@ public:
     void Info() const;
     
     //elastic distorsion energy due to the difference of cell size.(was deltageP) . unit: J/m^3
-    double ComputeDistorsionEnergy();
+    void ComputeDistorsionEnergy(); //Compute and Set distorsion Energy
     
     //Compute the interfacial energy. Unit: J/m^2. Actually, surface energy is not stored
     double ComputeSurfaceEnergy();
@@ -71,31 +73,47 @@ public:
     
     
     int GetVolNbPrecipitates() const  { assert(!"Method GetVolNbPrecipitates() has no sense for Precipitates!!! "); };
-
+    //void SetSSGrainChemicalComposition(const ChemicalComposition &CC) { assert(!"SetSSGrainChemicalComposition does not exist for pecipitate!!!")  ;};
 
   virtual double WettingFunction(double theta) = 0;
   
   
+  //Concentration conversion functions
+  void ComputeSumOfStoicCoefs();//Compute and Set Sum of stoichiometric coefficients
+  void ConvertMassicToVolumicConcentration();
+  void ConvertVolumicToMassicConcentration();
+  void ConvertAtomicToVolumicConcentration();
+  void ConvertVolumicToAtomicConcentration();
+  void ConvertStoichiometricCoefficientToVolumicConcentration();
+  void ConvertStoichiometricCoefficientToAtomicConcentration();
+  
+  
+  
+  
+  
   //Getter
-  double GetDeltaCell() const {return deltaCell_;} ;
-  double GetSolvusActivationEnergy() const {return solvusActivationEnergy_;};
-  double GetDistorsionEnergy()          const {return distorsionEnergy_;};
-  double GetNucleationSitesNumber()          const {return nucleationSitesNumber_;};
-  double GetPreExpTermForSolvus()          const {return preExpTermForSolvus_;};
-  double GetShapeFactor()          const {return shapeFactor_;};
-  double GetVolumicFraction()          const {return volumicFraction_;};
-  Polynomial* GetSurfaceEnergyPolynomialModel() const {return surfaceEnergyPolynomialModel_;};
+  double GetDeltaCell()                         const {return deltaCell_;} ;
+  double GetSolvusActivationEnergy()            const {return solvusActivationEnergy_;};
+  double GetDistorsionEnergy()                  const {return distorsionEnergy_;};
+  double GetNucleationSitesNumber()             const {return nucleationSitesNumber_;};
+  double GetPreExpTermForSolvus()               const {return preExpTermForSolvus_;};
+  double GetShapeFactor()                       const {return shapeFactor_;};
+  double GetVolumicFraction()                   const {return volumicFraction_;};
+  Polynomial& GetSurfaceEnergyPolynomial()            {return surfaceEnergyPolynomial_;};
+  const Polynomial& GetSurfaceEnergyPolynomial()const {return surfaceEnergyPolynomial_;};
+  const int GetSumOfStoicCoefs() const;
+  
   
   
   //Setter
   void SetDeltaCell (const double deltaCell);
   void SetSolvusActivationEnergy(const double );
-  void SetDistorsionEnergy(const double );
   void SetNucleationSitesNumber(const double);
   void SetPreExpTermForSolvus(const double);
-  void SetSurfaceEnergyPolynomialModel(Polynomial&);
   void SetShapeFactor(const double );
   void SetVolumicFraction(const double );
+  void SetSEPolynomialDegree(const int deg);//SE i.e. SurfaceEnergy
+  void AddSEPolynomialPyCoefs(boost::python::list& pythonCoefList);
 
   
   //RELATIONS
@@ -131,7 +149,7 @@ protected:
     double preExpTermForSolvus_;
     
     //The polynomial model to compute the surface energy. unit J/m^2
-    Polynomial * surfaceEnergyPolynomialModel_;
+    Polynomial surfaceEnergyPolynomial_;
     
     //ratio between lenght to radius.If nul, shape is spherical.
     double shapeFactor_;
@@ -144,6 +162,9 @@ protected:
     RadiusDistribution * currentRadiusDistribution_;
     const RadiusDistribution & initialRadiusDistribution_;
     
+    int sumOfStoicCoefs_;
+    bool SumOfStoiCoefsHasBeenComputed_;
+    
    
     //ChemicalComposition & chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time
 
@@ -153,6 +174,19 @@ private:
 };
 
 //TODO Inline Setters!!! (AND do not forget assrtions!!!!)
+
+
+
+
+inline const int 
+Precipitate::GetSumOfStoicCoefs() const
+{
+  assert ( (sumOfStoicCoefs_>0)&&"Cannot GetSumOfStoicCoefs because Sum of \
+  stoichiomoetric coefficients is not an integer stricly positive!!!");
+  
+  return sumOfStoicCoefs_;
+}
+
 
 inline void
 Precipitate::SetDeltaCell(const double deltaCell)
@@ -166,11 +200,7 @@ Precipitate::SetSolvusActivationEnergy(const double solvActEn)
  solvusActivationEnergy_=solvActEn;
 }
 
-inline void
-Precipitate::SetDistorsionEnergy(const double distEn)
-{
-  distorsionEnergy_=distEn;
-}
+
 
 inline void
 Precipitate::SetNucleationSitesNumber(const double nuclSitNb)
@@ -184,11 +214,6 @@ Precipitate::SetPreExpTermForSolvus(const double preExpSolv)
  preExpTermForSolvus_=preExpSolv;
 }
 
-inline void
-Precipitate::SetSurfaceEnergyPolynomialModel(Polynomial& surfEnPoly)
-{
-  surfaceEnergyPolynomialModel_=&surfEnPoly;
-}
 
 inline void
 Precipitate::SetShapeFactor(const double shapeFactor)

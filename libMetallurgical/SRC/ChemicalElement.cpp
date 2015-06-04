@@ -39,6 +39,7 @@ ChemicalElement::ChemicalElement(double density,
    diffusion_(0)
 {
   std::cout <<  "building an ChemicalElement Object <" << elementName_<<"> which has no diffusion parameters" << std::endl;
+  /*debug*/std::cout <<  "In Chemical Elemnt constructor. Adress of ChemElem is" << this<<"> which has no diffusion parameters" << std::endl;
   std::cout <<  std::endl;
 }
 
@@ -58,7 +59,11 @@ void ChemicalElement::EnterInChemicalComposition(ChemicalComposition& compo)
 void
 ChemicalElement::ConvertMassicToVolumicConcentration(ChemicalComposition& CC)
 {
+  
   //TODO assert if CC is in chemicalCompositionList_. If not, abandon 
+  
+  
+  
 }
 
 void
@@ -80,10 +85,28 @@ ChemicalElement::ConvertVolumicToAtomicConcentration(ChemicalComposition& CC)
 }
 
 void
-ChemicalElement::ConvertStoechiometricCoefficient2VolumicConcentration(ChemicalComposition& CC)
+ChemicalElement::ConvertStoechiometricCoefficientToVolumicConcentration(ChemicalComposition& CC)
 {
   // TODO assert if CC is in chemicalCompositionList_. If not, abandon
+  
+  
+  
 }
+
+void
+ChemicalElement::ConvertStoechiometricCoefficientToAtomicConcentration(ChemicalComposition& CC)
+{
+  // TODO assert if CC is in chemicalCompositionList_. 
+  
+  
+  //TODO
+  for (unsigned int i=0; i<CC.GetChemicalElementsList().size();i++)
+  {
+  }
+  
+  
+}
+
 
 void
 ChemicalElement::Info() const

@@ -15,6 +15,8 @@
 #ifndef __Diffusion__hpp__
 #define __Diffusion__hpp__
 
+#include <cassert>
+
 class Material;
 class ChemicalElement;
 class SSGrain;
@@ -33,46 +35,96 @@ public:
     
     void Info() const;
     
-    //Computes the diffusion coefficient for the given value of the temperature . Unit: K
-    void ComputeCoefValue();
+    //Computes the atomic diffusion coefficient for the current value of the temperature . Unit: K
+    void ComputeAtomicDiffusionCoefValue();
     
     //getter
     const double GetPreExpDiffusionCoef() {return preExpDiffusionCoef_;};
     const double GetActivationEnergy() {return activationEnergy_;};
-    const double GetInteractionEnergyWithVacancy() {return interactionEnergyWithVacancy_;};
+    const double GetInteractionEnergyWithVacancy() const;
+    
+    double GetAtomicDiffusionCoef() const ;
+    
+    //fake attribute: debug
+    const double GetToto() {return toto;};
+    void SetToto(const double pouet) {toto=pouet;};
+    
     
     //RELATION
     //getter
     const Material& GetMaterial() const ;//TODO check if 0 or not
     const Vacancy& GetVacancy() const;
     const ChemicalElement& GetChemicalElement() const {return chemicalElement_;};
-    SSGrain* GetSSGrain() const ;
+    SSGrain* GetSSGrainPointer() const ;
+    SSGrain& GetSSGrain() const;
     
 protected:
 
 private:
     
-    //Initial diffusion value. unit: m^2/s
+    //Initial diffusion value or diffusion prexponential term for an atom. (was D0_i_SS) unit: m^2/s
     const double preExpDiffusionCoef_;
     
-    //Activation energy of diffusion for a pair of chemical elements. Unit: J/mol
+    //Activation energy of diffusion for a pair of chemical elements.(was Q) Unit: J/mol
     const double activationEnergy_;
     
-    //Interaction energy between Chemical Element and vacancies. Unit: J
+    //Interaction energy between Chemical Element and vacancies.(was Evac) Unit: J
     const double interactionEnergyWithVacancy_;
+    
+    //was(D_i_SS)
+    double atomicDiffusionCoef_;
     
     //Association relation
     const ChemicalElement& chemicalElement_;
-    const Material* const material_;
-    SSGrain* ssgrain_;
-    const Vacancy* const vacancy_;
+    const Material* material_;
+    SSGrain* ssgrainPointer_;
+    const Vacancy* vacancy_;
     
 
+    
+    //fake attribute:debug
+    double toto;
+   
 };
+
+
+inline const double 
+Diffusion::GetInteractionEnergyWithVacancy() const
+{
+  assert( (interactionEnergyWithVacancy_!=-1)&&"In GetInteractionEnergyWithVacancy(): Cannot get interaction energy\
+  because Atomic Diffusion Object has been built with no vacancy diffusion and only atomic diffusion "  );
+  return interactionEnergyWithVacancy_;
+}
+
+
+inline double 
+Diffusion::GetAtomicDiffusionCoef() const 
+{
+  assert (  (atomicDiffusionCoef_!=-2)&&"Cannot GetAtomicDiffusionCoef because\
+  Diffusion Object do not have Atomic diffusion (Use another constructor) ");
+  return atomicDiffusionCoef_;
+}
+
+
+
+
 inline SSGrain*
+Diffusion::GetSSGrainPointer() const
+{
+  return ssgrainPointer_;
+}
+
+inline SSGrain& 
 Diffusion::GetSSGrain() const
 {
-  return ssgrain_;
+  if (ssgrainPointer_!=0)
+  {
+  return (*ssgrainPointer_);
+  }
+  else
+  {
+   return *ssgrainPointer_;
+  };
 }
 
 #endif

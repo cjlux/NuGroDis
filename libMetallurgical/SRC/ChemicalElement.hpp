@@ -41,7 +41,8 @@ public:
     void ConvertVolumicToMassicConcentration(ChemicalComposition& CC);
     void ConvertAtomicToVolumicConcentration(ChemicalComposition& CC);
     void ConvertVolumicToAtomicConcentration(ChemicalComposition& CC);
-    void ConvertStoechiometricCoefficient2VolumicConcentration(ChemicalComposition& CC);
+    void ConvertStoechiometricCoefficientToVolumicConcentration(ChemicalComposition& CC);
+    void ConvertStoechiometricCoefficientToAtomicConcentration(ChemicalComposition& CC);
 
     //getters
     double GetMolarMass()          const;
@@ -58,9 +59,13 @@ public:
     //getters
     void EnterInChemicalComposition(ChemicalComposition& compo);//Enter a CE to chemicalCompositionList
     std::vector<ChemicalComposition *> GetChemicalComposition() const {return chemicalCompositionList_;};
-    Diffusion* GetDiffusion() const {return diffusion_;}; 
+    const Diffusion& GetDiffusion() const ; 
     //setters
     void SetDiffusion(Diffusion &diffusionObj);
+    
+    //debug
+    //bool operator==(const ChemicalElement& CE1){return etElementName_==CE1.GetElementName() ;};
+    
 
 protected:
 
@@ -70,7 +75,9 @@ private:
     const double      YoungModulus_;
     const double      PoissonCoefficient_;
     double            latticeParameter_;
-    const std::string elementName_;
+    const std::string elementName_; /*WARNING Must be unique!!! 2 Objects ChemicalElement
+				     *can not have the same value of attribute elementName_*/
+    
     //RELATIONS
     std::vector<ChemicalComposition *> chemicalCompositionList_;
     Diffusion* diffusion_;
@@ -82,6 +89,16 @@ private:
     */
   
 };
+
+inline const Diffusion&
+ChemicalElement::GetDiffusion() const
+{
+  assert( (diffusion_!=0)&&"In GetDiffusion: cannot get diffusion because the chemical\
+  element does not have any diffusion object yet ( pointer is 0 )" );
+  return *diffusion_;
+}
+
+    
 
 inline double
 ChemicalElement::GetMolarMass() const

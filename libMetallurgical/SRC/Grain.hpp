@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/python.hpp>
 
 class Precipitate;
 class ChemicalComposition;
@@ -21,6 +22,11 @@ public:
   Grain(Material& mat, ChemicalComposition &CC ); 
   
   
+  //Only for SSGrain which belongs to a material,
+//and has the same properties as the material: ChemicalCompo and mechanical properties
+  //Grain(Material& mat); //TEST fake code!!!
+  
+    
   
   ~Grain();
   
@@ -28,6 +34,16 @@ public:
   
   //Compute the molar volume of (precipitates, solid solution,...).The result is written in molar volume[m^3/mol] (was VmP1,VmP2). Unit: m^3/mol
   void ComputeMolarVolume();
+  
+  
+  virtual void ConvertMassicToVolumicConcentration()=0;
+  virtual void ConvertVolumicToMassicConcentration()=0;
+  virtual void ConvertAtomicToVolumicConcentration()=0;
+  virtual void ConvertVolumicToAtomicConcentration()=0;
+  virtual void ConvertStoichiometricCoefficientToVolumicConcentration()=0;
+  virtual void ConvertStoichiometricCoefficientToAtomicConcentration()=0; 
+  
+  //virtual void SetSSGrainChemicalComposition(const ChemicalComposition &CC)=0;
   
  
   virtual int GetVolNbPrecipitates() const =0 ;
@@ -44,10 +60,17 @@ public:
 
   //RELATIONS
   //getters
-  const Material& GetMaterial() const {return *material_;};
-  ChemicalComposition& GetChemicalComposition() const {return chemicalComposition_;};
+  Material& GetMaterial() const;
+  Material* GetMaterialPointer() const {return materialPointer_;};
+  ChemicalComposition& GetChemicalComposition() const 
+  {
+    std::cout<<"in GetChemCompo. Adress of Grain is"<<this<<std::endl;
+    std::cout<<"in GetChemCompo. Adress of ChemicalComposition"<<&chemicalComposition_<<std::endl;
+    return chemicalComposition_;
+  };
+
   //setters
-  void SetMaterial(const Material &mat);
+  void SetMaterial(Material &mat);
  
   
   //Must be in SSGrain AND Precipitate ==>//ChemicalComposition& GetChemicalComposition() const {return chemicalComposition_;};
@@ -61,7 +84,7 @@ protected:
   double molarVolume_;
   
   //RELATIONS
-  Material *material_;//A Grain belongs to 1 and only 1 material
+  Material *materialPointer_;//A Grain belongs to 1 and only 1 material
   ChemicalComposition& chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time
 
 
@@ -70,6 +93,12 @@ private:
   
 
 };
+
+inline Material& 
+Grain::GetMaterial() const 
+{
+  return *materialPointer_;
+}
 
 inline void
 Grain::SetMeanDiameter(const double &meanD)
@@ -82,5 +111,15 @@ Grain::SetMolarVolume(const double &molV)
 {
   molarVolume_=molV;
 }
+
+inline void 
+Grain::SetMaterial(Material &mat)
+{
+  //TODO find if Grain is in material.grainList_. If yes, abandon"Cannot Set material because it is already belongs to the material"
+  
+  //if not then do:
+  materialPointer_=&mat;
+}
+
 
 #endif

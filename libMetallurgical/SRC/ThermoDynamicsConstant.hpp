@@ -25,9 +25,11 @@ public:
   
   void Info() const;
 
-  double GetR()   const { return R_;  };
-  double Get_kB() const { return kB_; };
-  double GetNa()  const { return Na_; };
+  double Get_R()   { return R_;  };
+  double Get_kB()  { return kB_; };
+  double Get_Na()  { return Na_; };
+  
+  static double GetR() {return R;};
   
 protected:
 
@@ -41,7 +43,11 @@ private:
     
   //Avogadro's number. Unit: at/mol
   const double Na_;
+  
+  static const double R=8.314472; // Unit "J.mol^-1.K^-1"
 
 };
+
+
 
 #endif

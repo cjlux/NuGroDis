@@ -12,6 +12,7 @@ sys.path.append("libMetallurgical/PythonB")
 
 #Bindings
 from Metallurgical import ChemicalComposition, \
+                                             Boundary,\
                                              ChemicalElement, \
                                              Concentration, \
                                              Computation, \
@@ -19,6 +20,7 @@ from Metallurgical import ChemicalComposition, \
                                              GuinierPreston, \
                                              Hardening, \
                                              Material, \
+                                             Polynomial,\
                                              Quenching,\
                                              RadiusDistribution, \
                                              Sprime, \
@@ -39,17 +41,11 @@ from MetalUtils.Mendeleiev import PyChemicalElement, PyChemicalComposition #impo
 from MetalUtils.Grain import PyPrecipitate, PrecipitateNatureList #import:  python Class PyPrecipitate module MetalUtils, Precipitate nature list
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict #import Physical constants data dictionary from module MetalUtils
 
-print (" ____________________________________________________________________ ")
-print(" |                                                            \    /_ | _ _ ._ _  _  _|_ _                        |") 
-print(" |                                                             \/\/(/_|(_(_)| | |(/_  |_(_)                      |")
-print(" |                                                                         __              __                          |") 
-print(" |                                                               |\ |     |  __  __   __  |  \      _              |")
-print(" |                                                               | \| |_| |__|  |    |__| |_ /  |  /_\           |")
-print ("|___________________________________________________________________   |")
+
 
 
 print ("|####################################################################################################|")
-print ("|######################################  WELCOME TO NUGRODIS #########################################|")
+print ("|######################################  RUNNING FILE <run.py> ######################################|")
 print ("|####################################################################################################|")
 
 
@@ -90,7 +86,7 @@ print("  > Computation.type                 :", c.type)
 
 #Build the Mendeleiv table
 PyChemicalElement.initFromElementsData()
-ED = PyChemicalElement.GetElementsDict() #a dictionary of chemichal Elements Names as keys with their chemicalElement python Objects associated. {"chemichal Elements Name": chemicalElementPyObject}
+ED = PyChemicalElement.GetElementsDict() #Mendeleiv  Table : a dictionary of chemichal Elements Names as keys with their chemicalElement python Objects associated. {"chemichal Elements Name": chemicalElementPyObject}
 
 #A list of chemical elements involded in the computation using chemical Elements read in AlloyInitialComposition dictionary from Module material
 #AlloyInitialComposition.keys() gives the list of chemical elements involded in the computation
@@ -110,11 +106,25 @@ for pyElement in ConcernedPyChemicalElements:
                                         pyElement.symbol)")
     exec 'CppElementsDict[pyElement.symbol]='+CppElement
     exec CppElement+".Info()"
+    exec "print ("+CppElement+")"
 print("  > C++ Elements Dictionary = ",CppElementsDict)
 
-#Create a C++ object ChemicalComposition: Initial Chemical Composition of material
+#Create a C++ object ChemicalComposition: Initial Chemical Composition. This obect will be give to Cpp material 
 InitialCCCpp=ChemicalComposition("solide solution");
-
+#Add "ALL" Cpp ChemicalElement in Cpp object Initial ChemicalComposition
+for u in AlloyInitialComposition.items():
+    symbol=u[0]
+    initialVolumicConcentration=u[1][0]
+    print("pouet 1")
+    #Add Cpp ChemicalElement in Cpp in Cpp object Initial ChemicalComposition (InitialCCCpp)
+    CppElementsDict[symbol].EnterInChemicalComposition(InitialCCCpp)
+    print("pouet 2")
+#SETTING Cpp CHEMICAL COMPOSITION'S CONCENTRATION BY FINDING CONCENTRATION IN C++ Map using name.
+    print("pouet 3")
+    #Set the volumic concentration of Cpp chemical Element in the Cpp Concentration for Cpp object Initial ChemicalComposition
+    InitialCCCpp.GetConcentrationForElement(symbol).volumicValue=initialVolumicConcentration
+    InitialCCCpp.mainElementName=mainEl
+    print("CppConc Setted volumic volumic concentration ",InitialCCCpp.GetConcentrationForElement(symbol).volumicValue)
 
 #reading Temperature parameters and Create a C++ object of type Temperature: Initial Temperature
 TempParam=nugrodis.TemperatureParam
@@ -126,6 +136,31 @@ InitialTempCpp=Temperature(TempParam['T0'][0]);
 CppMaterial=Material(InitialTempCpp,
                      CppElementsDict[mainEl],
                      InitialCCCpp);
+CppMaterial.Info()
+
+
+###Add "ALL" Cpp ChemicalElement in Cpp ChemicalComposition of Material
+##CppCCMaterial=CppMaterial.GetInitialChemicalComposition()
+##for u in AlloyInitialComposition.items():
+##    symbol=u[0]
+##    initialVolumicConcentration=u[1][0]
+##    print("pouet 1")
+##    #Add Cpp ChemicalElement in Cpp ChemicalComposition of Cpp Material
+##    CppElementsDict[symbol].EnterInChemicalComposition(CppCCMaterial)
+##    print("pouet 2")
+###SETTING MATERIAL CONCENTRATION BY FINDING CONCENTRATION IN C++ Map using name.
+##    CppMaterialConcentrationDict={}
+##    print("pouet 3")
+##    
+##    CppMaterialConcentrationDict[symbol]=CppCCMaterial.GetConcentrationForElement(symbol) # add found concentration for element in concentration dictionary
+##    print("pouet 4")
+##    #Set the volumic concentration of Cpp chemical Element in the Cpp Concentration for the material's Cpp ChemicalComposition
+##    CppCCMaterial.GetConcentrationForElement(symbol).volumicValue=initialVolumicConcentration
+##    CppCCMaterial.mainElementName=mainEl
+##    print("CppConc Setted volumic volumic concentration ",CppCCMaterial.GetConcentrationForElement(symbol).volumicValue)
+CppMaterial.ConvertVolumicToInitialAtomicConcentration()#Convert and set initialAtomicValues
+CppMaterial.ConvertVolumicToInitialMassicConcentration()#Convert and set initialMassicValues
+    
 
 
 #Reading Vacancies Parameters
@@ -138,7 +173,8 @@ exec "CppVacancy= Vacancy("+material+".VacanciesParam['deltaHF'][0],\
                  "+material+".VacanciesParam['Dlac0'][0],\
                  "+material+".VacanciesParam['halfSinkD'][0],\
                  "+material+".VacanciesParam['Tsol'][0],\
-                 CppMaterial)"
+                 CppMaterial,\
+                 "+material+".VacanciesParam.get('coordinationNumber', [0,""])[0] )"
 CppVacancy.Info();
 
 
@@ -200,18 +236,29 @@ print("  > PyPrecipitates python Objects  dictionary = ",pyPD)
 ComputationList = c.type.split(">")
 for computation in ComputationList:
     print("  > Processing <"+computation+">")
-
+    #QUENCHING
     if computation == "Quenching":
         # Create an object of type Quenching:
-        Quenching = Quenching(M2024.VacanciesParam["Tsol"][0],
-                              nugrodis.QuenchingParam["Tfinal"][0],
-                              nugrodis.QuenchingParam["v"][0])
+        exec "Quenching = Quenching("+material+".VacanciesParam['Tsol'][0],\
+                              nugrodis.QuenchingParam['Tfinal'][0],\
+                              nugrodis.QuenchingParam['v'][0])"
         Quenching.Info();
+    #HARDENING
     if computation == "Hardening":
         # Create a C++ object of type Hardening:
         CppHardening=Hardening(nugrodis.HardeningParam["duration"][0],
                             nugrodis.HardeningParam["initialTimeStep"][0])
         CppHardening.Info()
+
+        
+        #InitialiszeGrains. Create C++ object SSGrain which belongs to the material,  and has the same properties as the material. TODO: call it InitializeSSGrain ?
+        CppMaterial.InitializeGrains()
+        #REMEMBER: if concentration in Material SSGrain is change, it affects concentration of Material, and vice versa
+
+        
+        
+
+        
         #Create a C++ object of type RadiusDistribution
         CppHardeningRadDis=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
                           nugrodis.CellParam['minimumRadius'][0],
@@ -219,25 +266,132 @@ for computation in ComputationList:
         CppHardeningRadDis.Info();
         #Create Precipitates C++ object  
         CppPrecipitateDict={} #a dictionary of precipitates Names as keys with their C++ Precipitate Objects associated. {"precipitate Name": CppPrecipitateObject}
-        
+##        CppPolynomialDict={} #a dictionary of precipitates Names as keys with their C++ Polynomial Objects asssociated. {"precipitates Name": CppPolynomialObject}
         for x in pyPD:
             pyPrecipitateObj=pyPD[x]
             #Step1: Build A C++ object ChemicalComposition. necessary for building Precipitate CppObject
+            print("End of concevrsion######################################################################################")
             exec "CppChemicalComposition"+x+"=ChemicalComposition(pyPrecipitateObj.chemicalComposition[0])"  # e.g.  CppChemicalCompositionGP, CppChemicalCompositionSprime, ...
+            print("End of concevrsion######################################################################################")
             exec "CppCompo=CppChemicalComposition"+x #just to be more understandable
+            print("End of concevrsion######################################################################################")
             #Step2: Create Precipitates: GuinierPreston , Sprime, and ....
             if pyPrecipitateObj.nature=="GuinierPreston":
                 #Create a GuinierPreston C++ object
-                print("  > Building a C++ GuinierPreston object  : <"+x+">")
-               #exec "Cpp"+x+"=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)"
-                CppPrecipitateDict[x]=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)
-                #step3: Set CppPrecipitates other properties manually or  with Precipitate.InitializeParameters(...)?
-            if pyPrecipitateObj.nature=="Sprime":
+                print("  > Building a C++ GuinierPreston object named : <"+x+">")
+                CppPrecipitate=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)
+                CppPrecipitateDict[x]=CppPrecipitate 
+                #step3: Set specific GuinierPreston properties manually . (Or  with Precipitate.InitializeParameters() ? 
+                CppPrecipitate.nucleationSitesNumber=pyPrecipitateObj.initialNucleationSitesNb[0]
+            #Step2: Create Precipitates: GuinierPreston , Sprime, and ....
+            elif pyPrecipitateObj.nature=="Sprime":
                 #Create a Sprime C++ object
-                print("  > Building a C++ Sprime object               : <"+x+">")
+                print("  > Building a C++ Sprime object named         : <"+x+">")
                #exec "Cpp"+x+"=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])"
-                CppPrecipitateDict[x]=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])
-                #step3: Set CppPrecipitates other properties manually or  with Precipitate.InitializeParameters(...)?
+                CppPrecipitate=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])
+                CppPrecipitateDict[x]=CppPrecipitate
+                #step3: Set Sprime specifice properties manually or  with Precipitate.InitializeParameters(...)?
+                #Sprime did not have any other specific properties than wetting Angle which have been already setted in constructor
+            else:
+                print("Precipitate nature should be Guinier Preston or Sprime")
+                sys.exit(-1)
+            #step4: Set precipiatate ChemicalComposition
+            #CppPrecipitate.
+            #step5: set common properties of GuinierPrecton, Sprime , ...
+            CppPrecipitate.solvusActivationEnergy=pyPrecipitateObj.solvusActivationEnergy[0]
+            CppPrecipitate.preExpTermForSolvus=pyPrecipitateObj.preExpTermForSolvus[0]
+            CppPrecipitate.shapeFactor=pyPrecipitateObj.shapeFactor[0]
+            CppPrecipitate.molarVolume=pyPrecipitateObj.molarVolume[0]
+            CppPrecipitate.deltaCell=pyPrecipitateObj.deltaCell[0]
+            CppPrecipitate.ComputeDistorsionEnergy()
+             #Set Precipitate Polynomial object
+            polyDeg=len(pyPrecipitateObj.surfaceEnergyPolynomialModel[0])-1
+            CppPrecipitate.SetSEPolynomialDegree(polyDeg)
+            CppPrecipitate.AddSEPolynomialPyCoefs(pyPrecipitateObj.surfaceEnergyPolynomialModel[0])
+            CppPrecipitate.Info()
+            #Set precipitate chemical Composition
+            CppCompoOfCppPrecipitate=CppPrecipitate.GetChemicalComposition() #getting ChemicalComposition C++ object of the C++ Precipitate
+            CppCCP=CppCompoOfCppPrecipitate#just to be more accessible
+            print("CC Cpp object of precipitate is: ",CppCCP)
+            print("Precipitate Chemical Formulation: ",CppCCP.formula)
+            PyCC=PyChemicalComposition(pyPrecipitateObj.chemicalComposition[0])
+
+            #Add "ALL" Cpp ChemicalElement inCpp ChemicalComposition of Cpp Precipitate
+            for u in PyCC.composition.items():
+                symbol=u[0]
+                stoichiometry=u[1][0]
+                print("pouet 1")
+                #Add Cpp ChemicalElement in Cpp ChemicalComposition of Cpp Precipitate
+                CppElementsDict[symbol].EnterInChemicalComposition(CppCCP)
+                print("pouet 2")
+
+#Method 1: SETTING CONCENTRATION BY USING CONCENTRATION PyDict. Not work well
+##            print("PyCC.Composition.items:  ",PyCC.composition.items())
+##            for u in PyCC.composition.items():
+##                symbol=u[0]
+##                stoichiometry=u[1][0]
+##                print("pouet 2 bis")
+##                CppConcentrationDict=CppCCP.GetConcentrationPyDict() #just to be more understandable. A dictionary of { "A chemical element symbol" : "Cpp object Concentration of the precipitate"}
+##                print("pouet 2 bis bis")
+##                #Set the stoichiometry of Cpp chemical Element in the Cpp Concentration for the Precipitate's Cpp ChemicalComposition
+##                print("pouet 3")
+##                CppConcentrationDict[symbol].stoichiometricCoef=stoichiometry
+##                print("CppConc Setted stoichiometric coefs ",CppConcentrationDict[symbol].stoichiometricCoef)
+##            #print("Python print stoichiomemetric coef. Bynding Get stoi coef",CppConcentrationDict[symbol].stoichiometricCoef)
+
+#Method 2: SETTING CONCENTRATION BY FINDING CONCENTRATION IN C++ Map using name.
+            CppConcentrationDict={}#A dictionary of { "A chemical element symbol" : "Cpp object Concentration of the precipitate"}
+            print("PyCC.Composition.items:  ",PyCC.composition.items())
+            for u in PyCC.composition.items():
+                symbol=u[0]
+                stoichiometry=u[1][0]
+                print("pouet 2")
+                #Set the stoichiometry of Cpp chemical Element in the Cpp Concentration for the Precipitate's Cpp ChemicalComposition
+                print("pouet 3")
+                CppConcentrationDict[symbol]=CppCCP.GetConcentrationForElement(symbol) # add found concentration for element in concentration dictionary
+                CppCCP.GetConcentrationForElement(symbol).stoichiometricCoef=stoichiometry
+                print("CppConc Setted stoichiometric coefs ",CppCCP.GetConcentrationForElement(symbol).stoichiometricCoef)
+            
+            
+
+            #CppCCP.GetChemicalElementsPyList() returns a python List of C++ ChemicalElement Objects from Precipitate ChemicalComposition C++ object
+            print("Chemical Elements C++ Objects of <"+x+">  Precipitate Chemical Composition  are:",CppCCP.GetChemicalElementsPyList())
+            print("Dictionary of Concentration C++ objects for precipitate <"+x+">: ",CppConcentrationDict)
+            print("######################################################################################")
+
+            print("Beginning of Conversion stoic into Atomic ")
+            CppPrecipitate.ConvertStoichiometricCoefficientToAtomicConcentration()
+            print("End of concevrsion######################################################################################")
+            CppPrecipitate.ConvertAtomicToVolumicConcentration()
+
+        #Initialize material precipitate: make precipitates belong to the material or the SSGrain
+
+            
+            
+            
+            #b=CppCCP.GetGrainPointer()
+            #print("Grain to which is linked the CC")
+            #print(b)
+
+
+##a=CppPrecipitate.GetChemicalComposition()
+##print(a.formula+" AAAAAAAAAAAAAAAA")
+##aCCL=a.GetChemicalElementsPyList()
+##print("last CppPrecipitate CC")
+##print("aCCL",aCCL)
+###CppElementsDict["Cu"].chemicalCompositionList()
+##print("CppChemicalCompositionGP.GetChemicalElementsPyList()",CppChemicalCompositionGP.GetChemicalElementsPyList())
+##CppElementsDict["Cu"].EnterInChemicalComposition(CppChemicalCompositionGP)
+##CppElementsDict["Cu"].EnterInChemicalComposition(CppChemicalCompositionSprime)
+##print(CppChemicalCompositionGP.GetChemicalElementsPyList())
+##print(CppChemicalCompositionGP.GetChemicalElementsPyList()[0].elementName)
+##print(InitialTempCpp.GetTemperaturePyList())
+##print("CppPrecipitates CC")
+##print("aCCL",aCCL)
+##print("CppChemicalCompositionSprime.GetChemicalElementsPyList()",CppChemicalCompositionSprime.GetChemicalElementsPyList())
+
+
+##    THERMAL LOADING
 ##    if computation == "ThermalLoading":
 ##        #Create an object of type ThermalLoading:
 ##        ThermalLoading=thermalLoading()
@@ -248,6 +402,40 @@ for computation in ComputationList:
 
 # some stuff.... for Moubarak !
 
+
+
+CppMaterial.Info()
+CppMaterial.GetSSGrain().volNbGP=4
+CppMaterial.Info()
+CppMaterial.GetSSGrain().GetChemicalComposition().Info()
+CppMaterial.GetInitialChemicalComposition().Info()
+
+
+print('##############################################################################5674555555555555555555555555555555555555555')
+toto=ChemicalComposition("Al8Cu4")
+toto2=toto.Clone()
+toto3=CppChemicalCompositionSprime.Clone()
+toto3.GetGrainPointer()
+toto3.GetMaterialPointer()
+toto3.GetConcentrationForElement("Al")
+CppChemicalCompositionSprime.GetGrainPointer()
+CppChemicalCompositionSprime.GetMaterialPointer()
+CppChemicalCompositionSprime.GetConcentrationForElement("Al")
+print('##############################################################################5674555555555555555555555555555555555555555')
+
+
+
+print("Material test")
+CppMaterial.test()
+print("SSGrain test")
+CppMaterial.GetSSGrain().test()
+
+CppMaterial.GetInitialChemicalComposition().test()
+CppMaterial.GetSSGrain().GetChemicalComposition().test()
+CppMaterial.GetCurrentChemicalComposition().test()#if concentration in Material SSGrain is change, it affects concentration of Material
 c.Run()
+
+
+
 
 # éééé

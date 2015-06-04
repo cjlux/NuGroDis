@@ -1,7 +1,8 @@
 
                  NAME = Metallurgical
 
-	SRC_FILE_LIST = ChemicalComposition.cpp	\
+	SRC_FILE_LIST = ChemicalComposition.cpp\
+			Boundary.cpp\
 			ChemicalElement.cpp\
 			Concentration.cpp \
 			Computation.cpp \

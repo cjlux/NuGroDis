@@ -15,6 +15,10 @@
 #ifndef __Boundary__hpp__
 #define __Boundary__hpp__
 
+#include <vector>
+
+#include <boost/python.hpp>
+
 class Boundary
 {
 
@@ -23,6 +27,9 @@ public:
     ~Boundary();
     
     void Info() const;
+    
+//template<class T>
+static boost::python::list vectorToPyList(const std::vector<double>& v);
 
 protected:
 

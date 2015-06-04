@@ -19,6 +19,7 @@
 
 #include "Precipitate.hpp"
 
+
 class GuinierPreston: public Precipitate
 {
 
@@ -26,7 +27,7 @@ public:
     GuinierPreston(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD);//argument-->Material& because of inheritance with Precipitate
     ~GuinierPreston();
     
-    //void Info() const; //not needed here, Already in class Precipitate
+    void Info() const; 
     
     //Compute the number of nucleation sites using RadiusDistribution::ComputeTotNbOfItems
     void ComputeNucleationSiteNb();
@@ -36,7 +37,7 @@ public:
     
     void ReadDataValue(std::string fileName);
 
-  double WettingFunction(double theta) { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
+    double WettingFunction(double theta) { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
 
 
 protected:

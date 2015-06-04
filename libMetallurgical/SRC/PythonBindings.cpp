@@ -1,6 +1,7 @@
 #include <boost/python.hpp>
 
 #include <string>
+#include "Boundary.hpp"
 #include "ChemicalComposition.hpp"
 #include "ChemicalElement.hpp"
 #include "Concentration.hpp"
@@ -10,6 +11,7 @@
 #include "GuinierPreston.hpp"
 #include "Hardening.hpp"
 #include "Material.hpp"
+#include "Polynomial.hpp"
 #include "Precipitate.hpp"
 #include "Quenching.hpp"
 #include "RadiusDistribution.hpp"
@@ -29,6 +31,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
  
   //TODO class Boundary Binding !!!!
   
+  boost::python::class_<Boundary>("Boundary", boost::python::init< >() )
+    //.def("vectorToPyList", &Boundary::vectorToPyList, return_value_policy<manage_new_object>() )
+    //.staticmethod("vectorToPyList")
+    ;
   
 
   //TODO some stuff 
@@ -37,8 +43,19 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def(boost::python::init<std::string, Material& >())
     .def(boost::python::init<std::string, Material&, SSGrain& >())
     .add_property("formula", &ChemicalComposition::GetFormula)
-    //.add_property("material", &ChemicalComposition::GetMaterial)
-    //.add_property("grain", &ChemicalComposition::GetGrain)
+    .add_property("mainElementName", &ChemicalComposition::GetMainElementName, &ChemicalComposition::SetMainElementName )
+    .def("GetMaterial", &ChemicalComposition::GetMaterial,boost::python::return_internal_reference<>() )
+    .def("GetGrain", &ChemicalComposition::GetGrain,boost::python::return_internal_reference<>() )
+    .def("GetMaterialPointer", &ChemicalComposition::GetMaterialPointer,boost::python::return_internal_reference<>() )
+    .def("GetGrainPointer", &ChemicalComposition::GetGrainPointer,boost::python::return_internal_reference<>() )
+    .def("GetChemicalElementsPyList", &ChemicalComposition::GetChemicalElementsPyList )
+    .def("GetConcentrationPyDict",&ChemicalComposition::GetConcentrationPyDict, boost::python::return_internal_reference<>() )
+    .def("GetConcentrationForElement",&ChemicalComposition::GetConcentrationForElement,boost::python::return_internal_reference<>() )
+    //.def("GetConcentrationMap",&ChemicalComposition::GetConcentrationMap, boost::python::return_internal_reference<>() )
+     //.def("GetChemicalElementsList", &ChemicalComposition::GetChemicalElementsList, boost::python::return_internal_reference<>() )
+    //.def("GetConcentrationPyList", &ChemicalComposition::GetChemicalElementsPyList )
+    .def("Clone", &ChemicalComposition::Clone, boost::python::return_value_policy<boost::python::manage_new_object>() )
+    .def("test", &ChemicalComposition::test)
     .def("Info", &ChemicalComposition::Info)
     ;    
     
@@ -50,8 +67,9 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("poissonCoefficient", &ChemicalElement::GetPoissonCoefficient)
     .add_property("latticeParameter", &ChemicalElement::GetLatticeParameter, &ChemicalElement::SetLatticeParameter)
     .add_property("elementName", &ChemicalElement::GetElementName)
-    .add_property("chemicalCompositionList", &ChemicalElement::GetChemicalComposition)
+    .def("chemicalCompositionList", &ChemicalElement::GetChemicalComposition )
     .def("EnterInChemicalComposition", &ChemicalElement::EnterInChemicalComposition)
+    .def("GetDiffusion",&ChemicalElement::GetDiffusion, boost::python::return_internal_reference<>() /*, boost::python::return_value_policy<boost::python::manage_new_object>()*/ )
     .def("Info", &ChemicalElement::Info)
     ;
 
@@ -59,11 +77,13 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
     //TODO some stuff
   boost::python::class_<Concentration>("Concentration", boost::python::init<ChemicalElement&, ChemicalComposition& >() )
-    //.add_property("ChemicalElement", &Concentration::GetChemicalElement)
+    
     //.add_property("ChemicalComposition", &Concentration::GetChemicalComposition)
     .add_property("volumicValue", &Concentration::GetVolumicValue,&Concentration::SetVolumicValue)
     .add_property("initialAtomicValue", &Concentration::GetInitialAtomicValue,&Concentration::SetInitialAtomicValue)
     .add_property("initialMassicValue", &Concentration::GetInitialMassicValue,&Concentration::SetInitialMassicValue)
+    .add_property("stoichiometricCoef", &Concentration::GetStoichiometricCoef,&Concentration::SetStoichiometricCoef)
+    .def("GetChemicalElement", &Concentration::GetChemicalElement,boost::python::return_internal_reference<>())
     .def("Info", &Concentration::Info)
     ;
   
@@ -81,12 +101,78 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("preExpDiffusionCoef", &Diffusion::GetPreExpDiffusionCoef)
     .add_property("activationEnergy", &Diffusion::GetActivationEnergy)
     .add_property("interactionEnergyWithVacancy", &Diffusion::GetInteractionEnergyWithVacancy)
+    .add_property("toto", &Diffusion::GetToto,&Diffusion::SetToto)
+    .def("ComputeAtomicDiffusionCoefValue", &Diffusion::ComputeAtomicDiffusionCoefValue)
     .def("Info", &Diffusion::Info)
     ;  
     
-   
-  //TODO !!! check no_init correct ?
+    
+    
+  /* struct GrainWrap : Grain , boost::python::wrapper<Grain>
+   {
+    void ConvertMassicToVolumicConcentration()
+    {
+        this->get_override("ConvertMassicToVolumicConcentration")();
+    }
+    
+    void ConvertVolumicToMassicConcentration()
+    {
+      this->get_override("ConvertVolumicToMassicConcentration")();
+    }
+    
+    void ConvertAtomicToVolumicConcentration()
+    {
+      this->get_override("ConvertAtomicToVolumicConcentration")();
+    }
+    
+    void ConvertVolumicToAtomicConcentration()
+    {
+      this->get_override("ConvertVolumicToAtomicConcentration")();
+    }
+    
+    void ConvertStoichiometricCoefficientToVolumicConcentration()
+    {
+      this->get_override("ConvertStoichiometricCoefficientToVolumicConcentration")();
+    }
+    
+    void ConvertStoichiometricCoefficientToAtomicConcentration()
+    {
+      this->get_override("ConvertStoichiometricCoefficientToAtomicConcentration")();
+    }
+    
+   int GetVolNbPrecipitates()
+    {
+      return this->get_override("GetVolNbPrecipitates")();
+    }
+    
+   };
+    
+    
+
+    
+  boost::python::class_<GrainWrap, boost::noncopyable>("Grain")
+    .def("ConvertMassicToVolumicConcentration", boost::python::pure_virtual(&Grain::ConvertMassicToVolumicConcentration))
+    .def("ConvertVolumicToMassicConcentration", boost::python::pure_virtual(&Grain::ConvertVolumicToMassicConcentration))
+    .def("ConvertAtomicToVolumicConcentration", boost::python::pure_virtual(&Grain::ConvertAtomicToVolumicConcentration))
+    .def("ConvertVolumicToAtomicConcentration", boost::python::pure_virtual(&Grain::ConvertVolumicToAtomicConcentration))
+    .def("ConvertStoichiometricCoefficientToVolumicConcentration", boost::python::pure_virtual(&Grain::ConvertStoichiometricCoefficientToVolumicConcentration))
+    .def("ConvertStoichiometricCoefficientToAtomicConcentration", boost::python::pure_virtual(&Grain::ConvertStoichiometricCoefficientToAtomicConcentration))
+    
+    .def("GetVolNbPrecipitates", boost::python::pure_virtual(&Grain::GetVolNbPrecipitates))
+    //.add_property("molarVolume", &Grain::GetMolarVolume,&Grain::SetMolarVolume)
+    //.add_property("meanDiameter", &Grain::GetMeanDiameter,&Grain::SetMeanDiameter)
+    //.def("GetChemicalComposition", &Grain::GetChemicalComposition , boost::python::return_internal_reference<>() )
+    //.def("Info", &Grain::Info)
+    ;*/
+    
+
+    
+//TODO !!! check no_init correct ?
   boost::python::class_<Grain,boost::noncopyable >("Grain", boost::python::no_init /*<Material&, ChemicalComposition&>()*/ )
+  //boost::python::class_<Grain,boost::noncopyable >("Grain", boost::python::init<Material&, ChemicalComposition&>() )
+    .add_property("molarVolume", &Grain::GetMolarVolume,&Grain::SetMolarVolume)
+    .add_property("meanDiameter", &Grain::GetMeanDiameter,&Grain::SetMeanDiameter)
+    .def("GetChemicalComposition", &Grain::GetChemicalComposition  , boost::python::return_internal_reference<>() )
     .def("Info", &Grain::Info)
     ;
     
@@ -99,6 +185,9 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("volNbGP", &SSGrain::GetVolNbGP, &SSGrain::SetVolNbGP)
     .add_property("volNbSprime", &SSGrain::GetVolNbSprime, &SSGrain::SetVolNbSprime)
     .add_property("volNbPrecipitates", &SSGrain::GetVolNbPrecipitates, &SSGrain::SetVolNbPrecipitates)
+    .def("ConvertVolumicToAtomicConcentration", &SSGrain::ConvertVolumicToAtomicConcentration)
+   // .def("GetPrecipitateList", &SSGrain::GetPrecipitateList)
+    .def("test", &SSGrain::test)
     .def("Info", &SSGrain::Info)
     ;
     
@@ -106,12 +195,18 @@ BOOST_PYTHON_MODULE(Metallurgical)
   boost::python::class_<Precipitate, boost::python::bases<Grain>, boost::noncopyable >("Precipitate", boost::python::no_init /*<Material&, ChemicalComposition&, RadiusDistribution& >()*/ )
     .add_property("deltaCell", &Precipitate::GetDeltaCell,&Precipitate::SetDeltaCell)
     .add_property("solvusActivationEnergy", &Precipitate::GetSolvusActivationEnergy, &Precipitate::SetSolvusActivationEnergy)
-    .add_property("distorsionEnergy", &Precipitate::GetDistorsionEnergy,&Precipitate::SetDistorsionEnergy)
+    .add_property("distorsionEnergy", &Precipitate::GetDistorsionEnergy)
     .add_property("nucleationSitesNumber", &Precipitate::GetNucleationSitesNumber,&Precipitate::SetNucleationSitesNumber)
     .add_property("preExpTermForSolvus", &Precipitate::GetPreExpTermForSolvus,&Precipitate::SetPreExpTermForSolvus)
     .add_property("shapeFactor", &Precipitate::GetShapeFactor,&Precipitate::SetShapeFactor)
     .add_property("volumicFraction", &Precipitate::GetVolumicFraction,&Precipitate::SetVolumicFraction)
+    //.add_property("surfaceEnergyPolynomial", &Precipitate::GetSurfaceEnergyPolynomial)
     //.add_property("initialRadiusDistribution", &Precipitate::GetInitialRadiusDistribution)
+    .def("ComputeDistorsionEnergy", &Precipitate::ComputeDistorsionEnergy)
+    .def("SetSEPolynomialDegree", &Precipitate::SetSEPolynomialDegree)
+    .def("AddSEPolynomialPyCoefs", &Precipitate::AddSEPolynomialPyCoefs)
+    .def("ConvertStoichiometricCoefficientToAtomicConcentration", &Precipitate::ConvertStoichiometricCoefficientToAtomicConcentration)
+    .def("ConvertAtomicToVolumicConcentration", &Precipitate::ConvertAtomicToVolumicConcentration)
     .def("Info", &Precipitate::Info)
     ;
     
@@ -141,20 +236,35 @@ BOOST_PYTHON_MODULE(Metallurgical)
   boost::python::class_<Material>("Material", boost::python::init<Temperature&, ChemicalElement&, ChemicalComposition& >() )
     //.add_property("temperature", &Material::GetTemperature,&Material::SetTemperature)
     //.add_property("vacancyList", &Material::GetVacancyList)
-    //.add_property("ssgrainList", &Material::GetSSGrain)
-    //.add_property("mainChemicalElement", &Material::GetMainChemicalElement)
-    //.add_property("InitialChemicalComposition", &Material::GetInitialChemicalComposition)
-    //.add_property("precipitatesList", &Material::GetPrecipitateList)
+    .def("GetSSGrain", &Material::GetSSGrain,boost::python::return_internal_reference<>() ) //Gives the C++ object ssgrain
+    .def("GetSSGrainPointer", &Material::GetSSGrainPointer/*,boost::python::return_value_policy<boost::python::manage_new_object>()*/ , boost::python::return_internal_reference<>() ) //Gives the C++ object ssgrain
+    .def("GetMainChemicalElement", &Material::GetMainChemicalElement,boost::python::return_internal_reference<>() )
+    .def("GetInitialChemicalComposition", &Material::GetInitialChemicalComposition,boost::python::return_internal_reference<>() )
+    .def("GetCurrentChemicalComposition", &Material::GetCurrentChemicalComposition,boost::python::return_internal_reference<>() )
+    //.add_property("precipitateList", &Material::GetPrecipitateList)
     .add_property("YoungModulus", &Material::GetYoungModulus)
     .add_property("PoissonCoeff", &Material::GetPoissonCoeff)
     .add_property("latticeParameter", &Material::GetLatticeParameter)
+    .def("InitializeGrains", &Material::InitializeGrains)
+    .def("ConvertVolumicToInitialAtomicConcentration", &Material::ConvertVolumicToInitialAtomicConcentration)
+    .def("ConvertVolumicToInitialMassicConcentration", &Material::ConvertVolumicToInitialMassicConcentration)
+    .def("ReturnAtomicConcFromVolumicForElement", &Material::ReturnAtomicConcFromVolumicForElement)
+    .def("UpdateVolumicValues", &Material::UpdateVolumicValues)
+    .def("test", &Material::test)
     .def("Info", &Material::Info)
     ;
     
 
     
-    //TODO !!! class Polynomial Binding 
+    //TODO Info()
+  boost::python::class_<Polynomial>("Polynomial", boost::python::init<int >() )
+    .add_property("degree", &Polynomial::GetDegree)
+    .add_property("coefsList", &Polynomial::GetCoefsList,&Polynomial::SetCoefs)
+    .def("AddPyCoefs", &Polynomial::AddPyCoefs)
+    .def("Info", &Polynomial::Info)
     
+    
+    ;
     
   boost::python::class_<Quenching>("Quenching", boost::python::init<double, double, double, boost::python::optional<double> >() )
     .add_property("CoolingRate", &Quenching::GetCoolingRate)
@@ -166,7 +276,6 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("timeStep", &Quenching::GetTimeStep)
     .def("Info", &Quenching::Info)
     ;
-    
     
     //TODO some stuff
   boost::python::class_<RadiusDistribution>("RadiusDistribution", boost::python::init<double, double, double >() )
@@ -182,7 +291,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
      //TODO some stuff
   boost::python::class_<Temperature>("Temperature", boost::python::init< boost::python::optional<double> >() )
     .add_property("currentTemp", &Temperature::GetCurrentTemp, &Temperature::SetCurrentTemp)
-    //.add_property("temperatureList", &Temperature::GetTemperatureList)
+    .def("GetTemperaturePyList", &Temperature::GetTemperaturePyList )
     .def("Info", &Temperature::Info)
     ;
     
@@ -196,13 +305,13 @@ BOOST_PYTHON_MODULE(Metallurgical)
       
     
   boost::python::class_<ThermoDynamicsConstant>("ThermoDynamicsConstant", boost::python::init<double, double, double>() )
-    .add_property("R",  &ThermoDynamicsConstant::GetR)
+    .add_property("R",  &ThermoDynamicsConstant::Get_R)
     .add_property("kB", &ThermoDynamicsConstant::Get_kB)
-    .add_property("Na", &ThermoDynamicsConstant::GetNa)
+    .add_property("Na", &ThermoDynamicsConstant::Get_Na)
     .def("Info", &ThermoDynamicsConstant::Info)
     ;    
 
-  boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, Material& >() )
+  boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, Material&, boost::python::optional<double> >() )
     .add_property("vacCreationEnthalpy", &Vacancy::GetVacCreationEnthalpy, &Vacancy::SetVacCreationEnthalpy)
     .add_property("vacCreationEntropy", &Vacancy::GetVacCreationEntropy, &Vacancy::SetVacCreationEntropy)
     .add_property("migrationEnthalpy", &Vacancy::GetMigrationEnthalpy, &Vacancy::SetMigrationEnthalpy)
@@ -210,10 +319,16 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("jumpFrequency", &Vacancy::GetJumpFrequency, &Vacancy::SetJumpFrequency)
     .add_property("preExpDiffusionValue", &Vacancy::GetPreExpDiffusionValue, &Vacancy::SetPreExpDiffusionValue)
     .add_property("solutionisingTemp", &Vacancy::GetSolutionisingTemp, &Vacancy::SetSolutionisingTemp)
+    .def("ComputeDiffusionCoefValue", &Vacancy::ComputeDiffusionCoefValue)
     .def("Info", &Vacancy::Info)
     ;
 
 }
+
+
+
+
+
 
 
                                      //HOW TO SECTION

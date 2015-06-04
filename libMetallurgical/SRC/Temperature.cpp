@@ -15,6 +15,10 @@
 #include <cassert>
 #include <iostream>
 
+#include "Boundary.hpp"
+
+
+
 #include "Temperature.hpp"
 
 Temperature::Temperature(double T) //T=293.15 K,   Standard conditions for temperature and pressure (STP)
@@ -35,6 +39,25 @@ Temperature::SetCurrentTemp(const double temp)
   assert(temp >= 0) ; // unit is Kelvin, 
   currentTemp_ = temp;
   temperatureList_.push_back(currentTemp_);
+}
+
+
+
+
+
+boost::python::list 
+Temperature::GetTemperaturePyList()
+{
+  
+  boost::python::list temperaturePylist;
+  for( std::vector<double>::const_iterator i = temperatureList_.begin(); i != temperatureList_.end(); ++i)
+  {
+    temperaturePylist.append(*i);
+  }
+    //temperaturePylist=Boundary::vectorToPyList(temperatureList_);
+  //return temperaturePylist;
+
+  return temperaturePylist; 
 }
 
 void

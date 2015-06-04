@@ -31,6 +31,9 @@ class Material
 {
 
 public:
+  //FAKE METHOD
+   void test();
+  
   Material();
   Material(Temperature& , ChemicalElement&, ChemicalComposition& InitialCompo);
   
@@ -41,6 +44,10 @@ public:
   void Info() const;
   void ReadData(std::string dataFileName);
   void InitializeGrains(); //Initialize material SSgrains AND/OR precipitates
+  void UpdateVolumicValues();//Actualize the volumic value taking into account the volumic fraction of precipitates
+  void ConvertVolumicToInitialAtomicConcentration();
+  void ConvertVolumicToInitialMassicConcentration();
+  double ReturnAtomicConcFromVolumicForElement(std::string elementName) const;
   
   //Getter
   Temperature & GetTemperature() const {return temperature_; } 
@@ -57,16 +64,29 @@ public:
   std::vector<Grain *> GetGrainList() const {return grainList_; } ;//TO DO should be SSGraibLIst+PrecipitateList
   std::vector<Vacancy *> GetVacancyList() const {return vacancyList_; } ;
   const ChemicalElement& GetMainChemicalElement() const {return mainChemicalElement_; };
-  ChemicalComposition & GetInitialChemicalComposition() const {return InitialChemicalComposition_; }; //Not const because==>
-											//SSGrain.cpp:30: error: invalid initialization  
-                                                                                        //of reference of type ‘ChemicalComposition&’ from
-                                                                                        //expression of type ‘const ChemicalComposition’
-  const std::vector<Precipitate *> & GetPrecipitateList() const {return precipitatesList_; };
-  SSGrain * GetSSGrain() const {return ssgrain_; } ; 
+  const ChemicalComposition & GetInitialChemicalComposition() const 
+  {
+    std::cout<<"in GetInitialChemCompo. Adress of Material is"<<this<<std::endl;
+    std::cout<<"in GetInitialChemCompo. Adress of initialChemicalComposition"<<&InitialChemicalComposition_<<std::endl;
+    return InitialChemicalComposition_; 
+    
+  }; //Not const because==> SSGrain.cpp:30: error: invalid initialization of reference of type ‘ChemicalComposition&’ from
+  //expression of type ‘const ChemicalComposition’
+  
+  ChemicalComposition & GetCurrentChemicalComposition() const {return currentChemicalComposition_;};
+  const std::vector<Precipitate *> & GetPrecipitateList() const {return precipitateList_; };
+  std::vector<Precipitate *> & GetPrecipitateList() {return precipitateList_; };
+  SSGrain * GetSSGrainPointer() const {return ssgrainPointer_; } ; 
+  SSGrain& GetSSGrain() const 
+  {
+    assert ( (ssgrainPointer_!=0)&&"Cannot gGetSSGrain because pointer is 0" );  
+    return *ssgrainPointer_;
+    
+  };
   std::vector<const ChemicalElement*> GetSoluteList() const {return soluteList_;};
   
   //setter
-  void AddGrain(Grain& grain) ;//TODO grain_ can be alot of things:  SSGrain, Precipitate, or maybe in the future something else . Precipitate can be a lot of things: GuinierPreson,Sprime, ... 
+  void AddGrain(Grain& grain) ;//TODO grain_ can be a lot of things:  SSGrain, Precipitate, or maybe in the future something else . Precipitate can be a lot of things: GuinierPreson,Sprime, ... 
   void AddVacancy(const Vacancy& vacancy) ;
   void SetSSGrain(SSGrain& ssgrain) ;
   //void SetChemicalElement(const ChemicalElement& chemElm); //unuseful?
@@ -83,21 +103,22 @@ private:
   std::vector<Vacancy *> vacancyList_;
   std::vector<Grain *> grainList_; //TODO should be automatically SSGrainList+PrecipitateList
   const ChemicalElement& mainChemicalElement_;
-  ChemicalComposition& InitialChemicalComposition_;
+  const ChemicalComposition& InitialChemicalComposition_;
+  ChemicalComposition& currentChemicalComposition_; //Also the chemicalComposition (same object, same adress) of the SSGrain if material has one
   std::vector<const ChemicalElement*> soluteList_; /*list of solute in the material/ssgrain. 
                                                    can also be used to find diffusion param of
                                                    solutes in the material/ssgrain*/
  
   //TODO Get ssGrain, Precipitates( =GP OR Sprime OR ...) from grainList_. Retrieve the type of specialisation class
   
-  SSGrain * ssgrain_; //material has 0 or 1 ssgrain_.  Remember that ssgrain is the family of SSGrains
-  std::vector<Precipitate *> precipitatesList_;
+  SSGrain * ssgrainPointer_; //material has 0 or 1 ssgrainPointer_.  Remember that ssgrain is the family of SSGrains
+  std::vector<Precipitate *> precipitateList_;
   // Mechanical parameters are those of the main chemical component..:
   const double YoungModulus_;
   const double PoissonCoeff_;
   const double latticeParameter_;
  
-  //IMPORTANT: Material current ChemicalComposition is known thanks to ssgrain_ and its attribute chemicalComposition_ 
+  //IMPORTANT: Material current ChemicalComposition is known thanks to ssgrainPointer_ and its attribute chemicalComposition_ 
 };
 
 #endif

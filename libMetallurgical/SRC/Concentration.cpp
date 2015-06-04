@@ -23,13 +23,43 @@ Concentration::Concentration(const ChemicalElement& elem,const ChemicalCompositi
    chemicalComposition_(CC),
    volumicValue_(-1),
    initialAtomicValue_(-1),
-   initialMassicValue_(-1)
+   initialMassicValue_(-1),
+   stoichiometricCoef_(0),
+   initialAtomicValueHasBeenSet_(false),
+   initialMassicValueHasBeenSet_(false)
 {
 }
 
 Concentration::~Concentration()
 {
 }
+
+
+//TODO could be inline
+const int 
+Concentration::GetStoichiometricCoef() const
+{ 
+  assert( (stoichiometricCoef_>0)&&"Cannot Get StoichiometricCoef because it is not strictly positive " );
+  return stoichiometricCoef_;
+}
+
+
+
+
+void
+Concentration::SetStoichiometricCoef(const int stoiCoef)
+{
+  std::cout<<"In SetStoichoef. Old value is: "<<stoichiometricCoef_<<std::endl;
+  assert( (stoiCoef>0)&&"Cannot set value. Stoichiometric coef must be strictly positive " );
+  
+  stoichiometricCoef_=stoiCoef;
+  std::cout<<"In SetStoichoef.After assert. New value is: "<<stoichiometricCoef_<<std::endl;
+  std::cout<<"In SetStoichoef.After assert. Addresse of C++ object conentration is "<<this<<std::endl;
+  std::cout<<"In SetStoichoef.After assert. Adress of chemical composition is: "<<&chemicalComposition_<<std::endl;
+  std::cout<<"In SetStoichoef.After assert. Adress of chemicalCompo's Grain is: "<<&(chemicalComposition_.GetGrain())<<std::endl;
+  
+}
+
 
 
 void
@@ -41,6 +71,11 @@ void
 Concentration::ComputeMassicValue()
 {
 }
+
+
+
+
+
 
 void
 Concentration::Info() const

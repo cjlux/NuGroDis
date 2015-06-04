@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <cassert>
 
 class Material; 
 class ChemicalElement;
@@ -28,20 +29,20 @@ class Vacancy
 public:
 
     //The constructor
-    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat);
+    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb=0);
     
     ~Vacancy();
     
     void Info() const;
     
-    void SetHalfSinkDistance(const double &);
-    void SetJumpFrequency(const double &);
-    void SetVacCreationEnthalpy(const double &);
-    void SetVacCreationEntropy(const double &);
-    void SetConcentration(const double &);
-    void SetMigrationEnthalpy(const double &);
-    void SetSolutionisingTemp(const double &);
-    void SetPreExpDiffusionValue(const double &);
+    void SetHalfSinkDistance(const double );
+    void SetJumpFrequency(const double );
+    void SetVacCreationEnthalpy(const double );
+    void SetVacCreationEntropy(const double );
+    void SetConcentration(const double );
+    void SetMigrationEnthalpy(const double );
+    void SetSolutionisingTemp(const double );
+    void SetPreExpDiffusionValue(const double );
     
     double GetHalfSinkDistance() const;
     double GetJumpFrequency() const;
@@ -52,8 +53,27 @@ public:
     double GetSolutionisingTemp() const;
     double GetPreExpDiffusionValue() const;
     
+    
+    //Computes and set the vacancy diffusion coefficient for the current value of temperature(was compute Dlac)  . Unit: K
+    void ComputeDiffusionCoefValue();
+
+    //return a coputed value of boost facto (return lambda=Xlac/Xlaceq)
+    const double ReturnBoostFactor() const;
+    
     //Compute and save equilibrium concentration of vacancies after solutionising. Was Xlacavtremp.  To do: check validity of the equation
     void ComputeConcentrationBeforeQuenching();
+    
+    //Compute and set the current equilibrium concentration for the current temperature (Xlaceq)
+    void ComputeEquilibriumConcentration();
+    
+    //Return after computing (not set, just compute) current equilibrium concentration for the current temperature (Xlaceq)
+    const double ReturnEquilibriumConcentration() const;
+    
+    double GetVacancyDiffusionCoef() const ;
+    
+    const double GetCoordinationNumber() const {return coordinationNumber_;};
+    
+    const double GetEquilibriumConcentration() const {return equilibriumConc_;};
     
     //get equilibrium concentration of vacancies after solutionising.  was Xlacavtremp
     double GetConcentrationBeforeQuenching() const ;
@@ -70,10 +90,12 @@ public:
     // Compute and save the evolution of vacancies based on analytical solution of the differential equation 
     double SolveConcentrationEvolutionEquation();
     
-    void SetConcentrationBeforeQuenching(const double &);
+    void SetConcentrationBeforeQuenching(const double );
     
     //Set the vacancy concentration  value after hardening  (maturation or tempering). Set XlacFinmat. Last Current value of concentration_ can be  Concentratrion  After hardening.
-    void SetConcentrationAfterHardening(double &);
+    void SetConcentrationAfterHardening(double );
+    
+    void SetVacancyDiffusionCoef(const double);
     
     
     
@@ -102,12 +124,18 @@ private:
     double halfSinkDistance_;
     //Frequency of vacancy's jumps (was fE). Unit: s^(-1)
     double jumpFrequency_;
-    //Preexponential term of vacancy diffusion expression(was Dlac0). Unit: m^2/s
+    //Preexponential term of vacancy diffusion expression(was Dlac0).Initial diffusion coef value Unit: m^2/s
     double preExpDiffusionValue_;
     //Enthalpy of vacancy migration (Was DeltaHM). Unit: J/mol
     double migrationEnthalpy_;
     //Solutionising temperature: temperature at which the metal is heated before quenching (was Tf). Unit: K
     double solutionisingTemp_;
+    const double coordinationNumber_;
+    
+    //Current diffusion coef value according to current value of temperature (was Dlac)
+    double vacancyDiffusionCoef_;
+    //equilibium concentration of vacancies for the current temperature (was Xlaceq)
+    double equilibriumConc_;
     
     
     //RELATIONS
@@ -116,46 +144,71 @@ private:
 
 };
 
+    
+//return a coputed value of boost facto (return lambda=Xlac/Xlaceq)
+inline const double  
+Vacancy::ReturnBoostFactor() const
+{
+  
+  assert( (equilibriumConc_>0)&&"In ReturnBoostFactor(): Equilibrium concentration has not been computed (it must be different from 0)");
+  double XlacEq=this->ReturnEquilibriumConcentration();
+  assert ( (equilibriumConc_==XlacEq )&&"In ReturnBoostFactor():Equilibrium concentration has not\
+  been actualize. Use method ComputeEquilibriumConcentration() before ReturnBoostFactor() ");
+  
+  double lambda=(concentration_/equilibriumConc_);
+  
+  assert( (lambda>0)&&"In ReturnBoostFactor(): diffusion Boost factor must be positive");
+  
+  return lambda;
+}
+
+
+
+inline double 
+Vacancy::GetVacancyDiffusionCoef() const 
+{
+  return vacancyDiffusionCoef_;
+}
 
 
 inline void
-Vacancy::SetConcentrationAfterHardening(double &C)
+Vacancy::SetConcentrationAfterHardening(double C)
 {
 }
 
 //Setters
 inline void
-Vacancy::SetConcentrationBeforeQuenching(const double &cBQ)
+Vacancy::SetConcentrationBeforeQuenching(const double cBQ)
 {
   concentrationBeforeQuenching_=cBQ;
 }
 
 inline void
-Vacancy::SetHalfSinkDistance(const double &hSD)
+Vacancy::SetHalfSinkDistance(const double hSD)
 {
   halfSinkDistance_=hSD;
 }
 
 inline void
-Vacancy::SetJumpFrequency(const double &jF)
+Vacancy::SetJumpFrequency(const double jF)
 {
   jumpFrequency_=jF;
 }
 
 inline void
-Vacancy::SetVacCreationEnthalpy(const double &vCEnthalpy)
+Vacancy::SetVacCreationEnthalpy(const double vCEnthalpy)
 {
   vacCreationEnthalpy_=vCEnthalpy;
 }
 
 inline void
-Vacancy::SetVacCreationEntropy(const double &vCEntropy)
+Vacancy::SetVacCreationEntropy(const double vCEntropy)
 {
   vacCreationEntropy_=vCEntropy;
 }
 
 inline void
-Vacancy::SetConcentration(const double &C)
+Vacancy::SetConcentration(const double C)
 {
   concentration_=C;
 }
@@ -163,19 +216,19 @@ Vacancy::SetConcentration(const double &C)
 
 
 inline void
-Vacancy::SetMigrationEnthalpy(const double &migrationEnth)
+Vacancy::SetMigrationEnthalpy(const double migrationEnth)
 {
   migrationEnthalpy_=migrationEnth;
 }
 
 inline void
-Vacancy::SetSolutionisingTemp(const double &solT)
+Vacancy::SetSolutionisingTemp(const double solT)
 {
   solutionisingTemp_=solT;
 }
 
 inline void
-Vacancy::SetPreExpDiffusionValue(const double &pEDV)
+Vacancy::SetPreExpDiffusionValue(const double pEDV)
 {
  preExpDiffusionValue_ =pEDV;
 }

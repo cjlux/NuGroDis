@@ -15,6 +15,8 @@
 #ifndef __Concentration__hpp__
 #define __Concentration__hpp__
 
+#include <cassert>
+
 class ChemicalElement;
 class ChemicalComposition;
 
@@ -31,34 +33,42 @@ public:
     
     void Info() const;
     
-    //Compute the atomic concentration from  current volumic value. 
+    //Compute and NOT SET the atomic concentration from  current volumic value. 
     //Because current atomic concentration is not stored , it is computed using chemicalElement::ConvertVolumicToAtomicConcentration
     void ComputeAtomicValue();
     
-    // Compute massic from the current volumic value  Because current amassic concentration is not 
+    // Compute NOT SET massic from the current volumic value  Because current amassic concentration is not 
     // stored , it is computed using chemicalElement::ConvertVolumicToAtMassicncentration
     void ComputeMassicValue();
     
+    
+    
+    
+    
+    //setters
     //Set Initial atomic value
-    void SetInitialAtomicValue();
-    
+    void SetInitialAtomicValue(const double initialAtomicValue);
     //Set Initial massic value
-    void SetInitialMassicValue();
-    
+    void SetInitialMassicValue(const double initialMassicValue);
     //Set value of volumic concentration
-    void SetVolumicValue();
+    void SetVolumicValue(const double volumicvalue);
+    void SetStoichiometricCoef(const int stoiCoef);
     
+    
+    //getters
     //This method return the value of the volumic concentration
     double GetVolumicValue() const;
-    
     double GetInitialAtomicValue() const;
-    
     double GetInitialMassicValue() const;
+    const int GetStoichiometricCoef() const;
+    bool GetInitialAtomicValueHasBeenSet() const {return initialAtomicValueHasBeenSet_;};
+    bool GetInitialMassicValueHasBeenSet() const {return initialMassicValueHasBeenSet_;};
+    
     
     //RELATIONS
     //getter
-    const ChemicalElement& GetChemicalElement() {return chemicalElement_; };
-    const ChemicalComposition& GetChemicalComposition() {return chemicalComposition_;};
+    const ChemicalElement& GetChemicalElement() const {return chemicalElement_; };
+    const ChemicalComposition& GetChemicalComposition() const {return chemicalComposition_;};
 
 
 protected:
@@ -79,7 +89,12 @@ private:
     //The initial massic concentration of the chemical element. Unit: ratio in the range [0,1]
     double initialMassicValue_;
     
-    //TODO new double[NbElements][NbElement] stoechiometricCoef_;
+    int stoichiometricCoef_;
+    
+    bool initialAtomicValueHasBeenSet_;
+    bool initialMassicValueHasBeenSet_;
+    
+    
     
     //TODO double equilibriumConcentration_;  //Equilibrium concentration between the solid solution and a planar precipitate.(volumic %)
 				              //Depends on temperature
@@ -90,37 +105,63 @@ private:
 
 };
 
+
+
+//SETTERS
 inline void
-Concentration::SetInitialMassicValue()
+Concentration::SetInitialMassicValue(const double initialMassicValue)
 {
+  assert ( (initialMassicValueHasBeenSet_==false)&&"Cannot Set Initial Massic Value because it has already been set " );
+  initialMassicValue_=initialMassicValue;
+  initialMassicValueHasBeenSet_=true;
 }
 
 inline void
-Concentration::SetInitialAtomicValue()
+Concentration::SetInitialAtomicValue(const double initialAtomicValue)
 {
+  assert ( (initialAtomicValueHasBeenSet_==false)&&"Cannot Set Initial Atomic Value because it has already been set " );
+  initialAtomicValue_=initialAtomicValue;
+  initialAtomicValueHasBeenSet_=true;
 }
 
 inline void
-Concentration::SetVolumicValue()
+Concentration::SetVolumicValue(const double volumicValue)
 {
+  volumicValue_=volumicValue;
 }
 
+
+
+
+
+
+//GETTERS
 inline double
 Concentration::GetInitialAtomicValue() const
 {
+  assert(  (initialAtomicValue_!=-1)&&"Cannot Get initialAtomicValue because it is equal to -1 \
+  and probably has not been setted!!!"  );
   return initialAtomicValue_;
 }
 
 inline double
 Concentration::GetInitialMassicValue() const
 {
+  assert(  (initialMassicValue_!=-1)&&"Cannot Get InitialAtomic. Value because it is equal to -1 \
+  and probably has not been setted!!!"  );
   return initialMassicValue_;
 }
 
 inline double
 Concentration::GetVolumicValue() const
 {
-  return 0;
+  return volumicValue_;
 }
+
+
+
+
+
+
 
 #endif

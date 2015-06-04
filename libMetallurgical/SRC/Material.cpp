@@ -18,8 +18,26 @@
 #include "Material.hpp"
 #include "Temperature.hpp"
 #include "ChemicalElement.hpp"
+#include "ChemicalComposition.hpp"
 #include "SSGrain.hpp"
 #include "Grain.hpp"
+#include "Concentration.hpp"
+#include "Precipitate.hpp"
+
+
+
+//FAKE METHOD
+void 
+Material::test()
+{
+  std::cout<<"Size = "<<precipitateList_.size()<<std::endl;
+  std::cout<<"Adresse of precipitate vector is "<<&precipitateList_<<std::endl;
+  std::cout <<"Adresse of precipitate object are: ";
+  for( std::vector<Precipitate*>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {std::cout << *i << '|';}
+  std::cout <<""<<std::endl;
+}
+
 
 Material::Material(Temperature& temp, 
 		   ChemicalElement& mainChemicalElem,
@@ -29,23 +47,24 @@ Material::Material(Temperature& temp,
     grainList_(),
     mainChemicalElement_(mainChemicalElem),
     InitialChemicalComposition_(InitialCompo),
+    currentChemicalComposition_(* (InitialChemicalComposition_.Clone()) ),
+    /*TODO*///currentChemicalComposition_(),
     soluteList_(),
-    ssgrain_(0),
-    precipitatesList_(),
+    ssgrainPointer_(0),
+    precipitateList_(),
     YoungModulus_(mainChemicalElem.GetYoungModulus()),
     PoissonCoeff_(mainChemicalElem.GetPoissonCoefficient()),
     latticeParameter_(mainChemicalElem.GetLatticeParameter())
 {
   
   
-  std::cout<<"Constructor of Material"<<std::endl;
   
   
+  
+  std::cout<<" >Building a C++ object Material"<<std::endl;
+  InitialCompo.SetMaterial(*this);
   
   /*
-  std::cout<<"		>>Building a C++ object Material"<<std::endl;
-  
-  
   //debug
   std::cout<<"		material Young modulus "<<YoungModulus_<<std::endl;
   std::cout<<"		material Poisson coef "<<PoissonCoeff_<<std::endl;
@@ -102,13 +121,193 @@ Material::ReadData(std::string dataFileName)
 void  
 Material::InitializeGrains()  //Initialize material SSgrains AND/OR precipitates
 {
-  assert( (this->GetSSGrain()==0) && ("Cannot InitializeGrains(): The material has already solid solution grains! Material ssgrain has already been initialize") );
+  assert( (ssgrainPointer_==0) && ("Cannot InitializeGrains(): The material has already solid solution grains! Material ssgrain has already been initialize") );
 
   // make the SSGrain which has the same properties as the material: ChemicalCompo and mechanical properties
-  SSGrain *ssgrain= new SSGrain(*this);
-  this->SetSSGrain(*ssgrain);
+  new SSGrain(*this);//Remember, creating an SSgrain by constructor SSgrain(materialObject) also set material's ssgrainPointer
   
 }
+
+
+void
+Material::ConvertVolumicToInitialAtomicConcentration()
+{
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
+  
+  
+  std::map<std::string , Concentration*>::iterator it;
+  std::map<std::string , Concentration*>::iterator it2;
+  std::map<std::string, Concentration*> concMap=InitialChemicalComposition_.GetConcentrationMap();
+  
+    
+  for (it=concMap.begin(); it!=concMap.end(); ++it)
+  {
+    double volumicConc=0;
+    double elementRho=0;
+    double elementMolarMass=0;
+    double sum=0;
+    for (it2=concMap.begin(); it2!=concMap.end(); ++it2)
+    {
+      volumicConc=it2->second->GetVolumicValue();
+      elementRho=it2->second->GetChemicalElement().GetDensity();
+      elementMolarMass=it2->second->GetChemicalElement().GetMolarMass();
+      sum+=volumicConc*elementRho*1000/elementMolarMass;
+      
+    }
+    
+    volumicConc=it->second->GetVolumicValue();
+    elementRho=it->second->GetChemicalElement().GetDensity();
+    elementMolarMass=it->second->GetChemicalElement().GetMolarMass();
+    
+    
+    
+    
+    
+    double atomicConc= (volumicConc*elementRho*1000/elementMolarMass)/sum;
+    //SET INITIAL ATOMIC VALUE!!!
+    assert ( (it->second->GetInitialAtomicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To AtomicConcentration\
+    because InitialAtomicValue has already been set." );
+    it->second->SetInitialAtomicValue(atomicConc);
+    std::cout<<"===================== VALUE COMPUTED FOR INITIAL ATOMIC CONC OF ELEMENT <"<<it->first<<"> MATERIAL GRAIN IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
+  }
+  
+}
+
+//Return current atomic concentration from volumic concentration
+double 
+Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
+{
+  
+   std::map<std::string , Concentration*>::iterator it;
+  std::map<std::string , Concentration*>::iterator it2;
+  std::map<std::string, Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
+  
+  it=currentConcMap.find(elementName);
+  assert( (it!=currentConcMap.end())&&"Cannot find given symbol in concentrationMap of Material's current Chemical composition " );
+  
+  
+    double volumicConc=0;
+    double elementRho=0;
+    double elementMolarMass=0;
+    double sum=0;
+    for (it2=currentConcMap.begin(); it2!=currentConcMap.end(); ++it2)
+    {
+      volumicConc=it2->second->GetVolumicValue();
+      elementRho=it2->second->GetChemicalElement().GetDensity();
+      elementMolarMass=it2->second->GetChemicalElement().GetMolarMass();
+      sum+=volumicConc*elementRho*1000/elementMolarMass;
+      
+    }
+    
+    volumicConc=it->second->GetVolumicValue();
+    elementRho=it->second->GetChemicalElement().GetDensity();
+    elementMolarMass=it->second->GetChemicalElement().GetMolarMass();
+    
+    
+    
+    
+    
+    double computedAtomicConc= (volumicConc*elementRho*1000/elementMolarMass)/sum;
+   
+    std::cout<<"===================== VALUE RETURNED FOR ATOMIC CONC OF ELEMENT <"<<it->first<<"> IN MATERIAL IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
+  
+  
+  //Post conditions
+  assert( (computedAtomicConc>0)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must be positive" );
+  assert( (computedAtomicConc<=1)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must inferior to 1" );
+  
+  return computedAtomicConc;
+}
+
+
+
+void
+Material::ConvertVolumicToInitialMassicConcentration()
+{
+  // TODO assert if CC is in chemicalCompositionList_. If not, abandon
+  
+  
+  std::map<std::string , Concentration*>::iterator it;
+  std::map<std::string , Concentration*>::iterator it2;
+  std::map<std::string, Concentration*> concMap=InitialChemicalComposition_.GetConcentrationMap();
+  
+    
+  for (it=concMap.begin(); it!=concMap.end(); ++it)
+  {
+    double volumicConc=0;
+    double elementRho=0;
+    double sum=0;
+    for (it2=concMap.begin(); it2!=concMap.end(); ++it2)
+    {
+      volumicConc=it2->second->GetVolumicValue();
+      elementRho=it2->second->GetChemicalElement().GetDensity();
+      sum+=volumicConc*elementRho;
+      
+    }
+    
+    volumicConc=it->second->GetVolumicValue();
+    elementRho=it->second->GetChemicalElement().GetDensity();
+    
+    
+    
+    
+    
+    double massicConc= (volumicConc*elementRho)/sum;
+    //SET INITIAL MASSIC VALUE!!!
+    assert ( (it->second->GetInitialMassicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To MassicConcentration\
+    because InitialMassicValue has already been set." );
+    it->second->SetInitialMassicValue(massicConc);
+    std::cout<<"===================== VALUE COMPUTED FOR MASSIC CONC OF ELEMENT <"<<it->first<<"> SOLID SOLUTION GRAIN IS ============= "<<it->second->GetInitialMassicValue()<<std::endl;
+  }
+  
+}
+
+//Actualize the volumic value taking into account the volumic fraction of precipitates
+void 
+Material::UpdateVolumicValues()
+{
+  
+  std::cout<<"Updating material current volumic concentration values\
+  taking into account the volumic fraction of precipitates"<<std::endl;
+  // XvCuSS
+  //TODO 
+  std::map<std::string, Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
+  std::map<std::string, Concentration*> initialConcMap=InitialChemicalComposition_.GetConcentrationMap();
+  
+  std::map<std::string, Concentration*>::iterator it;
+  
+
+    
+    for (it=initialConcMap.begin(); it!=initialConcMap.end(); ++it)
+    {
+
+      
+      double product=0;
+      double sumOfFracVol=0;
+      
+      for( std::vector<Precipitate*>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+      {
+	std::map<std::string, Concentration*>::iterator iter;
+	double precipitateFracVol=(*i)->GetVolumicFraction();
+	double elementVolumicConcInPrecipitate=(*i)->GetChemicalComposition().GetConcentrationForElement(it->first).GetVolumicValue();
+	product+= precipitateFracVol*elementVolumicConcInPrecipitate;
+	sumOfFracVol+=precipitateFracVol;
+      }
+      
+    double elementInitialVolumicConcInMaterial=it->second->GetVolumicValue();
+    double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1-sumOfFracVol);
+    
+    
+    currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
+    
+    }
+    
+ 
+}
+
+
+
+
 
 //RELATIONS
 void
@@ -130,14 +329,14 @@ Material::AddSolute(const ChemicalElement& Solute)
   soluteList_.push_back(&Solute);
 }
 
-void //set ssgrain_ and add ssgrain to grainList_
+void //set ssgrainPointer_ and add ssgrain to grainList_
 Material::SetSSGrain(SSGrain& ssgrain)
 {
   
-  assert( (this->GetSSGrain()==0) && ("Cannot SetSSGrain(), The material has already solid solution grains! Material ssgrain has already been initialize") );
+  assert( (ssgrainPointer_==0) && ("Cannot SetSSGrain(), The material has already solid solution grains! Material ssgrain has already been initialize") );
 
   this->AddGrain(ssgrain);
-  ssgrain_=&ssgrain;
+  ssgrainPointer_=&ssgrain;
   
   // later... 
 }
@@ -148,7 +347,7 @@ Material::AddPrecipitate(Precipitate& P)
   /*Any precipitate which belongs to the material's SSgrain belongs to the
   * material. But all precipitates which belongs to the material does not belong to the material's SSGrain*/
   
-  precipitatesList_.push_back(&P);
+  precipitateList_.push_back(&P);
  // later...
   
 }
@@ -171,9 +370,9 @@ Material::Info() const
 
   //std::cout <<  "                               vacancyList: " << vacancyList_.Info();
   std::cout <<  "                                   ssgrain: " ;
-  if  (ssgrain_!=0) 
-  {
-    ssgrain_->Info();
+  if  (ssgrainPointer_!=0) 
+  {std::cout<<"Adress of the ssgrain is "<<ssgrainPointer_<<std::endl;
+    ssgrainPointer_->Info();
   }
   else
   {
@@ -186,7 +385,8 @@ Material::Info() const
   mainChemicalElement_.Info();
   std::cout <<"                      ---------------------------------------------- END mainChemicalElement ---------------------------------"<<std::endl;
   //std::cout <<  "                InitialChemicalComposition: " << InitialChemicalComposition_ << " SI unit" << std::endl;
-  //std::cout <<  "                          precipitatesList: " << precipitatesList_ << " SI unit" << std::endl;
+   // currentChemicalComposition_
+  //std::cout <<  "                          precipitateList: " << precipitateList_ << " SI unit" << std::endl;
   std::cout <<  "                              YoungModulus: " << YoungModulus_ << " SI unit" << std::endl;
   std::cout <<  "                              PoissonCoeff: " << PoissonCoeff_ << " SI unit" << std::endl;
   std::cout <<  "                          LatticeParameter: " << latticeParameter_ << " SI unit" << std::endl;

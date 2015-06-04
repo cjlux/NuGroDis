@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <cassert>
+
 
 #include "Grain.hpp"
 
@@ -31,6 +33,9 @@ class SSGrain: public Grain
 
 public:
   
+  //FAKE METHOD
+  void test();
+  
   //Basic constructor, An SSGrain must Know its ChemicalComposition, its material, its YoungM, Its PoissonCoef, its volNbGP and its volNbSprime
   //This constructor means, material.YM, material.PoisCoef, material.latticP, and material.ChemicalCompo could be different from those of SSGrain.
   SSGrain(Material &mat,ChemicalComposition &CC,double YM,double PoissonCoeff, double latticeParam, int volNbGP=0, int volNbSprime=0); 
@@ -40,6 +45,19 @@ public:
   SSGrain(Material &mat,int volNbGP=0, int volNbSprime=0);
   
     ~SSGrain();
+    
+  
+    
+  void ConvertMassicToVolumicConcentration();
+  void ConvertVolumicToMassicConcentration();
+  void ConvertAtomicToVolumicConcentration();
+  void ConvertVolumicToAtomicConcentration();
+  void ConvertStoichiometricCoefficientToVolumicConcentration(){ assert(!"ConvertStoechiometricCoefficientToVolumicConcentration has no sense for Solid Solution!!! "); };
+  void ConvertStoichiometricCoefficientToAtomicConcentration(){ assert(!"ConvertStoechiometricCoefficientToAtomicConcentration has no sense for Solid Solution!!! "); };
+  
+  /*TODO double ReturnAtomicConcentrationFromVolumic();*/
+  
+  //void SetSSGrainChemicalComposition(const ChemicalComposition &CC);
     
     void Info() const;
     
@@ -51,9 +69,9 @@ public:
     
     
     //Setters
-    void SetVolNbGP(const int &);
-    void SetVolNbSprime(const int &);
-    void SetVolNbPrecipitates(const int &);
+    void SetVolNbGP(const int );
+    void SetVolNbSprime(const int );
+    void SetVolNbPrecipitates(const int );
     //Getters
     int    GetVolNbGP()           const {return volNbGP_;          };
     int    GetVolNbSprime()       const {return volNbSprime_;      };
@@ -71,17 +89,18 @@ public:
 
     //Getter aggregations
     std::vector<Precipitate*> GetPrecipitateList() {return precipitateList_;};
+    boost::python::list GetConcentrationPyList();
 
 protected:
 
 private:
    
     //The Young modulus of the Grain. If not given, can be approximated with the Young modulus of the main chemical element of the grain. Unit: MPa
-    const double & YoungModulus_;
+    const double  YoungModulus_;
     //The Poisson coefficient of the Grain. If not given, can be approximated with the Poisson coefficient of the main chemical element of the grain. Unit: no unit
-    const double & PoissonCoeff_;       
+    const double  PoissonCoeff_;       
     //The lattice parameter of the main ChemicalElement. Unit: m
-    const double & latticeParameter_;   
+    const double  latticeParameter_;   
     //volumic number of GP precipitates. Unit: number/m^3
     int volNbGP_;
     //volumic number of Sprime precipitates. Unit: number/m^3
@@ -90,29 +109,31 @@ private:
     int volNbPrecipitates_;
     
     // RELATIONS
-    std::vector<Precipitate *> precipitateList_; //A SSGrain contains 0 or many Precipitates
+    std::vector<Precipitate *>& precipitateList_; //A SSGrain contains 0 or many Precipitates
 };
 
 
 
 
 inline void
-SSGrain::SetVolNbGP(const int &vNGP)
+SSGrain::SetVolNbGP(const int vNGP)
 {
   volNbGP_=vNGP;
 }
 
 inline void
-SSGrain::SetVolNbSprime(const int &vNSP)
+SSGrain::SetVolNbSprime(const int vNSP)
 {
   volNbSprime_=vNSP;
 }
 
 inline void
-SSGrain::SetVolNbPrecipitates(const int &vNP)
+SSGrain::SetVolNbPrecipitates(const int vNP)
 {
   volNbPrecipitates_=vNP;
 }
+
+
 
 
 //Aggregation setters

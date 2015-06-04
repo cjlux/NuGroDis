@@ -14,7 +14,7 @@ def ComputeMolarVolume(Element,stoechiometrySumCoeff=1):
 Dict={            
     #Aluminium
     "Al":{  "density" : (2698,"Kg.m^-3"),#Volumetric mass density, [Kg/m^3]
-            "molarMass": (26.98,"g.mol^-1"),#Molar mass, [g/mol]
+            "molarMass": (26.98,"Kg.mol^-1"),#Molar mass, [g/mol]
             "YoungModulus": (70000,"MPa"),#Young modulus, [MPa]
             "PoissonCoeff": (0.3,""),#Poisson coefficient
             "cellSize": (4.0412E-10,"m"), #Cell size, [m]
@@ -26,7 +26,7 @@ Dict={
     
     #Copper
     "Cu":{  "density" : (8960,"Kg.m^-3"),#Volumetric mass density, [Kg/m^3]
-            "molarMass": (63.54,"g.mol^-1"), #Molar mass, [g/mol]
+            "molarMass": (63.54,"Kg.mol^-1"), #Molar mass, [g/mol]
             "PoissonCoeff": (0.33,""), #Poisson coefficient
             "YoungModulus": (124000,"MPa"),  #Young modulus, [MPa]
             "atomicNumber":(29,"")
@@ -34,7 +34,7 @@ Dict={
     
     #Magnesium
     "Mg":{  "density" : (1738,"Kg.m^-3"),#Volumetric mass density, [Kg/m^3]
-            "molarMass": (24.31,"g.mol^-1"),#Molar Mass, [g/mol]
+            "molarMass": (24.31,"Kg.mol^-1"),#Molar Mass, [g/mol]
             "PoissonCoeff": (0.35,""), #Poisson coefficient
             "YoungModulus": (45000,"MPa"),#Young modulus, [MPa]
             "atomicNumber":(12,"")

@@ -117,14 +117,18 @@ class PyChemicalComposition:
     def __init__(self, symbols):
         self.__symbols = symbols
         self.__composition = {}
-        self.__ParseSymbols()
         self.__listElements = []
+        self.__ParseSymbols()
+        
 
     @property
     def symbols(self) : return self.__symbols
     
     @property
     def composition(self) : return self.__composition
+
+    @property
+    def listElements(self) : return self.__listElements
 
     @property
     def sumOfStoichCoeff(self):
@@ -155,7 +159,7 @@ class PyChemicalComposition:
                     
         if not self.__symbols[-1].isdigit():
             self.__composition[symbol] = (1, PyChemicalElement.GetElement(symbol))
-
+            
         self.__listElements = sorted(self.__composition.keys())
         
         # debug: print [ (e, self.__composition[e], PyChemicalElement.GetElement(e)) for e in self.__listElements]
@@ -177,7 +181,7 @@ if __name__ == "__main__":
 ##    # Build the Mendeleiev table:
 ##    PyChemicalElement.initFromData()
 ##    ED = PyChemicalElement.GetElementsDict()
-##    MT = PyChemicalElement.GetMendeleievDict()
+##    MT = PyChemicalElement.GetMendeleievDict() # Mendeleiv dictionnary of pairs {symbol: atomic number}
 ##
 ##    # try some chemical composition
 ##    a=PyChemicalComposition("Al8CuMg")
@@ -192,6 +196,7 @@ if __name__ == "__main__":
 ##    print(a)
 ##    print("Sum of Stoichiometric number = ",a.sumOfStoichCoeff )
 
+    # Build the Mendeleiev table:
     PyChemicalElement.initFromElementsData()
     ED = PyChemicalElement.GetElementsDict()
     MT = PyChemicalElement.GetMendeleievDict()
@@ -199,6 +204,11 @@ if __name__ == "__main__":
     # try some chemical composition
     a=PyChemicalComposition("Al8CuMg")
     print(a)
+    print("symbols:",a.symbols)
+    print("Composition items:",a.composition.items())
+    print("Elements List",a.listElements)
+    for u in a.composition.items():
+        print("Composition:","<symbol>",u[0],"\n                        <stoichiometry>",u[1][0])
     print("Sum of Stoichiometric number = ",a.sumOfStoichCoeff )
 
     a=PyChemicalComposition("NaCl")

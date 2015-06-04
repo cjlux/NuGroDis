@@ -17,6 +17,7 @@
 #define __Temperature__hpp__
 
 #include <vector>
+#include <boost/python.hpp>
 
 //Class Temperature, defining the current temperature for computing, 
 //Can be an array of Value versus time
@@ -36,9 +37,14 @@ public:
 
     std::vector<double> & GetTemperatureList() {return temperatureList_; };
     const std::vector<double> & GetTemperatureList() const {return temperatureList_; };
+    boost::python::list GetTemperaturePyList();
     
     //Setters
     void SetCurrentTemp(double temp);
+    
+    
+
+
    
 protected:
 

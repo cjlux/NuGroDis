@@ -17,6 +17,7 @@
 #define __Sprime__hpp__
 
 #include <string>
+#include <cmath>
 
 #include "Precipitate.hpp"
 
@@ -75,7 +76,7 @@ double inline
 Sprime::WettingFunction(double theta)
 {
   assert( (Stheta_==-1) && "WettingFunction: Stheta has already been computed" );
-  //Stheta_=(2+cos(wettingAngle_))/4*(1-cos(wettingAngle_))**2;
+  Stheta_=(1-cos(wettingAngle_))*(1-cos(wettingAngle_))*(2+cos(wettingAngle_))/4;
   return 0; // TODO
 }
 

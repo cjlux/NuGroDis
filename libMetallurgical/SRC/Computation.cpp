@@ -28,8 +28,34 @@ Computation::Computation()
     thermalLoading_(0),
     maxComputationTime_(0),
     type_("")
-{
-  std::cout << "Building Object <Computation>" << std::endl;
+{  
+std::cout << "   .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-. " << std::endl;
+std::cout << " .'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `." << std::endl;
+std::cout << "(    .     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .    )" << std::endl;
+std::cout << " `.   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   `._.'   .'" << std::endl;  
+std::cout << "   )    )        __        __   _                            _____              (    (" << std::endl;
+std::cout << " ,'   ,'         \\ \\      / /__| | ___ ___  _ __ ___   ___  |_   _|__            `.   `." << std::endl;
+std::cout << "(    (            \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\   | |/ _ \\              )    )" << std::endl;
+std::cout << " `.   `.           \\ V  V /  __/ | (_| (_) | | | | | |  __/   | | (_) |           .'   .' " << std::endl;
+std::cout << "   )    )           \\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___|   |_|\\___/           (    (" << std::endl;
+std::cout << " ,'   ,'                                                                          `.   `. " << std::endl;
+std::cout << "(    (                _   _        ____           ____  _                          )    )" << std::endl;
+std::cout << " `.   `.             | \\ | |_   _ / ___|_ __ ___ |  _ \\(_)___                    .'   .'" << std::endl;
+std::cout << "   )    )            |  \\| | | | | |  _| '__/ _ \\| | | | / __|                  (    (" << std::endl;
+std::cout << " ,'   ,'             | |\\  | |_| | |_| | | | (_) | |_| | \\__ \\                   `.   `." << std::endl;
+std::cout << "(    (               |_| \\_|\\__,_|\\____|_|  \\___/|____/|_|___/                     )    )" << std::endl;
+std::cout << " `.   `.                                                                         .'   .' " << std::endl;                                         
+std::cout << "   )    )       _       _       _       _       _       _       _       _       (    (" << std::endl;
+std::cout << " ,'   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   `." << std::endl;
+std::cout << "(    '  _  `-'  _  `-'  _  `-'  _  `-'  _  `-'  _  `-'  _  `-'  _  `-'  _  `-'  _  `    )" << std::endl;
+std::cout << " `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .' `.   .'" << std::endl;
+std::cout << "   `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'" << std::endl;
+std::cout <<""<<std::endl;
+std::cout <<""<<std::endl;
+std::cout <<""<<std::endl;
+
+std::cout << "Building Object <Computation>" << std::endl;
+
 
 }
 
@@ -70,5 +96,7 @@ Computation::Run()
       //
     }
 }
+
+
 
 

@@ -15,7 +15,9 @@
 #ifndef __Computation__hpp__
 #define __Computation__hpp__
 
+#include <fstream>
 #include <string>
+
 
 // Forward declarations, avoid including...
 class Hardening;
@@ -49,6 +51,7 @@ public:
   void ReadDataFile(std::string fileName);
 
   void Run();
+  
 
 private:
 

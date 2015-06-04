@@ -13,11 +13,15 @@
 //
 
 #include <iostream>
+#include <cmath>
 
 #include "Diffusion.hpp"
 #include "ChemicalElement.hpp" 
 #include "Material.hpp"
+#include "Temperature.hpp"
+#include "ThermoDynamicsConstant.hpp"
 #include "Vacancy.hpp"
+
 
 
 
@@ -28,14 +32,18 @@ Diffusion::Diffusion(ChemicalElement& CE, Material& mat,Vacancy& vacancy,double 
  :preExpDiffusionCoef_(preExpDiffCoef),
   activationEnergy_(actEn),
   interactionEnergyWithVacancy_(Evac),
+  atomicDiffusionCoef_(-1), //-1 means this attribute has not been initialize
   chemicalElement_(CE),
   material_(&mat),
-  ssgrain_(mat.GetSSGrain()),
+  ssgrainPointer_(mat.GetSSGrainPointer()),
   vacancy_(&vacancy)
+
 {
+  //TODO assert mat.GetVacancy==vacancy (same object, same adress) ;   assert ( (mat.)&&"" )
   mat.AddSolute(CE);
   vacancy.AddInteractingSolute(CE);
   CE.SetDiffusion(*this);
+
 }
 
 
@@ -46,9 +54,10 @@ Diffusion::Diffusion(ChemicalElement& CE, Material& mat,double preExpDiffCoef,do
  :preExpDiffusionCoef_(preExpDiffCoef),
   activationEnergy_(actEn),
   interactionEnergyWithVacancy_(-1),
+  atomicDiffusionCoef_(-1),
   chemicalElement_(CE),
   material_(&mat),
-  ssgrain_(mat.GetSSGrain()),
+  ssgrainPointer_(mat.GetSSGrainPointer()),
   vacancy_(0)
 {
   mat.AddSolute(CE);
@@ -61,10 +70,12 @@ Diffusion::Diffusion(ChemicalElement& CE, Vacancy& vacancy,double Evac)
  :preExpDiffusionCoef_(-1),
   activationEnergy_(-1),
   interactionEnergyWithVacancy_(Evac),
+  atomicDiffusionCoef_(-2),//-2 means this attribute must not be used
   chemicalElement_(CE),
   material_(0),
-  ssgrain_(0),
+  ssgrainPointer_(0),
   vacancy_(&vacancy)
+   
 {
   vacancy.AddInteractingSolute(CE);
   CE.SetDiffusion(*this);
@@ -79,10 +90,28 @@ Diffusion::~Diffusion()
 }
 
 
-
-void
-Diffusion::ComputeCoefValue()
+//Computes the atomic diffusion coefficient for the current value of the temperature . Unit: K
+void 
+Diffusion::ComputeAtomicDiffusionCoefValue()
 {
+  assert ( (atomicDiffusionCoef_!=-2)&&"In diffusion: Cannot Compute\
+  Atomic Diffusion Coef because Diffusion Object do not have Atomic \
+  diffusion (Use another constructor)" );
+  
+  if (vacancy_==0)
+  { 
+    //TODO get lambda using material_
+  };
+  
+  
+  //TODO Dont forget LAMBDA which will come from Vacancy Diffusion!!!
+  double R=ThermoDynamicsConstant::GetR();
+  double T=material_->GetTemperature().GetCurrentTemp();
+  
+  
+  
+  atomicDiffusionCoef_=preExpDiffusionCoef_*std::exp(-activationEnergy_/(R*T));
+  
 }
 
 
@@ -112,7 +141,7 @@ Diffusion::Info() const
   std::cout <<  "                           activationEnergy: " << activationEnergy_ << " SI unit" << std::endl;
   std::cout <<  "               interactionEnergyWithVacancy: " << interactionEnergyWithVacancy_ << " SI unit" << std::endl;
   std::cout <<  "                            chemicalElement: " << chemicalElement_.GetElementName() << " SI unit" << std::endl;
-  if (material_->GetSSGrain()==0) 
+  if (material_->GetSSGrainPointer()==0) 
   {
   std::cout <<  "           Diffusion parameters of <"<< chemicalElement_.GetElementName() <<"> in : material"<< std::endl;
   }

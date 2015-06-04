@@ -36,7 +36,10 @@ VacanciesParam={
 "deltaSF": (17,"J.mol^-1.K^-1"), #Entropy of vacancy formation
 "fE": (10**13,"s^-1"), #Frequency of vacancy's jumps
 "halfSinkD": (30E-6,"m"), #Semi-distance between vacancy sinks
-"Tsol": (495,"Celsius degree") #solutionazingTemp=InitialQuenching Temperature, [°C]
+"Tsol": (495,"Celsius degree"), #solutionazingTemp=InitialQuenching Temperature, [°C]
+"coordinationNumber": (12,"")#Coordination Number, is the number of near neighbours. For Aluminium structure FCC, it is 12. 
+#If coordinationNumber is not given, interaction with ChemicalElements between chemicalElement and vacancies will not be taken into account.
+#means alpha in Xlaceq will be equal to 1!!!
 }
 Al=ElementsDataDict["Al"]
 VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2, Al["cellSize"][1]+"."+VacanciesParam["fE"][1])# Preexponential term value of vacancy diffusion expression. 
@@ -74,13 +77,15 @@ Mg={
 ################################################## Guinier-Preston DATA ##########################################################
 GP={
 "nature":"GuinierPreston", #Important nature can be:  "GuinierPreston" or "Sprime". key words can be found in MetalUtils/Grain.py PrecipitateNatureList
-"chemicalComposition": ("Al8CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
+"chemicalComposition": ("Al5Cu2Mg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1. Is assumed to be the initial number of aluminium atoms/volum unit
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
+"molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,
 "solvusActivationEnergy":(36000,"J.mol^-1"), # DeltaHP1
 "surfaceEnergyPolynomialModel":([0.044],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(0,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP
 "deltaCell":(1/100,"m.m^-1") , # difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate)
+#REMEMBER: At the moment, molar volume of GuinierPreston precipitates must be define by the user. But, subsequently, it can be computed automatically taking into account the structure of the precipitate.  
 }
 
 

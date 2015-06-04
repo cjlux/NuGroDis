@@ -47,18 +47,59 @@ Sprime::Info() const
 {
   std::cout <<  "###################################  Sprime::Info #################################" 	<< std::endl;
   std::cout <<  "                                molarVolume: " << molarVolume_  << " SI unit" << std::endl;
-  std::cout <<  "                               meanDiameter: " << meanDiameter_ << " SI unit" << std::endl;
-  std::cout <<  "                               wettingAngle: " << wettingAngle_ << " SI unit" << std::endl;
-  std::cout <<  "                                     Stheta: " << Stheta_ << " SI unit" << std::endl;  
+  
+  
+  std::cout <<  "                               wettingAngle: " << wettingAngle_ << " SI unit" << std::endl;  
   //std::cout <<  "                                material_: " << material_ << " SI unit" << std::endl;
   std::cout <<  "                                  deltaCell: " << deltaCell_ << " SI unit" << std::endl;
   std::cout <<  "                     solvusActivationEnergy: " << solvusActivationEnergy_ << " SI unit" << std::endl;
-  std::cout <<  "                           distorsionEnergy: " << distorsionEnergy_ << " SI unit" << std::endl;
-  std::cout <<  "                      nucleationSitesNumber: " << nucleationSitesNumber_ << " SI unit" << std::endl;
+  
+  //DistorsionEnergy
+  if (distorsionEnergy_==-1)
+  {std::cout << "                           distorsionEnergy: Not defined" << std::endl;}
+  else
+  {std::cout << "                           distorsionEnergy: " << distorsionEnergy_ << " SI unit" << std::endl;};  
+   
   std::cout <<  "                        preExpTermForSolvus: " << preExpTermForSolvus_ << " SI unit" << std::endl;
- // std::cout <<  "               surfaceEnergyPolynomialModel: " << surfaceEnergyPolynomialModel_ << " SI unit" << std::endl;
+  
   std::cout <<  "                                shapeFactor: " << shapeFactor_ << " SI unit" << std::endl;
   std::cout <<  "                            volumicFraction: " << volumicFraction_ << " SI unit" << std::endl;
+  
+  //MeanDiameter
+  if (meanDiameter_==-1)
+  {std::cout << "                               meanDiameter: Not defined" << std::endl;}
+  else
+  {std::cout << "                               meanDiameter: " << meanDiameter_ << " SI unit" << std::endl;};
+  
+  //SurfaceEnergyPolynomial
+  if (surfaceEnergyPolynomial_.GetDegree()==-1)
+  {
+  std::cout <<  "                    surfaceEnergyPolynomial: Not defined" << std::endl;
+  }
+  else
+  {
+  std::cout <<  "                    surfaceEnergyPolynomial: " ;
+  std::cout <<"<"<<surfaceEnergyPolynomial_.GetCoefsList()[0]<<">";
+  for (int i=1; i<=surfaceEnergyPolynomial_.GetDegree();i++)
+  {
+    std::cout <<" + <"<<surfaceEnergyPolynomial_.GetCoefsList()[i]<<">*"<<"T^"<<i;
+  }
+  std::cout<< " SI unit" << std::endl;
+  };
+  
+  //Stheta
+  if (Stheta_==-1)
+  {std::cout << "                                     Stheta: Not defined" << std::endl;}
+  else
+  {std::cout << "                                     Stheta: " << Stheta_ << " SI unit" << std::endl;};
+  
+  //Nucleation site Nb
+  if (nucleationSitesNumber_==-1)
+  {std::cout << "                      nucleationSitesNumber: Not defined"<<std::endl;}
+  else
+  {std::cout << "                      nucleationSitesNumber: " << nucleationSitesNumber_ << " SI unit" << std::endl;};
+  
+  std::cout  << "                         precipitate adress: " <<this<<std::endl;
   std::cout <<  std::endl;
   
 }

@@ -6,17 +6,20 @@ PrecipitateNatureList=['GuinierPreston','Sprime']
 class PyPrecipitate:
     def __init__(self,dataDict,mainElement):
         #mandatory keys
+        self.__nature=dataDict["nature"]
         self.__chemicalComposition=dataDict["chemicalComposition"]#the chemichal Formulation
         self.__preExpTermForSolvus=dataDict["preExpTermForSolvus"]
         self.__solvusActivationEnergy=dataDict["solvusActivationEnergy"]
         self.__surfaceEnergyPolynomialModel=dataDict["surfaceEnergyPolynomialModel"]
         self.__shapeFactor=dataDict["shapeFactor"]
         self.__deltaCell=dataDict["deltaCell"]
-        self.__nature=dataDict["nature"]
+        
+       
 
         #Optional keys
         self.__initialNucleationSitesNb=dataDict.get("initialNucleationSitesNb",None) #example : for GP
         self.__wettingAngle=dataDict.get("wettingAngle",None) #example: for Sprime
+        self.__molarVolume=dataDict.get("molarVolume",None) #Can be also computed. Will be done subsequently
 
         #computed attributes
         self.__distorsionEnergy=None

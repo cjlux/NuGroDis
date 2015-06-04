@@ -29,17 +29,15 @@ Quenching::Quenching(double Tsol, double Tfinal, double coolingRate, double delt
   std::cout <<  "Building object <Quenching> " << std::endl;
   
   // Preconditions:
-  assert(finalTemp_ < solutionizingTemp_);
-  assert(coolingRate_ > 0);
-  assert(deltaT_ > 0);
+  assert( (finalTemp_ < solutionizingTemp_)&&"Quenching final Temperature must be inferior to solutionizing Temperature");
+  assert( (coolingRate_ > 0)&&"Quenching cooling rate must be strictly positive");
+  assert( (deltaT_ > 0)&&"Discretisation step for Quenching Temperature must be strictly positive");
   
-  /*Total iteration number for quenching discretisation.By default, This value
-  is not initially setted by the user.The  default value used for constructor is
-  the one which gives a  temperature discretisation step (deltaTi) of 1°C. 
-  deltaTi=(Tinitiale-Tfinale)/totIterationNumber. If deltaTi=1°C then
-  totIterationNumber=Tinitiale-Tfinale, this is the default value of totIterationNumber
-  totIterationNumber_ = (solutionizingTemp_ - finalTemp_)/deltaT_;*/ 
-  
+  /*Total iteration number for quenching discretisation.By default, This value is not initially setted by the user.
+   * The  default value used for constructor is the one which gives a  temperature discretisation step (deltaTi) of 1°C.
+   * deltaTi=(Tinitiale-Tfinale)/totIterationNumber. 
+   * If deltaTi=1°C then totIterationNumber=Tinitiale-Tfinale, this is the default value of totIterationNumber*/
+  totIterationNumber_ = (solutionizingTemp_ - finalTemp_)/deltaT_;
   timeStep_ = duration_ / totIterationNumber_;
 }
 
