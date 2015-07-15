@@ -55,11 +55,13 @@ VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2, Al["cell
 ##################################################   Diffusion DATA     ##########################################################
 Cu={
              "nature":"DiffusionParam", #Important                  
-"preExpDiffusionCoef": (6.5E-5,"m^2.s^-1"), #Atomic diffusion: initial diffusion value for copper, pre-exponential diffusion coeffcient. If this parameter is not needed, user must write :==> (None,None)                  
-                  "Q": (135000,"J.mol^-1"), #Atomic diffusion: Activation energy of diffusion for copper. If this parameter is not needed, user must write :==> (None,None)
-               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!.  If this parameter is not needed, user must write :==> (None,None)   
+"preExpDiffusionCoef": (6.5E-5,"m^2.s^-1"), #Atomic diffusion: initial diffusion value for copper, pre-exponential diffusion coeffcient. Mandatory!               
+                  "Q": (135000,"J.mol^-1"), #Atomic diffusion: Activation energy of diffusion for copper.  Mandatory!
+               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!. Optional: If this parameter is not needed, user must write :==> (None,None)   
 
-#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) OR vacancyDiffusion(Evac). He can also give both
+#WARNING: all these keys are mandatory. In case of the key "Evac", If  user don't want to use it, he must give value :==> (None,None)
+#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) .
+  
 }
 
 Mg={        
@@ -68,7 +70,7 @@ Mg={
                   "Q": (131000,"J.mol^-1"), #Activation energy of diffusion for magnesium
                "EVac": (19264,"J.mol^-1") #magnesium-Vacancy interaction energy, #CHECK. If this parameter is not needed, user must write :==> (None,None)
 
-#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) OR vacancyDiffusion(Evac). He can also give both
+#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) . He can also give both
 }
 
 
@@ -77,7 +79,7 @@ Mg={
 ################################################## Guinier-Preston DATA ##########################################################
 GP={
 "nature":"GuinierPreston", #Important nature can be:  "GuinierPreston" or "Sprime". key words can be found in MetalUtils/Grain.py PrecipitateNatureList
-"chemicalComposition": ("Al5Cu2Mg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
+"chemicalComposition": ("Al9Cu5Mg6","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1. Is assumed to be the initial number of aluminium atoms/volum unit
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,
@@ -100,6 +102,7 @@ Sprime={
                                     #V_moleculeAl2CuMg=V_unitCell/4 , then V_mAl2CuMg which is the volume of 1 mole of molecules Al2CuMg is expressed as follow:  
                                     #V_mAl2CuMg= Na*V_moleculeAl2CuMg  =  3.9686*10^(-5) m^3/moleOfMolecule_Al2CuMg, sensibly equal to 4E-5
 "surfaceEnergyPolynomialModel":([-0.10985+0.1,8.31E-4,-8.71E-7],"J.m^-2"), #  for example, if degree of polynom is 3 then we write:   ([a0,a1,a2,a3],"J.m^-2")
+#"surfaceEnergyPolynomialModel":([0,0,0,1],"J.m^-2"),
 "shapeFactor":(20,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP2
 "deltaCell":(1/100,"m.m^-1") , #difference between precipitate and solid solution cell size , was deltamailleP2
 "wettingAngle":(30,"degree") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2

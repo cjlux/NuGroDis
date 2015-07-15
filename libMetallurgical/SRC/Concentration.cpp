@@ -61,14 +61,15 @@ Concentration::SetStoichiometricCoef(const int stoiCoef)
 }
 
 
-
+//Unusefull?
 void
-Concentration::ComputeAtomicValue()
+Concentration::ReturnCurrentAtomicValue()
 {
 }
 
+//Unusefull?
 void
-Concentration::ComputeMassicValue()
+Concentration::ReturnCurrentMassicValue()
 {
 }
 

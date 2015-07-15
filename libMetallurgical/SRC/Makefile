@@ -22,8 +22,8 @@
 			ThermalLoading.cpp \
 			ThermoDynamicsConstant.cpp \
 			Vacancy.cpp\
-			PythonBindings.cpp
-			
+			PythonBindings.cpp\
+			Util.cpp
 			
 
 #			PythonBindings.cpp \ Diffusion.cpp\ InterfacialConcentration.cpp\

@@ -62,7 +62,15 @@ public:
   //RELATION
   //getter
   std::vector<Grain *> GetGrainList() const {return grainList_; } ;//TO DO should be SSGraibLIst+PrecipitateList
-  std::vector<Vacancy *> GetVacancyList() const {return vacancyList_; } ;
+  const Vacancy*  GetVacancyPointer() const {return vacancy_; } ;
+  Vacancy*  GetVacancyPointer() {return vacancy_; } ;
+  const bool AssertVacancyPointer( Vacancy* pointedAdress) const  {return vacancy_== pointedAdress  ;};
+  
+  Vacancy& GetVacancy() const 
+  {
+    assert  ( (vacancy_!=0)&&"Cannot GetVacancy() because material does not have any vacancy yet (vacancy pointer is 0) " );
+    return *vacancy_;
+  };
   const ChemicalElement& GetMainChemicalElement() const {return mainChemicalElement_; };
   const ChemicalComposition & GetInitialChemicalComposition() const 
   {
@@ -87,7 +95,7 @@ public:
   
   //setter
   void AddGrain(Grain& grain) ;//TODO grain_ can be a lot of things:  SSGrain, Precipitate, or maybe in the future something else . Precipitate can be a lot of things: GuinierPreson,Sprime, ... 
-  void AddVacancy(const Vacancy& vacancy) ;
+  void SetVacancy(Vacancy& vacancy) ;
   void SetSSGrain(SSGrain& ssgrain) ;
   //void SetChemicalElement(const ChemicalElement& chemElm); //unuseful?
   void AddPrecipitate(Precipitate& P); /* All precipitates which belongs to the material does not belong to the material's SSGrain.
@@ -100,7 +108,7 @@ private:
    
   //RELATIONS
   Temperature& temperature_;
-  std::vector<Vacancy *> vacancyList_;
+  Vacancy * vacancy_;
   std::vector<Grain *> grainList_; //TODO should be automatically SSGrainList+PrecipitateList
   const ChemicalElement& mainChemicalElement_;
   const ChemicalComposition& InitialChemicalComposition_;

@@ -163,7 +163,7 @@ CppMaterial.ConvertVolumicToInitialMassicConcentration()#Convert and set initial
     
 
 
-#Reading Vacancies Parameters
+#Reading Vacancies Parameters and Create a Cpp object Vacancy wich will be automatically setted as the material's vacancy. Remember that creating a vacancy Object  with a given material as argument, also set this vacancy as the material's vacancy
 exec "VacParam="+material+".VacanciesParam"
 print("  > Found dico VacancyParam           : ", VacParam)
 exec "CppVacancy= Vacancy("+material+".VacanciesParam['deltaHF'][0],\
@@ -178,6 +178,10 @@ exec "CppVacancy= Vacancy("+material+".VacanciesParam['deltaHF'][0],\
 CppVacancy.Info();
 
 
+
+print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ONE')
+
+#after setting materia
 #Search for DiffusionParam for solute chemicalElements ( any element different from the main chemical Element)
 #Read dictionaries which have a nature of  DiffusionParam
 CppDiffusionDict={} #a dictionary of Chemical Elements names as keys with their C++ diffusion Objects associated. {"ChemicalElementSymbol": diffusionCppObject}
@@ -187,38 +191,41 @@ for e in L:
         if type(E)==dict :
             nature = E.get('nature', None)
             if nature is 'DiffusionParam':
-                assert ( (E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None) or (E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None) ),\
-                       "Missing attribute  'preExpDiffusionCoef' or 'Q'  in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E) #       assertion failed:  001, 010, 101,110
-                if (E.get('EVac', None)==None and E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None): #000.
-                    #No Vacancy diffusion(i.e. interaction ) and no atomic diffusion. Build C++ objects Diffusion according to read dictionnaries :
-                    print("  > Chemical Elements <{:s}> has no diffusion parameter (neither atomic diffusion nor Vacancy  interaction)".format(e))
-                elif ( E.get('EVac', None)!=None and E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None ): #111
-                    #Atomic Diffusion and Vacancy diffusion. Therefore, appropriate C++ constructor for Diffusion must be used 
-                    print("  > Found diffusion parameters dico <{:s}> with atomic diffusion and  vacancies interaction energy : {:s}".format(e,E))
-                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
-                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
-                                                  CppMaterial,
-                                                  CppVacancy,
-                                                  E["preExpDiffusionCoef"][0],
-                                                  E["Q"][0],
-                                                  E["EVac"][0])
-                elif ( E.get('EVac', None)!=None and E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None ): #100
-                    #Only vacancies diffusion or interaction , i.e. no Atomic diffusion but only vacancies interaction. Therefore, appropriate C++ constructor for Diffusion must be used
-                    print("  > Found diffusion parameters dico <{:s}> with only vacancies diffusion(interaction energy)  and no atomic diffusion : {:s}".format(e,E))
-                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
-                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
-                                                  CppVacancy,
-                                                  E["EVac"][0])
-                elif ( E.get('EVac', None)==None and E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None ):   #011
+                assert (  (E.get('EVac', 'missing')!='missing' and E.get('preExpDiffusionCoef', 'missing')!='missing' and E.get('Q', 'missing')!='missing') ),\
+                       "Chemical Elements <{:s}> has no diffusion parameter (neither atomic diffusion nor Vacancy  interaction). Missing keys :  'preExpDiffusionCoef',  'Q'  and 'EVac' ".format(e)
+                assert ( (E.get('preExpDiffusionCoef', 'missing')!='missing' and E.get('Q', 'missing')!='missing')  ),\
+                       "Missing attribute  'preExpDiffusionCoef' or 'Q' or both in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E)
+                assert ( (E.get('EVac', 'missing')!='missing' ) ),\
+                       "Missing attribute  'EVac' in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E)
+                         
+                #assert ( (E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None) or (E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None) ),\
+                   #    "Missing attribute  'preExpDiffusionCoef' or 'Q'  in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E)#       assertion failed:  001, 010, 101,110
+                if ( E["EVac"][0]==None):
                     #ONLY ATOMIC DIFFUSION, i.e. no vacancy interaction but Atomic diffusion. Therefore, appropriate C++ constructor for Diffusion must be used
-                    print("  > Found diffusion parameters dico <{:s}> with only atomic diffusion and no vacancies interaction : {:s}".format(e,E))
+                    print("  > Found diffusion parameters dico <{:s}> with ONLY atomic diffusion and NO vacancies interaction : {:s}".format(e,E))
                     print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
                     CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
                                                   CppMaterial,
                                                   E["preExpDiffusionCoef"][0],
                                                   E["Q"][0])
+                else:
+                    try:
+                        i = float(E["EVac"][0])
+                    except (ValueError, TypeError):
+                        print(" Value ==> "+E["EVac"][0]+" <== for key 'EVac' is not a numeric value , in diffusion parameters dico <{:s}>  : {:s}".format(e,E)  )
+                        sys.exit(0)
+                    #Found Atomic Diffusion param and Vacancy diffusion param. Therefore, appropriate C++ constructor for Diffusion must be used 
+                    print("  > Found diffusion parameters dico <{:s}> with atomic diffusion and  vacancies interaction energy : {:s}".format(e,E))
+                    print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
+                    CppDiffusionDict[e]=Diffusion(CppElementsDict[e],
+                                                  CppMaterial,
+                                                  E["preExpDiffusionCoef"][0],
+                                                  E["Q"][0],
+                                                  E["EVac"][0])
                 CppDiffusionDict[e].Info()
 print("  > C++ Diffusion Objects Dictionary = ",CppDiffusionDict)
+
+print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& TWO") 
 
 pyPD={} #a dictionary of precipitates Names as keys with their precipitates python Objects associated. {"precipitate Name": precipitatePyObject}
 #Read Precipitate dictionaries in Module material 
@@ -364,6 +371,9 @@ for computation in ComputationList:
             print("End of concevrsion######################################################################################")
             CppPrecipitate.ConvertAtomicToVolumicConcentration()
 
+            #initialize precipitate equilibrium concentratations
+            CppPrecipitate.InitializeEquilibriumConcentrationMap();
+
         #Initialize material precipitate: make precipitates belong to the material or the SSGrain
 
             
@@ -433,6 +443,23 @@ CppMaterial.GetSSGrain().test()
 CppMaterial.GetInitialChemicalComposition().test()
 CppMaterial.GetSSGrain().GetChemicalComposition().test()
 CppMaterial.GetCurrentChemicalComposition().test()#if concentration in Material SSGrain is change, it affects concentration of Material
+
+CppPrecipitateDict["Sprime"].ComputeSurfaceEnergy()
+print("Surface energy of <Sprime> value ==============================================",CppPrecipitateDict["Sprime"].surfaceEnergyCurrentValue)
+
+CppPrecipitateDict["GP"].ComputeSurfaceEnergy()
+print("Surface energy of <GP> value ==============================================",CppPrecipitateDict["GP"].surfaceEnergyCurrentValue)
+
+
+#CppPrecipitateDict["GP"].GetEquilibriumConcentrationForElement("Mg");
+#CppPrecipitateDict["GP"].GetEquilibriumConcentrationForElement("Cu");
+#CppPrecipitateDict["Sprime"].GetEquilibriumConcentrationForElement("Cu");
+#CppPrecipitateDict["Sprime"].ComputePhaseChangeVolumicEnergy()
+#print("Phase change energy is ",CppPrecipitateDict["Sprime"].phaseChangeVolumiqueEnergy)
+
+
+
+
 c.Run()
 
 

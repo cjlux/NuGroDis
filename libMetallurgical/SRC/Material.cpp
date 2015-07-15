@@ -23,6 +23,7 @@
 #include "Grain.hpp"
 #include "Concentration.hpp"
 #include "Precipitate.hpp"
+#include "Vacancy.hpp"
 
 
 
@@ -43,7 +44,7 @@ Material::Material(Temperature& temp,
 		   ChemicalElement& mainChemicalElem,
 		   ChemicalComposition& InitialCompo)
   : temperature_(temp), 
-    vacancyList_(), 
+    vacancy_(0), 
     grainList_(),
     mainChemicalElement_(mainChemicalElem),
     InitialChemicalComposition_(InitialCompo),
@@ -310,15 +311,20 @@ Material::UpdateVolumicValues()
 
 
 //RELATIONS
-void
-Material::AddVacancy(const Vacancy& vacancy)
+
+void 
+Material::SetVacancy(Vacancy& vacancy)
 {
-  
+  assert ( (vacancy_==0)&&"In SetVacancy(): Cannot set another vacancy because material already has a Vacancy object!!! ");
+  vacancy_=&vacancy;
+  assert ( (vacancy_!=0)&&"In SetVacancy(): pointer can not be equal to 0 after setting vacancy object!!! ");
 }
+
 
 void
 Material::AddGrain(Grain& grain)
-{//TODO : check if grain type is ssgrain. If true, then check if material has already ssgrain or not before pushing in List
+{
+  //TODO : check if grain type is ssgrain. If true, then check if material has already ssgrain or not before pushing in List
   grainList_.push_back(&grain);
 }
 
@@ -364,11 +370,21 @@ void
 Material::Info() const
 {
   std::cout <<  "################################# Material::Info #################################" 	<< std::endl;
-  std::cout <<  "                               temperature: -------------------- BEGIN temperature ---------------------------------"<< std::endl;
+  std::cout <<  "                               temperature: -------------------- BEGIN Material's temperature Info ---------------------------------"<< std::endl;
   temperature_.Info(); 
-  std::cout <<"                        -------------------------------------------- END temperature ---------------------------------"<<std::endl;
+  std::cout <<"                        -------------------------------------------- END Material's temperature Info ---------------------------------"<<std::endl;
 
-  //std::cout <<  "                               vacancyList: " << vacancyList_.Info();
+  if (vacancy_!=0)
+  {
+  std::cout <<  "                                   vacancy: -------------------- BEGIN Material's Vacancy Info --------------------------------"<< std::endl;
+  vacancy_->Info();
+  std::cout <<"                        -------------------------------------------- END material's Vacancy Info ---------------------------------"<<std::endl;
+  }
+  else
+  {
+    std::cout<<"The material does not have any Vacancy yet"<<std::endl ;
+  };
+  
   std::cout <<  "                                   ssgrain: " ;
   if  (ssgrainPointer_!=0) 
   {std::cout<<"Adress of the ssgrain is "<<ssgrainPointer_<<std::endl;
@@ -381,9 +397,9 @@ Material::Info() const
   };
   
  
-  std::cout <<  "                       mainChemicalElement: -------------------- BEGIN mainChemicalElement ---------------------------------"<<std::endl;
+  std::cout <<  "                       mainChemicalElement: -------------------- BEGIN Material's mainChemicalElement Info ---------------------------------"<<std::endl;
   mainChemicalElement_.Info();
-  std::cout <<"                      ---------------------------------------------- END mainChemicalElement ---------------------------------"<<std::endl;
+  std::cout <<"                      ---------------------------------------------- END Material's mainChemicalElement Info ---------------------------------"<<std::endl;
   //std::cout <<  "                InitialChemicalComposition: " << InitialChemicalComposition_ << " SI unit" << std::endl;
    // currentChemicalComposition_
   //std::cout <<  "                          precipitateList: " << precipitateList_ << " SI unit" << std::endl;

@@ -38,6 +38,9 @@ public:
     
     void Info() const;
     
+    double ReturnCriticalTotalEnergy();
+    void ComputeCriticalTotalEnergy();
+    
     //Compute the number of nucleation sites using  the Guinier-Preston RadiusDistribution::ComputeTotNbOfIte
     void ComputeNucleationSiteNb();
     

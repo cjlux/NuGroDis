@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <vector>
+#include <map>
 #include <boost/python.hpp>
 
 #include "SSGrain.hpp"
@@ -54,11 +55,33 @@ public:
     //elastic distorsion energy due to the difference of cell size.(was deltageP) . unit: J/m^3
     void ComputeDistorsionEnergy(); //Compute and Set distorsion Energy
     
-    //Compute the interfacial energy. Unit: J/m^2. Actually, surface energy is not stored
-    double ComputeSurfaceEnergy();
+    //Compute the value of interfacial energy according to current temperature. Unit: J/m^2. Actually, current surface energy is stored in surfaceEnergyCurrentValue_
+    void ComputeSurfaceEnergy();
+    
+    //Compute and set Gibbs Free Energy for phase change (was DeltaGv)
+    void ComputePhaseChangeVolumicEnergy();
+    
+    //Compute and return a value. The value computed is not set!!!
+    double ReturnCriticalRadius();
+    double ReturnDeltaCriticalRadius();
+    virtual double ReturnCriticalTotalEnergy()=0;//this method has to be defined in inherithed class!!!
+    double ReturnZeldovichFactor();
+    double ReturnCriticalBeta();
+    double ReturnNucleationRate();
+    
+    //compute and set
+    void ComputeCriticalRadius();
+    void ComputeDeltaCriticalRadius();
+    virtual void ComputeCriticalTotalEnergy()=0;
+    void ComputeZeldovichFactor();
+    void ComputeCriticalBeta();
+    void ComputeNucleationRate();
     
     //Read data value specific for a type of precipitate
     void ReadDataValue(std::string fileName);
+    
+    //
+    void InitializeEquilibriumConcentrationMap();
     
     
     //Initialize attributes of class Precipitate.
@@ -95,6 +118,7 @@ public:
   double GetDeltaCell()                         const {return deltaCell_;} ;
   double GetSolvusActivationEnergy()            const {return solvusActivationEnergy_;};
   double GetDistorsionEnergy()                  const {return distorsionEnergy_;};
+  double GetphaseChangeVolumicEnergy()          const {assert ((phaseChangeVolumiqueEnergy_!=-1)&&"In precipitate GetphaseChangeVolumicEnergy(): phaseChangeVolumiqueEnergy_ has not been computed"); return phaseChangeVolumiqueEnergy_;};
   double GetNucleationSitesNumber()             const {return nucleationSitesNumber_;};
   double GetPreExpTermForSolvus()               const {return preExpTermForSolvus_;};
   double GetShapeFactor()                       const {return shapeFactor_;};
@@ -102,8 +126,20 @@ public:
   Polynomial& GetSurfaceEnergyPolynomial()            {return surfaceEnergyPolynomial_;};
   const Polynomial& GetSurfaceEnergyPolynomial()const {return surfaceEnergyPolynomial_;};
   const int GetSumOfStoicCoefs() const;
-  
-  
+  double GetSurfaceEnergyCurrentValue() const {return surfaceEnergyCurrentValue_;};
+  std::map<std::string, double> GetEquilibriumConcMap() const {return equilibriumConcMap_;};
+  double GetEquilibriumConcentrationForElement(std::string elementSymbol);
+  double GetCriticalRadius()         const {return  criticalRadius_      ;} ;/*TODO assert*/
+  double GetDeltaCriticalRadius()    const {return  deltaCriticalRadius_ ;} ;/*TODO assert*/
+  double GetCriticalTotalEnergy()    const {return  criticalTotalEnergy_ ;} ;/*TODO assert*/
+  double GetZeldovichFactor()        const {return  ZeldovichFactor_     ;} ;/*TODO assert*/
+  double GetCriticalBeta()           const {return  criticalBeta_        ;} ;/*TODO assert*/
+  double GetNucleationRate() const 
+  {
+    assert ((nucleationRate_>=0)&&"Cannot GetNucleationRate() because it is not positive!!!");
+    return  nucleationRate_      ;
+  } ;
+
   
   //Setter
   void SetDeltaCell (const double deltaCell);
@@ -142,21 +178,40 @@ protected:
     //elastic distorsion energy due to the difference of cell size.(was deltageP). unit: J/m^3
     double distorsionEnergy_;
     
-    //urrent nucleation sites number. The first value is initial value (was Ns0P1 or N0P2) .Unit: atomNumber/m^3 (P1) or Precipitates-Dislocations-GrainBoundary Number/m^3  (P2)
+    // (was DeltaGv)
+    double phaseChangeVolumiqueEnergy_;
+    
+    //current nucleation sites number. The first value is initial value (was Ns0P1 or N0P2) .Unit: atomNumber/m^3 (P1) or Precipitates-Dislocations-GrainBoundary Number/m^3  (P2)
     double nucleationSitesNumber_;
     
     //pre-exponential solvus constant. Used in the temperature dependency of X_eq_SS or X_i_SS... . Value depends on the precipitate....
     double preExpTermForSolvus_;
     
-    //The polynomial model to compute the surface energy. unit J/m^2
+    //The polynomial model to compute the surface energy.
     Polynomial surfaceEnergyPolynomial_;
+    
+    //Current value of surfaceEnergyPolynomial_ according to temperature. unit J/m^2
+    double surfaceEnergyCurrentValue_;
     
     //ratio between lenght to radius.If nul, shape is spherical.
     double shapeFactor_;
     
-    //was fractvolPn
+    //was fractvolP
     double volumicFraction_;//Value is setted and update thanks to Method ComputeVolumicFraction in cclass GuinierPreston and Sprime
 
+    //was retoileP or r*
+    double criticalRadius_;
+    //was deltaretoileP
+    double deltaCriticalRadius_;
+    //was deltaGetoile DeltaG*
+    double criticalTotalEnergy_;
+    //was ZP
+    double ZeldovichFactor_;
+    //was Beta*
+    double criticalBeta_;
+    //was J
+    double nucleationRate_;
+    
     //RELATIONS
     std::vector<RadiusDistribution*> radiusDistributionList_; //Save all the RadiusDistribution at each step of the computation
     RadiusDistribution * currentRadiusDistribution_;
@@ -164,6 +219,8 @@ protected:
     
     int sumOfStoicCoefs_;
     bool SumOfStoiCoefsHasBeenComputed_;
+    double solubilityProduct_;
+    std::map<std::string, double> equilibriumConcMap_; //(map of XvSSeq_i)
     
    
     //ChemicalComposition & chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time

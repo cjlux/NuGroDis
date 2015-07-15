@@ -97,6 +97,7 @@ private:
 inline Material& 
 Grain::GetMaterial() const 
 {
+  assert (  (materialPointer_!=0)&&"In GetMaterial of Grain object: Cannot Get material object because Grain does not have material yet" );
   return *materialPointer_;
 }
 

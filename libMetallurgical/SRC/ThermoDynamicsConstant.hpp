@@ -16,6 +16,8 @@
 #ifndef __ThermoDynamicsConstant__hpp__
 #define __ThermoDynamicsConstant__hpp__
 
+#include <cmath>
+
 class ThermoDynamicsConstant
 {
 
@@ -29,7 +31,9 @@ public:
   double Get_kB()  { return kB_; };
   double Get_Na()  { return Na_; };
   
-  static double GetR() {return R;};
+  static double GetR()  {return R;};
+  static double GetNa() {return 6.02214179*std::pow(10,23);};
+  static double GetkB() {return 1.3806488*std::pow(10,-23);};
   
 protected:
 
@@ -45,7 +49,7 @@ private:
   const double Na_;
   
   static const double R=8.314472; // Unit "J.mol^-1.K^-1"
-
+  //static const double Na; //unit mol^-1
 };
 
 

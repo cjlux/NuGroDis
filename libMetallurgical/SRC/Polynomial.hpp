@@ -34,8 +34,8 @@ public:
     
     
     
-    //Gives P(x)
-    void ComputeValue(double x);
+    //Return the computed  scalar P(x) for value x 
+    const double ReturnValue(double x);
     
     //Getters
     const std::vector<double> GetCoefsList() const {return coefsList_;};
@@ -64,12 +64,19 @@ inline
 void 
 Polynomial::SetDegree(int deg)
 {
-  assert (degree_==-1);
+  assert ( (degree_==-1)&&"In setDegree(): Cannot set degree because it has aready been setted");
+  
+  assert( (deg>=0)&&"In SetDegree(): given degree in parameter must be superior or equal to 0" );
+  
+  //assert(  );
+  
   degree_=deg;
   
    for (int i=0;i<=degree_;i++)
   {
     coefsList_.push_back(0);
   }
+  
+  //assert ( ()&&"");  
 }
 #endif

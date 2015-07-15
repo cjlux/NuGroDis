@@ -12,7 +12,8 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 #include <iostream>
-#include <cassert> 
+#include <cassert>
+#include <cmath>
 
 
 #include "Polynomial.hpp"
@@ -26,6 +27,7 @@ Polynomial::Polynomial(int degree)
   {
     coefsList_.push_back(0);
   }
+   
 }
 
 Polynomial::~Polynomial()
@@ -39,6 +41,8 @@ Polynomial::AddPyCoefs(boost::python::list& pythonCoefList)
   //Debug
   /*std::cout<<std::abs(coefsList_.size())<<std::endl;
   std::cout<<boost::python::len(pythonCoefList)<<std::endl;*/
+  
+  
  
   assert( ( std::abs(coefsList_.size())==boost::python::len(pythonCoefList) ) &&"Cannot set Polynome coefficients! Size of given argument python List does not match with degree of the polynome ");
   
@@ -53,6 +57,9 @@ Polynomial::AddPyCoefs(boost::python::list& pythonCoefList)
   {
     coefsList_.push_back(boost::python::extract<double>(pythonCoefList[i]));
   }
+  
+  
+   assert ( (degree_+1==(int)coefsList_.size())&&"In AddPyCoefs() of polynomial: Cannot add coefs because, polynomial degree does not correspond to given Python List" );
 }
 
 void
@@ -70,9 +77,34 @@ Polynomial::PrintVectorPolynomial(std::vector<Polynomial*>& vec)
     std::cout << *i << '|';
 }
 
-void
-Polynomial::ComputeValue(double x)
+//Return the computed  scalar P(x) for value x 
+const double
+Polynomial::ReturnValue(double x)
 {
+  assert ( (degree_!=-1)&&"In ReturnValue() of class Polynomial: polynomial has not been setted" )  ;
+ 
+  assert (  (degree_+1 ==(int)coefsList_.size())&&"In ReturnValue() of class Polynomial: size of vector and degree are not equivalent" );
+  
+  double polynomValue=0;
+  
+  
+  //Sum of monom method
+  /*
+  for (int j=0;j<=degree_;j++)
+  {
+    polynomValue+=std::pow(x,j)*coefsList_[j] ;
+  }*/
+  
+  
+  //Horner method
+  for (int j=0;j<=degree_;j++)
+  {
+    polynomValue=polynomValue*x + coefsList_[degree_-j];
+  }
+  
+  
+  return polynomValue;
+  
 }
 
 void
@@ -81,6 +113,8 @@ Polynomial::SetCoefs(std::vector<double> const& coefsVector)
   assert( ( coefsList_.size()==coefsVector.size() ) &&"Cannot set Polynome coefficients! Size of given argument Vector does not match with the size of coefsList_" );
   
   coefsList_=coefsVector;
+  
+  assert ( (degree_+1==(int)coefsList_.size())&&"In SetCoefs() of polynomial: Cannot set coefs because, polynomial degree is not equivalent to coefs vector" );
 }
 
 

@@ -27,6 +27,47 @@ Sprime::~Sprime()
 {
 }
 
+
+double //TODO
+Sprime::ReturnCriticalTotalEnergy()
+{
+    //Assert DeltaGv and DeltaGe have been computed before, and correct (current) values are used
+  
+  double oldDeltaGv=phaseChangeVolumiqueEnergy_;
+  double oldDeltaGe=distorsionEnergy_;
+  double oldGamma=surfaceEnergyCurrentValue_;
+  double oldStheta=Stheta_;
+  this->ComputePhaseChangeVolumicEnergy();//compute another value of phaseChangeVolumiqueEnergy_
+  this->ComputeDistorsionEnergy(); //compute another value of distorsionEnergy_
+  this->ComputeSurfaceEnergy();
+  this->WettingFunction(wettingAngle_);
+  assert ( (phaseChangeVolumiqueEnergy_==oldDeltaGv)&&"may be phaseChangeVolumiqueEnergy_ has not been computed before\
+  running method ReturnCriticalRadius()");
+  assert ( (distorsionEnergy_==oldDeltaGe)&&"may be distorsionEnergy_ has not been computed before\
+  running method ReturnCriticalRadius()");
+  assert ( (surfaceEnergyCurrentValue_==oldGamma)&&"may be surfaceEnergyCurrentValue_ has not been computed before\
+  running method ReturnCriticalRadius()");
+  assert ( (Stheta_==oldStheta)&&"may be Stheta_ has not been computed before\
+  running method ReturnCriticalRadius()");
+  
+  
+  assert((phaseChangeVolumiqueEnergy_+distorsionEnergy_)!=0);
+  
+  double criticalDeltaG= Stheta_*32/27*M_PI*std::pow(surfaceEnergyCurrentValue_,3)/std::pow( (phaseChangeVolumiqueEnergy_+distorsionEnergy_),2)*std::pow((shapeFactor_+2),3)/std::pow((shapeFactor_+4/3),2); 
+  
+  assert (criticalDeltaG>0);
+  
+  return criticalDeltaG;
+}
+
+
+void
+Sprime::ComputeCriticalTotalEnergy()
+{
+  criticalTotalEnergy_=this->ReturnCriticalTotalEnergy();
+}
+
+
 void
 Sprime::ComputeNucleationSiteNb()
 {
@@ -89,7 +130,7 @@ Sprime::Info() const
   
   //Stheta
   if (Stheta_==-1)
-  {std::cout << "                                     Stheta: Not defined" << std::endl;}
+  {std::cout << "                                     Stheta: Not computed yet" << std::endl;}
   else
   {std::cout << "                                     Stheta: " << Stheta_ << " SI unit" << std::endl;};
   

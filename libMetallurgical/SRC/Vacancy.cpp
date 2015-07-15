@@ -40,9 +40,25 @@ Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double D
   std::cout <<  "Enter in contructor of object <Vacancy> " << std::endl;
   std::cout <<  "Building object <Vacancy> " << std::endl;
   
+  /*Do not work, thus, mat.AssertVacancyPointer() is used instead */  //assert ( (mat.GetVacancyPointer==0)&&"Material already has a vacancy!!!"  );
+  
+  const bool isMaterialVacancyPtrZero = mat.AssertVacancyPointer(0);
+  
+  if (isMaterialVacancyPtrZero==true)
+  {
+  mat.SetVacancy(*this);
+  
   assert( (coordinationNumber_>=0)&&"In vacancy constructor: Given argument of coordination number must be positive" );
   
   std::cout <<  "Exit contructor of object <Vacancy> " << std::endl;
+  }
+  else
+  {
+    assert(!"In Vacancy constructor:  mat.GetvacancyPointer() is not equal to 0. Material already has a vacancy!!!");
+  };
+  
+ 
+
 }
 
 Vacancy::~Vacancy()
@@ -75,7 +91,18 @@ Vacancy::ComputeEquilibriumConcentration()
  {
    std::string elementName = (*i)->GetElementName();
    double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
-   double Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+   
+   const bool usingEvac= (*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2);//Evac is interaction with vacancy. Also remember that -2 means unused
+   double Evac=0;
+   
+   if (usingEvac==true)
+   {
+    Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+   }
+   else
+   {
+    Evac=1;
+   };
    sum_alpha_i += coordinationNumber_*atomicConc*( -1 + std::exp(Evac/(R*T)) );
  }
   
@@ -128,6 +155,32 @@ Vacancy::ComputeConcentrationBeforeQuenching()
   
 }
 
+double
+Vacancy::ReturnCurrentConcentrationFromAnalyticalSolution(double duration, double initialEquilibriumConc) const
+{
+  assert( (duration >=0)&&"In ReturnCurrentConcentrationFromAnalyticalSolution(): Given duration in argument \
+  is not strictly positive!!!");
+  assert( (initialEquilibriumConc >=0)&&"In ReturnCurrentConcentrationFromAnalyticalSolution(): Given initial Equilibrium Concentration in argument \
+  is not strictly positive!!!");
+  
+  assert((vacancyDiffusionCoef_!=0)&&"vacancyDiffusionCoef_ must be different from zero !!! Can not \
+  compute time factor (Tau) in ReturnCurrentConcentrationFromAnalyticalSolution() .");
+  
+  double Tau=std::pow( halfSinkDistance_/2/M_PI ,2)/vacancyDiffusionCoef_;
+  
+  assert ( (equilibriumConc_!=0)&&"In ReturnCurrentConcentrationFromAnalyticalSolution: equilibriumConc_ must\
+  be different from 0 . It has not been computed yet!");
+  
+  double Xlac=(initialEquilibriumConc-equilibriumConc_)*std::exp(-duration/Tau) + equilibriumConc_;
+  
+  return Xlac;
+}
+
+void
+Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution(double duration, double initialEquilibriumConc)
+{
+  concentration_= this->ReturnCurrentConcentrationFromAnalyticalSolution(duration,initialEquilibriumConc);
+}
 
 
 double 

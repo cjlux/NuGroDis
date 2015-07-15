@@ -13,7 +13,8 @@ ComputationParam={"Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoa
                   "Material": "M2024" } 
 
 TemperatureParam ={ 
-"T0" : (20,"Celsius degree")#Initial temperature, [Celsius degree] 
+#"T0" : (20,"Celsius degree")#Initial temperature, [Celsius degree] 
+"T0" : (293.15,"K")
 }
 
 QuenchingParam={

@@ -28,9 +28,9 @@ class Diffusion
 
 public:
 
-  Diffusion(ChemicalElement& CE, Material& mat,Vacancy& vacancy,double preExpDiffCoef,double actEn, double Evac);
+  Diffusion(ChemicalElement& CE, Material& mat,double preExpDiffCoef,double actEn, double Evac);
   Diffusion(ChemicalElement& CE, Material& mat,double preExpDiffCoef,double actEn);
-  Diffusion(ChemicalElement& CE,Vacancy& vacancy, double Evac);
+  /*TODO ERASE THIS CONSTRUCTOR Diffusion(ChemicalElement& CE,Vacancy& vacancy, double Evac);*/
     ~Diffusion();
     
     void Info() const;
@@ -42,6 +42,7 @@ public:
     const double GetPreExpDiffusionCoef() {return preExpDiffusionCoef_;};
     const double GetActivationEnergy() {return activationEnergy_;};
     const double GetInteractionEnergyWithVacancy() const;
+    const bool AssertInteractionEnergyWithVacancyValue(double valueAsserted) const;
     
     double GetAtomicDiffusionCoef() const ;
     
@@ -78,7 +79,7 @@ private:
     const ChemicalElement& chemicalElement_;
     const Material* material_;
     SSGrain* ssgrainPointer_;
-    const Vacancy* vacancy_;
+    Vacancy* vacancy_;
     
 
     
@@ -91,9 +92,15 @@ private:
 inline const double 
 Diffusion::GetInteractionEnergyWithVacancy() const
 {
-  assert( (interactionEnergyWithVacancy_!=-1)&&"In GetInteractionEnergyWithVacancy(): Cannot get interaction energy\
+  assert( (interactionEnergyWithVacancy_!=-2)&&"In GetInteractionEnergyWithVacancy(): Cannot get interaction energy\
   because Atomic Diffusion Object has been built with no vacancy diffusion and only atomic diffusion "  );
   return interactionEnergyWithVacancy_;
+}
+
+inline const bool 
+Diffusion::AssertInteractionEnergyWithVacancyValue(double valueAsserted) const
+{
+  return interactionEnergyWithVacancy_==valueAsserted;
 }
 
 

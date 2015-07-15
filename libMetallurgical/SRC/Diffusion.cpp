@@ -28,7 +28,7 @@
 //CONSTRUCTOR 
 //vacancies diffusion and atomic diffusion
 //can also be used in case material did not have a ssgrain! Chemical element diffuse in material or material's ssgrain(which can be =0), 
-Diffusion::Diffusion(ChemicalElement& CE, Material& mat,Vacancy& vacancy,double preExpDiffCoef,double actEn, double Evac)
+Diffusion::Diffusion(ChemicalElement& CE, Material& mat,double preExpDiffCoef,double actEn, double Evac)
  :preExpDiffusionCoef_(preExpDiffCoef),
   activationEnergy_(actEn),
   interactionEnergyWithVacancy_(Evac),
@@ -36,12 +36,13 @@ Diffusion::Diffusion(ChemicalElement& CE, Material& mat,Vacancy& vacancy,double 
   chemicalElement_(CE),
   material_(&mat),
   ssgrainPointer_(mat.GetSSGrainPointer()),
-  vacancy_(&vacancy)
+  vacancy_(& (mat.GetVacancy()) )
 
 {
-  //TODO assert mat.GetVacancy==vacancy (same object, same adress) ;   assert ( (mat.)&&"" )
+  assert ( (mat.GetVacancyPointer()!=0)&&"Material given in Diffusion contructor does not have any vacancy");
+
   mat.AddSolute(CE);
-  vacancy.AddInteractingSolute(CE);
+  vacancy_->AddInteractingSolute(CE);
   CE.SetDiffusion(*this);
 
 }
@@ -53,34 +54,37 @@ Diffusion::Diffusion(ChemicalElement& CE, Material& mat,Vacancy& vacancy,double 
 Diffusion::Diffusion(ChemicalElement& CE, Material& mat,double preExpDiffCoef,double actEn)
  :preExpDiffusionCoef_(preExpDiffCoef),
   activationEnergy_(actEn),
-  interactionEnergyWithVacancy_(-1),
+  interactionEnergyWithVacancy_(-2),//-2 means this attribute must not be used
   atomicDiffusionCoef_(-1),
   chemicalElement_(CE),
   material_(&mat),
   ssgrainPointer_(mat.GetSSGrainPointer()),
-  vacancy_(0)
+  vacancy_(mat.GetVacancyPointer())
 {
+  assert ( (mat.GetVacancyPointer()!=0)&&"Material given in Diffusion contructor does not have any vacancy");
   mat.AddSolute(CE);
   CE.SetDiffusion(*this);
 }
 
+
+/* TODO ERASE THIS CONSTRUCTOR
 //CONSTRUCTOR
 //ONLY VACANCIES DIFFUSION. (not atomic diffusion)
-Diffusion::Diffusion(ChemicalElement& CE, Vacancy& vacancy,double Evac)
+Diffusion::Diffusion(ChemicalElement& CE, Material& mat,double Evac)
  :preExpDiffusionCoef_(-1),
   activationEnergy_(-1),
   interactionEnergyWithVacancy_(Evac),
   atomicDiffusionCoef_(-2),//-2 means this attribute must not be used
   chemicalElement_(CE),
-  material_(0),
+  material_(mat),
   ssgrainPointer_(0),
-  vacancy_(&vacancy)
+  vacancy_(mat.GetVacancyPointer())
    
 {
   vacancy.AddInteractingSolute(CE);
   CE.SetDiffusion(*this);
 }
-
+*/
 
 
 
@@ -98,19 +102,17 @@ Diffusion::ComputeAtomicDiffusionCoefValue()
   Atomic Diffusion Coef because Diffusion Object do not have Atomic \
   diffusion (Use another constructor)" );
   
-  if (vacancy_==0)
-  { 
-    //TODO get lambda using material_
-  };
-  
-  
+  assert ((vacancy_!=0)&&"In ComputeAtomicDiffusionCoefvalue: vacancy pointer is 0");
+ 
   //TODO Dont forget LAMBDA which will come from Vacancy Diffusion!!!
+  double lambda = vacancy_->ReturnBoostFactor(); 
+  
   double R=ThermoDynamicsConstant::GetR();
   double T=material_->GetTemperature().GetCurrentTemp();
   
   
   
-  atomicDiffusionCoef_=preExpDiffusionCoef_*std::exp(-activationEnergy_/(R*T));
+  atomicDiffusionCoef_=lambda*preExpDiffusionCoef_*std::exp(-activationEnergy_/(R*T));
   
 }
 

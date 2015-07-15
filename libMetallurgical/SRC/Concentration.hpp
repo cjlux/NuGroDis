@@ -35,11 +35,11 @@ public:
     
     //Compute and NOT SET the atomic concentration from  current volumic value. 
     //Because current atomic concentration is not stored , it is computed using chemicalElement::ConvertVolumicToAtomicConcentration
-    void ComputeAtomicValue();
+    void ReturnCurrentAtomicValue();
     
     // Compute NOT SET massic from the current volumic value  Because current amassic concentration is not 
     // stored , it is computed using chemicalElement::ConvertVolumicToAtMassicncentration
-    void ComputeMassicValue();
+    void ReturnCurrentMassicValue();
     
     
     

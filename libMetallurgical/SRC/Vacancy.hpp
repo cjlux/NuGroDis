@@ -87,8 +87,15 @@ public:
     //get the concentration (atomic fraction) of vacancies at the end of the hardening. 
     double GetHardeningFinalConcentration(std::string);
     
-    // Compute and save the evolution of vacancies based on analytical solution of the differential equation 
+    /*unuseful now?*/ // Compute and save the evolution of vacancies based on analytical solution of the differential equation 
     double SolveConcentrationEvolutionEquation();
+    
+    // Compute and save the evolution of vacancies based on analytical solution of the differential equation
+    void ComputeCurrentConcentrationFromAnalyticalSolution(double duration, double initialEquilibriumConc);
+    
+    //Return Xlac from analytical solution of the differential equation
+    double ReturnCurrentConcentrationFromAnalyticalSolution(double duration, double initialEquilibriumConc) const;
+    
     
     void SetConcentrationBeforeQuenching(const double );
     
@@ -105,7 +112,7 @@ public:
    const Material& GetMaterial() const {return material_;};
    std::vector<const ChemicalElement*> GetSoluteInteractingWithVacList() const {return soluteInteractingWithVacList_;};
    //setter
-   void AddInteractingSolute(const ChemicalElement& solute);
+   void AddInteractingSolute(const ChemicalElement& solute) ;
    
    
 protected:
