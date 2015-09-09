@@ -18,10 +18,12 @@
 
 #include <cassert>
 
+class Computation; 
+
 class Quenching
 {
 public:
-  Quenching(double Tsol, double Tfinal, double coolingRate, double deltaT = 1.);
+  Quenching(Computation& computation, double Tsol, double Tfinal, double coolingRate, double deltaT = 1.);
   ~Quenching();
 
   void Info() const;
@@ -37,10 +39,17 @@ public:
 
   //Setters
   void SetTotIterationNumber(double tin);//Set totIterationNumber_  and compute timeStep_ and deltaT_ 
+  
+  //Relations
+  Computation& GetComputation() const {return computation_;};
 
 protected:
 
 private:
+    //Relations
+  Computation& computation_;
+  
+  //attributes
   const double solutionizingTemp_;
   const double finalTemp_;
   const double coolingRate_;
@@ -48,7 +57,9 @@ private:
   double timeStep_;
   double totIterationNumber_;
   double deltaT_;
+
 };
+
 
 //Set totIterationNumber and use it to compute corrct values of deltaT, and timeStep_. Maybe, this part has TO BE REFINED
 inline void

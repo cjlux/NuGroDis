@@ -8,9 +8,11 @@ from MetalUtils.ElementsData import Dict as ElementsDataDict
 
 NuGroDisVersion="1.0"  
 
-ComputationParam={"Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
+ComputationParam={            "Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
-                  "Material": "M2024" } 
+                          "Material": "M2024",
+                  "initialTimeStep" : (1,"s") #default Time step for the first iteration 
+                  } 
 
 TemperatureParam ={ 
 #"T0" : (20,"Celsius degree")#Initial temperature, [Celsius degree] 
@@ -27,8 +29,7 @@ QuenchingParam={
 
 HardeningParam={
 "duration": (150000,"s"), # hardening duration
-"initialClassNumber" : (20, ""), # Initial number for hardening radiusDistribution Class , unitless. 
-"initialTimeStep" : (1,"s") #Time step for first iteration
+"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
 
 #initialRadiusDistribution={
@@ -66,7 +67,7 @@ InitialGlobalData={
 ########################################      RADIUS DISTRIBUTION PARAM       ###################################################
 #################################################################################################################################
 CellParam ={
-"spatialStep"  : (10E-10,"m") , #Spatial discretisation step
+"spatialStep"  : (1E-10,"m") , #Spatial discretisation step
 "initialClassNumber" : (20, ""), # Initial number for radiusDistribution Class, unitless. This is the default value use when an radiusDistribution object is instanciate
 }  #avant : (4* CellParam["spatialStep"],"m")
 CellParam["minimumRadius"] = (4*CellParam["spatialStep"][0],CellParam["spatialStep"][1]) #not useful in cellParam ???? argument for object RadiusDiustribution contructor or not????

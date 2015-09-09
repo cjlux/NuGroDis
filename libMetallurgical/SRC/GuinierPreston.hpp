@@ -27,10 +27,13 @@ public:
     GuinierPreston(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD);//argument-->Material& because of inheritance with Precipitate
     ~GuinierPreston();
     
+    const std::string GetPrecipitateType() { return precipitateType_ ;} ;
+    
     void Info() const; 
     
     double ReturnCriticalTotalEnergy();
     void ComputeCriticalTotalEnergy();
+    double ReturnVolumicFraction();
     
     //Compute the number of nucleation sites using RadiusDistribution::ComputeTotNbOfItems
     void ComputeNucleationSiteNb();
@@ -41,11 +44,14 @@ public:
     void ReadDataValue(std::string fileName);
 
     double WettingFunction(double theta) { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
+    
+    
 
 
 protected:
 
 private:
+  const std::string precipitateType_;
 
 };
 

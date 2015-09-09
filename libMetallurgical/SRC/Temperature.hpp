@@ -22,6 +22,7 @@
 //Class Temperature, defining the current temperature for computing, 
 //Can be an array of Value versus time
 //Unit: K
+class Material;
 
 class Temperature
 {
@@ -42,6 +43,10 @@ public:
     //Setters
     void SetCurrentTemp(double temp);
     
+    //RELATIONS
+    Material& GetMaterial() const;
+    void SetMaterial(Material& mat);
+    
     
 
 
@@ -51,7 +56,24 @@ protected:
 private:
   double currentTemp_;
   std::vector<double> temperatureList_;
+  //RELATIONS
+  Material* material_;
+  
 };
+
+inline Material&
+Temperature::GetMaterial() const
+{
+  assert( (material_!=0)&&"Cannot GetMaterial(): Temepature Object is not linked to any material Object Yet");
+  
+  return *material_;
+}
+inline void
+Temperature::SetMaterial(Material& mat)
+{
+  assert ((material_==0)&&"Cannot SetMaterial(): Tempature Object is already linked to a material Object.");
+  material_=&mat;
+}
 
 
 #endif

@@ -69,6 +69,7 @@ Vacancy::~Vacancy()
 void
 Vacancy::ComputeDiffusionCoefValue()
 {
+  std::cout<<"Vacancy::ComputeDiffusionCoefValue() ==> Computing Diffusion Coef Value"<<std::endl;
   double R=ThermoDynamicsConstant::GetR();
   double T=material_.GetTemperature().GetCurrentTemp();
   vacancyDiffusionCoef_=preExpDiffusionValue_*std::exp(-migrationEnthalpy_/(R*T) );
@@ -82,7 +83,64 @@ Vacancy::ComputeEquilibriumConcentration()
 {
   /*  formula  */
   
+  std::cout<<"Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl;
+  equilibriumConc_=this->ReturnEquilibriumConcentration();
+  std::cout<<"##########  END Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl; 
+}
+
+
+
+//TODO DELETE AFTER 
+//Compute and set the current equilibrium (Xlaceq) concentration for the current temperature 
+// void  
+// Vacancy::ComputeEquilibriumConcentration()
+// {
+//   /*  formula  */
+//   
+//   std::cout<<"Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl;
+//   
+//   double R=ThermoDynamicsConstant::GetR();
+//   double T=material_.GetTemperature().GetCurrentTemp();
+//   
+//  double sum_alpha_i=0;
+//  for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
+//  {
+//    std::string elementName = (*i)->GetElementName();
+//    double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
+//    const bool usingEvac= (*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2);//Evac is interaction with vacancy. Also remember that -2 means unused
+//    double Evac=0;
+//    
+//    if (usingEvac==true)
+//    {
+//     Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+//    }
+//    else
+//    {
+//     Evac=1;
+//    };
+//    sum_alpha_i += coordinationNumber_*atomicConc*( -1 + std::exp(Evac/(R*T)) );
+//  }
+//   
+//    alpha
+//   double alpha= 1 + sum_alpha_i;
+//   equilibriumConc_=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
+//   assert ( (equilibriumConc_>0)&&"In ComputeEquilibriumConcentration: Computed value is not positive");
+// 
+//   
+// }
+
+
+
+
+
+
+
+
+const double  //TODO
+Vacancy::ReturnEquilibriumConcentration() const
+{  
   
+  std::cout<<"################## Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
   double R=ThermoDynamicsConstant::GetR();
   double T=material_.GetTemperature().GetCurrentTemp();
   
@@ -91,7 +149,6 @@ Vacancy::ComputeEquilibriumConcentration()
  {
    std::string elementName = (*i)->GetElementName();
    double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
-   
    const bool usingEvac= (*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2);//Evac is interaction with vacancy. Also remember that -2 means unused
    double Evac=0;
    
@@ -103,42 +160,17 @@ Vacancy::ComputeEquilibriumConcentration()
    {
     Evac=1;
    };
+   
    sum_alpha_i += coordinationNumber_*atomicConc*( -1 + std::exp(Evac/(R*T)) );
  }
   
   //TODO alpha
   double alpha= 1 + sum_alpha_i;
-  
-  
-  equilibriumConc_=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
-  assert ( (equilibriumConc_>0)&&"In ComputeEquilibriumConcentration: Computed value is not positive");
-
-  
-}
-
-const double  //TODO
-Vacancy::ReturnEquilibriumConcentration() const
-{  
-  
-  
-  double R=ThermoDynamicsConstant::GetR();
-  double T=material_.GetTemperature().GetCurrentTemp();
-  
- double sum_alpha_i=0;
- for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
- {
-   std::string elementName = (*i)->GetElementName();
-   double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
-   double Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
-   sum_alpha_i += coordinationNumber_*atomicConc*( -1 + std::exp(Evac/(R*T)) );
- }
-  
-  //TODO alpha
-  double alpha= 1 + sum_alpha_i;
-  
-  
   double equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
   assert ( (equilibriumConcValue>0)&&"In ReturnEquilibriumConcentration: Returned value is not positive");
+  
+  std::cout<<"############ equilibriumConcValue = "<<equilibriumConcValue<<std::endl;
+  std::cout<<"################## END  Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
 
   return equilibriumConcValue;
   
@@ -147,12 +179,25 @@ Vacancy::ReturnEquilibriumConcentration() const
 
 
 
+double 
+Vacancy::ReturnConcentrationBeforeQuenching()
+{
+  double R=ThermoDynamicsConstant::GetR();
+  double Xlacavtrempe;
+  Xlacavtrempe = std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*solutionisingTemp_));
+  
+  assert(Xlacavtrempe>0);
+  
+  return Xlacavtrempe;
+}
+
 
   //Compute and save equilibrium concentration of vacancies after solutionising. Was Xlacavtremp.  To do: check validity of the equation
 void 
 Vacancy::ComputeConcentrationBeforeQuenching()
 {
-  
+  std::cout<<"############# Vacancy::ComputeConcentrationBeforeQuenching()"<<std::endl;
+  concentrationBeforeQuenching_=this->ReturnConcentrationBeforeQuenching();
 }
 
 double
@@ -179,7 +224,10 @@ Vacancy::ReturnCurrentConcentrationFromAnalyticalSolution(double duration, doubl
 void
 Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution(double duration, double initialEquilibriumConc)
 {
+  std::cout<<"Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution() ==> Computing current concentration from analytical solution"<<std::endl;
+  
   concentration_= this->ReturnCurrentConcentrationFromAnalyticalSolution(duration,initialEquilibriumConc);
+  std::cout<<"END Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution() ==> Computing current concentration from analytical solution"<<std::endl;
 }
 
 

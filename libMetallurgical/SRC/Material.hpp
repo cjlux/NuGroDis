@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+class Computation;
 class Temperature;
 class ChemicalElement;
 class Vacancy;
@@ -34,12 +35,28 @@ public:
   //FAKE METHOD
    void test();
   
-  Material();
-  Material(Temperature& , ChemicalElement&, ChemicalComposition& InitialCompo);
+  Material(Temperature& , ChemicalElement&, ChemicalComposition& InitialCompo, Computation& computation);
   
-  //Material(Temperature& , ChemicalElement&, ChemicalComposition& InitialCompo, PrecipitateList&); //TODO
+  //Material(Temperature& , ChemicalElement&, ChemicalComposition& InitialCompo, PrecipitateList&, Computation& computation); //TODO
   
   ~Material();
+  
+  
+  void RunProcess();
+
+  void ProcessPrecipitatesNucleationRate();
+  
+  void ComputePrecipitatesAllInterfacialConcentrations();
+  
+  void ComputePrecipitatesInterfacialVelocityList();
+  
+  void ComputeCriticalInterfacialConcentration();
+  
+  void ProcessComputationMaxTimeStep();
+  
+  void AddNucleatedPrecipitates();
+  
+  void SolveCineticLinearSytem();
 
   void Info() const;
   void ReadData(std::string dataFileName);
@@ -56,11 +73,11 @@ public:
   const double GetLatticeParameter() const { return latticeParameter_; }
 
   //Setter
-  void SetTemperature(const Temperature &temperatureClass);
 
    
   //RELATION
   //getter
+  Computation& GetComputation() const {return computation_;}; 
   std::vector<Grain *> GetGrainList() const {return grainList_; } ;//TO DO should be SSGraibLIst+PrecipitateList
   const Vacancy*  GetVacancyPointer() const {return vacancy_; } ;
   Vacancy*  GetVacancyPointer() {return vacancy_; } ;
@@ -116,6 +133,8 @@ private:
   std::vector<const ChemicalElement*> soluteList_; /*list of solute in the material/ssgrain. 
                                                    can also be used to find diffusion param of
                                                    solutes in the material/ssgrain*/
+                                                   
+  Computation& computation_;
  
   //TODO Get ssGrain, Precipitates( =GP OR Sprime OR ...) from grainList_. Retrieve the type of specialisation class
   

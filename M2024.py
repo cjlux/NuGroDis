@@ -79,7 +79,7 @@ Mg={
 ################################################## Guinier-Preston DATA ##########################################################
 GP={
 "nature":"GuinierPreston", #Important nature can be:  "GuinierPreston" or "Sprime". key words can be found in MetalUtils/Grain.py PrecipitateNatureList
-"chemicalComposition": ("Al9Cu5Mg6","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
+"chemicalComposition": ("Al8Cu1Mg1","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
 "initialNucleationSitesNb":(6.02214E28,"at.m^-3")  , # initial Number of nucleation sites at beginning of hardening, was Ns0P1. Is assumed to be the initial number of aluminium atoms/volum unit
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,

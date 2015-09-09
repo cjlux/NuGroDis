@@ -75,7 +75,7 @@ namespace Util
 
       static int SolveSecondDegreeEquation(double a, double b, double c,
                                            std::complex<double> & x1,
-                                           std::complex<double> & x2);
+                                           std::complex<double> & x2,bool complexSolution=true);
 
       static int SolveThirdDegreeEquation(double a, double b, double c, double d,
                                           std::complex<double> & x1,

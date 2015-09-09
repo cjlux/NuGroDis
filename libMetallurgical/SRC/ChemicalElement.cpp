@@ -19,6 +19,7 @@
 #include "ChemicalElement.hpp"
 #include "Concentration.hpp"
 #include "ChemicalComposition.hpp"
+#include "Diffusion.hpp"
 
 
 //CONSTRUCTOR
@@ -46,6 +47,20 @@ ChemicalElement::ChemicalElement(double density,
 ChemicalElement::~ChemicalElement()
 {
 }
+
+void
+ChemicalElement::ComputeAtomicDiffusionCoefValue() const
+{
+  std::cout<<"#################### ChemicalElement::ComputeAtomicDiffusionCoefValue() ===>"<<std::endl;
+  
+  assert( (diffusion_!=0)&&"In GetDiffusion: cannot get diffusion because the chemical\
+  element does not have any diffusion object yet ( pointer is 0 )" );
+  
+  diffusion_->ComputeAtomicDiffusionCoefValue();
+  
+  std::cout<<"END ChemicalElement::ComputeAtomicDiffusionCoefValue() ===>"<<std::endl;
+}
+
 
 void ChemicalElement::EnterInChemicalComposition(ChemicalComposition& compo)
 {

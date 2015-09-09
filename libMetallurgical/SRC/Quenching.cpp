@@ -16,9 +16,11 @@
 #include <cassert>
 
 #include "Quenching.hpp"
+#include "Computation.hpp"
 
-Quenching::Quenching(double Tsol, double Tfinal, double coolingRate, double deltaT)
-  : solutionizingTemp_(Tsol),
+Quenching::Quenching(Computation& computation, double Tsol, double Tfinal, double coolingRate, double deltaT)
+  : computation_(computation),
+    solutionizingTemp_(Tsol),
     finalTemp_(Tfinal),
     coolingRate_(coolingRate),
     duration_((solutionizingTemp_ - finalTemp_)/coolingRate_),
@@ -27,6 +29,7 @@ Quenching::Quenching(double Tsol, double Tfinal, double coolingRate, double delt
     deltaT_(deltaT)
 {
   std::cout <<  "Building object <Quenching> " << std::endl;
+  computation_.SetQuenching(*this);
   
   // Preconditions:
   assert( (finalTemp_ < solutionizingTemp_)&&"Quenching final Temperature must be inferior to solutionizing Temperature");

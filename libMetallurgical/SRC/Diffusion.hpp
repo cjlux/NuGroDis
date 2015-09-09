@@ -109,6 +109,14 @@ Diffusion::GetAtomicDiffusionCoef() const
 {
   assert (  (atomicDiffusionCoef_!=-2)&&"Cannot GetAtomicDiffusionCoef because\
   Diffusion Object do not have Atomic diffusion (Use another constructor) ");
+  
+  assert (  (atomicDiffusionCoef_!=0)&&"Atomic diffusion coefficient is 0!!! No sense Value.\
+  Cannot GetAtomicDiffusionCoef()");
+  
+  assert (  (atomicDiffusionCoef_!=-1)&&"In Diffusion::GetAtomicDiffusionCoef(): Atomic diffusion coefficient has not been computed yet!!! ");
+  
+  
+  
   return atomicDiffusionCoef_;
 }
 

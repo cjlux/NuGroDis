@@ -13,13 +13,20 @@
 //
 
 #include <iostream>
+#include <cmath>
 
 #include "GuinierPreston.hpp"
 #include "Polynomial.hpp"
+#include "Material.hpp"
+#include "RadiusDistribution.hpp"
+#include "ChemicalElement.hpp"
+
+
 
 
 GuinierPreston::GuinierPreston(Material& mat, ChemicalComposition &CC, RadiusDistribution &initialRD)
-  :Precipitate(mat,CC,initialRD)
+  :Precipitate(mat,CC,initialRD),
+   precipitateType_("GuinierPreston")
 {
 }
 
@@ -65,11 +72,75 @@ GuinierPreston::ComputeCriticalTotalEnergy()
 void
 GuinierPreston::ComputeNucleationSiteNb()
 {
+  
+  std::cout<<"Computing Nucleation Site Number For GuinierPreston Precipitate"<<std::endl;
+  
+  std::vector<Precipitate *> precipitateList = materialPointer_->GetPrecipitateList();
+  //TODO  
+  std::vector<Precipitate *> GPList;//List of GuinierPreston
+  
+  for ( unsigned int i=0; i<precipitateList.size(); ++i  )
+  {
+    std::string type= precipitateList[i]->GetPrecipitateType();
+    if (type=="GuinierPreston")
+    {
+      GPList.push_back(precipitateList[i]) ;
+    } 
+  }
+  
+  double SumOfFracOfAllGP=0;
+  double am = materialPointer_->GetMainChemicalElement().GetLatticeParameter();
+  
+  for (unsigned int i=0; i<GPList.size(); ++i )
+  {
+    
+    double fracVol= GPList[i]->ReturnVolumicFraction();
+    
+    double NOccupiedSiteGP_i= (4/std::pow(am,3))*fracVol;
+    
+    assert (NOccupiedSiteGP_i>=0);
+    
+    SumOfFracOfAllGP += NOccupiedSiteGP_i;
+    
+  }
+  
+  
+  nucleationSitesNumber_= initialNucleationSitesNumber_ - SumOfFracOfAllGP ;
+  
+  assert (nucleationSitesNumber_>=0);
+  
+  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç initialNucleationSitesNumber_ : "<<initialNucleationSitesNumber_<<std::endl;
+  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç Nucleation sites number: "<<nucleationSitesNumber_<<std::endl;
+  
+}
+
+double 
+GuinierPreston::ReturnVolumicFraction()
+{
+  double n=currentRadiusDistribution_->GetItemsValues().size();
+  
+  assert (n>0);
+  
+  double Sum=0;
+  for (unsigned int i=1; i<=n; ++i)
+  {
+    double sum_i;
+    double Ri=currentRadiusDistribution_->GetRadiusForClass(i);
+    double Ni=currentRadiusDistribution_->GetItemValueForClass(i);
+    sum_i= (4/3 + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
+    assert (sum_i >= 0);
+    Sum +=sum_i;
+  }
+  
+  assert(Sum>=0);
+  
+  return Sum;
 }
 
 void
 GuinierPreston::ComputeVolumicFraction()
-{
+{ 
+  volumicFraction_=this->ReturnVolumicFraction(); 
 }
 
 

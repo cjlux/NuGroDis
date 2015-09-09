@@ -37,6 +37,8 @@ public:
     ~ChemicalElement();
     
     void Info() const;
+    void ComputeAtomicDiffusionCoefValue() const;
+    
     void ConvertMassicToVolumicConcentration(ChemicalComposition& CC);
     void ConvertVolumicToMassicConcentration(ChemicalComposition& CC);
     void ConvertAtomicToVolumicConcentration(ChemicalComposition& CC);

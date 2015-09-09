@@ -23,10 +23,12 @@
 
 Temperature::Temperature(double T) //T=293.15 K,   Standard conditions for temperature and pressure (STP)
   : currentTemp_(T),
-    temperatureList_()
+    temperatureList_(),
+    material_(0)
 {
   assert(currentTemp_ > 0);
   temperatureList_.push_back(currentTemp_);
+  
 }
 
 Temperature::~Temperature()

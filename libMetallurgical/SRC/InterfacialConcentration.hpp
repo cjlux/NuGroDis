@@ -16,6 +16,7 @@
 #define __InterfacialConcentration__hpp__
 
 #include <vector>
+#include <cassert>
 
 class RadiusDistribution;
 class ChemicalElement;
@@ -24,20 +25,43 @@ class InterfacialConcentration
 {
 
 public:
-  InterfacialConcentration(RadiusDistribution& RD,ChemicalElement& CE);
+  InterfacialConcentration(RadiusDistribution& RD,ChemicalElement& CE); 
   ~InterfacialConcentration();
-
-  std::vector<double*> ComputeInterfacialConcentrationValuesList(double diameter, double temperature);
+  
+  const double GetLeftInterfacialVelocityForClass(unsigned int classId)  ; //classId varies from 1 to n
+  
+  const double GetRightInterfacialVelocityForClass(unsigned int classId) ; //classId varies from 1 to n
+  
+  const double GetLeftInterfacialConcValueForClass(unsigned int classId)  ; //classId varies from 1 to n
+  
+  double GetRightInterfacialConcValueForClass(unsigned int classId) ; //classId varies from 1 to n
+  
+  void SetLeftInterfacialConcValueForClass(double value,unsigned int classId);
+  
+  void SetRightInterfacialConcValueForClass(double value,unsigned int classId);
+  
+  std::vector<double> ReturnInterfacialVelocityList();// list of VINT 
+  
+  void ComputeInterfacialVelocityList(); //compute list of VINT
+  
+  const std::vector<double> GetInterfacialVelocityList(); // get list of VINT
+  
+  const double ReturnCriticalInterfacialVelocity();// VINTcritique_El_P . example VINTcritique_Cu_P
 
   //GETTERS
   //return list (all values) of interfacial concentration
-  const std::vector<double*>& GetInterfacialConcentrationValuesList() const {return interfacialConcentrationValuesList_;};
-  //return a value of interfacial concentration for a given item
+  const std::vector<double>& GetInterfacialConcentrationValuesList() const {return interfacialConcentrationValuesList_;};
+  //return a value of interfacial concentration for a given item. position started from 0 ton n
   const double GetItemValueInInterfConcList(int positionOfInterface);
+  
+  double GetCriticalInterfacialConcentration() const;  
+  
   
   //SETTERS
   //set a value of interfacial concentration for a given item
   void SetItemValueInInterfConcList(const double &computedValueOfItemInInterfConcList);
+  void SetCriticalInterfacialConcentration(const double & computedValueOfCriticalInterfacialConcentration);
+  
   
   
   //RELATIONS
@@ -47,13 +71,45 @@ public:
 protected:
 
 private:
-  std::vector<double*> interfacialConcentrationValuesList_;
+  std::vector<double> interfacialConcentrationValuesList_;//vector of XvintP
+  
+  std::vector<double> interfacialVelocityList_;
+  
+  double criticalInterfacialConcentration_;//XvintcritiqueP_i. example: XvintcritiqueP_Cu, XvintcritiqueP_Mg
+  
   
   //RELATION
   const RadiusDistribution& radiusDistribution_;
   const ChemicalElement& chemicalElement_;
-  
 
 };
+
+inline  double 
+InterfacialConcentration::GetCriticalInterfacialConcentration() const
+{
+  assert ( (criticalInterfacialConcentration_ !=-1)&&"criticalInterfacialConcentration_ has not been computed yet");
+  
+  assert( (criticalInterfacialConcentration_ >=0)&&"Cannot get value because criticalInterfacialConcentration_ is not positive" );
+  
+  return criticalInterfacialConcentration_;
+}
+
+inline void
+InterfacialConcentration::SetCriticalInterfacialConcentration(const double & computedValueOfCriticalInterfacialConcentration)
+{
+  assert ((computedValueOfCriticalInterfacialConcentration>=0)&&"Cannot SetCriticalInterfacialConcentration(): given value is not  positive!!");
+  
+  criticalInterfacialConcentration_=computedValueOfCriticalInterfacialConcentration;
+}
+
+inline const std::vector<double>
+InterfacialConcentration::GetInterfacialVelocityList()
+{
+  //TODO find a way to Check if interfacialVelocityList_ has been computed before!
+  
+  return interfacialVelocityList_;
+}
+
+
 
 #endif

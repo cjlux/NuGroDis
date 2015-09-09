@@ -86,7 +86,7 @@ namespace Util
   int
   Util::SolveSecondDegreeEquation(double a, double b, double c,
                                   std::complex<double> & x1,
-                                  std::complex<double> & x2)
+                                  std::complex<double> & x2,bool complexSolution)
   {
     if (a == 0)
       return SolveFirstDegreeEquation(b, c, x1);
@@ -104,10 +104,17 @@ namespace Util
       }
     else      // 2 conjugate complex roots
       {
+	if (complexSolution)
+	{
         x1.real() = -b*oneOver2a;
         x1.imag() = -sqrt(-delta)*oneOver2a;
         x2.real() =  x1.real();
         x2.imag() = -x1.imag();
+	}
+	else
+	{
+	  assert (!("No real solutions!!!!"));
+	};
       }
 
     return 2;

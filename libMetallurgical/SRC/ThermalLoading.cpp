@@ -14,12 +14,16 @@
 #include <iostream>
 
 #include "ThermalLoading.hpp"
+#include "Computation.hpp"
 
-ThermalLoading::ThermalLoading()
+ThermalLoading::ThermalLoading(Computation& computation)
   :duration_(0),
    time_(0),
-   temperature_(0)
+   temperature_(0),
+   maxTimeStep_(1),
+   computation_(computation)
 {
+  computation_.SetThermalLoading(*this);
 }
 
 ThermalLoading::~ThermalLoading()

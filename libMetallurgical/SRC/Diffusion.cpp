@@ -98,6 +98,8 @@ Diffusion::~Diffusion()
 void 
 Diffusion::ComputeAtomicDiffusionCoefValue()
 {
+  std::cout<<"############Diffusion::ComputeAtomicDiffusionCoefValue() ==> Computing Atomic DiffusionCoefValue"<<std::endl;
+  
   assert ( (atomicDiffusionCoef_!=-2)&&"In diffusion: Cannot Compute\
   Atomic Diffusion Coef because Diffusion Object do not have Atomic \
   diffusion (Use another constructor)" );
@@ -113,6 +115,8 @@ Diffusion::ComputeAtomicDiffusionCoefValue()
   
   
   atomicDiffusionCoef_=lambda*preExpDiffusionCoef_*std::exp(-activationEnergy_/(R*T));
+  
+  std::cout<<"############# END    Diffusion::ComputeAtomicDiffusionCoefValue()   Computing Atomic DiffusionCoefValue"<<std::endl;
   
 }
 

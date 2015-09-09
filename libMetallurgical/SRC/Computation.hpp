@@ -17,6 +17,7 @@
 
 #include <fstream>
 #include <string>
+#include <cassert>
 
 
 // Forward declarations, avoid including...
@@ -24,24 +25,28 @@ class Hardening;
 class ThermalLoading;
 class RadiusDistribution;
 class Quenching;
+class Material;
 
 class Computation
 {
 
 public:
   // The constructor :
-  Computation();
+  Computation(double initialTimeStep);
 
   // The destructor
   ~Computation();
+  
+
 
   // Setters:
   void SetType(const std::string &);
   std::string GetType() const;
   void SetMaxComputationTime(const double &); 
   double GetMaxComputationTime() const;
-  void SetRadiusDistribution(RadiusDistribution *);
-  RadiusDistribution * GetRadiusDistribution() const;
+  
+  double GetMaxTimeStep() const { assert(maxTimeStep_>0) ;  return maxTimeStep_;};
+  
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
   void ComputeDuration();
 
@@ -52,6 +57,31 @@ public:
 
   void Run();
   
+  void Info() const;
+  
+  void ComputeMaxTimeStep();
+  
+  //Relations
+  //setters
+  void SetHardening(Hardening& hardening);
+  void SetQuenching(Quenching& quenching);
+  void SetThermalLoading(ThermalLoading& thermalLoading);
+  void SetRadiusDistribution(RadiusDistribution *);
+  void SetMaterial(Material& mat);
+  
+  //getters
+  RadiusDistribution& GetRadiusDistribution() const;
+  
+  Material& GetMaterial() const;
+  
+  Hardening& GetHardening() const ;
+  
+  Quenching& GetQuenching() const ;
+  
+  ThermalLoading& GetThermalLoading() const;
+  
+  
+  
 
 private:
 
@@ -59,12 +89,22 @@ private:
   Quenching * quenching_;
   Hardening * hardening_;
   ThermalLoading * thermalLoading_;
+  Material * material_;
   
 
   //The total computation duration in second [s] = Maturation.duration + ThermalLoading.duration (was tmax)
   //Unit: s
   double maxComputationTime_;
   std::string type_;
+  double currentTime_; // unit: s
+  
+  //Also can be used as initial value for time step. (was deltati). Unit: s
+  double defaulTimeStep_;
+  
+  //The maximum value allowed for any computed Time step. is deltat  Unit: s
+  double maxTimeStep_;
+  
+  
 };
 
 inline void
@@ -79,6 +119,9 @@ Computation::GetType() const
   return type_;
 }
 
+
+
+
 inline void
 Computation::SetMaxComputationTime(const double & maxCompTime) 
 {
@@ -90,6 +133,74 @@ Computation::GetMaxComputationTime() const
 {
   return maxComputationTime_;
 }
+
+inline void
+Computation::SetHardening(Hardening& hardening)
+{
+  
+  assert ((hardening_==0)&&"Computation is already linked to a Hardening Object");
+  hardening_=&hardening;
+}
+
+inline void
+Computation::SetQuenching(Quenching& quenching)
+{
+  assert ((quenching_==0)&&"Computation is already linked to a Quenching Object");
+  quenching_=&quenching;
+}
+
+inline void
+Computation::SetThermalLoading(ThermalLoading& thermalLoading)
+{
+  assert ((thermalLoading_==0)&&"Computation is already linked to a ThermalLoading Object");
+  thermalLoading_=&thermalLoading;
+}
+
+inline RadiusDistribution&
+Computation::GetRadiusDistribution() const
+{
+  assert ((radiusDistribution_!=0)&&"Computation object is not linked to any RadiusDistribution object yet ");
+  
+  return *radiusDistribution_;
+}
+
+
+inline void
+Computation::SetMaterial(Material& mat)
+{
+  assert (material_==0);
+  material_=&mat; 
+}
+
+inline Hardening& 
+Computation::GetHardening() const 
+  {
+    assert ((hardening_!=0)&&"Computation object is not linked to any Hardening Object yet");
+    return *hardening_;
+  };
+  
+inline Quenching& 
+Computation::GetQuenching() const 
+{
+  assert ((quenching_!=0)&&"Computation object is not linked to any Quenching Object yet");
+  return *quenching_;
+};
+  
+inline ThermalLoading& 
+Computation::GetThermalLoading() const
+{ 
+  assert ((thermalLoading_!=0)&&"Computation object is not linked to any ThermalLoading Object yet");
+  return *thermalLoading_ ;
+};
+
+inline  Material& 
+Computation::GetMaterial() const
+{
+  assert ((material_!=0)&&"Computation Object is not linked to any material yet");
+  
+  return *material_;
+}
+
 
 
 #endif

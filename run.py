@@ -6,6 +6,7 @@
 
 
 from __future__ import division, print_function
+from math import exp
 
 import sys
 sys.path.append("libMetallurgical/PythonB")
@@ -49,23 +50,25 @@ print ("|######################################  RUNNING FILE <run.py> #########
 print ("|####################################################################################################|")
 
 
-# Create a C++ object of type ThermoDynamicsConstant:
-thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
-                                        PhysicalConstantsDict['kB'][0],
-                                        PhysicalConstantsDict['Na'][0])
-thermoDynConst.Info();
 
-
-# Create a C++ object of type Computation:
-c = Computation()
-c.type = nugrodis.ComputationParam["Type"]
 
 material = nugrodis.ComputationParam["Material"]
 print("  > importing module                 :",material)
 exec "import "+material #importing module material given by user
 exec 'L = dir('+material+')' #import  L=directory of module material
-
 print("  > material read is                 :",material)
+
+
+# Create a C++ object of type Computation:
+c = Computation(nugrodis.ComputationParam["initialTimeStep"][0])
+c.Info()
+c.type = nugrodis.ComputationParam["Type"]
+
+# Create a C++ object of type ThermoDynamicsConstant:
+thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
+                                        PhysicalConstantsDict['kB'][0],
+                                        PhysicalConstantsDict['Na'][0])
+thermoDynConst.Info();
 
 #Reading initial alloy compo
 exec "AlloyInitialComposition="+material+".AlloyInitialComposition" 
@@ -135,7 +138,7 @@ InitialTempCpp=Temperature(TempParam['T0'][0]);
 #Create a C++ object of type Material
 CppMaterial=Material(InitialTempCpp,
                      CppElementsDict[mainEl],
-                     InitialCCCpp);
+                     InitialCCCpp,c);
 CppMaterial.Info()
 
 
@@ -181,7 +184,7 @@ CppVacancy.Info();
 
 print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ONE')
 
-#after setting materia
+#after setting material
 #Search for DiffusionParam for solute chemicalElements ( any element different from the main chemical Element)
 #Read dictionaries which have a nature of  DiffusionParam
 CppDiffusionDict={} #a dictionary of Chemical Elements names as keys with their C++ diffusion Objects associated. {"ChemicalElementSymbol": diffusionCppObject}
@@ -246,15 +249,14 @@ for computation in ComputationList:
     #QUENCHING
     if computation == "Quenching":
         # Create an object of type Quenching:
-        exec "Quenching = Quenching("+material+".VacanciesParam['Tsol'][0],\
+        exec "Quenching = Quenching(c,"+material+".VacanciesParam['Tsol'][0],\
                               nugrodis.QuenchingParam['Tfinal'][0],\
                               nugrodis.QuenchingParam['v'][0])"
         Quenching.Info();
     #HARDENING
     if computation == "Hardening":
         # Create a C++ object of type Hardening:
-        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0],
-                            nugrodis.HardeningParam["initialTimeStep"][0])
+        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0], c)
         CppHardening.Info()
 
         
@@ -266,18 +268,19 @@ for computation in ComputationList:
         
 
         
-        #Create a C++ object of type RadiusDistribution
-        CppHardeningRadDis=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
-                          nugrodis.CellParam['minimumRadius'][0],
-                          nugrodis.HardeningParam['initialClassNumber'][0])
-        CppHardeningRadDis.Info();
         #Create Precipitates C++ object  
         CppPrecipitateDict={} #a dictionary of precipitates Names as keys with their C++ Precipitate Objects associated. {"precipitate Name": CppPrecipitateObject}
+        CppHardeningRadDisDict={} #a dictionary of precipitates Names as keys with their C++ RadiusDistribution Objects associated. {"precipitate Name": CppRadiusDIstributionObject}
 ##        CppPolynomialDict={} #a dictionary of precipitates Names as keys with their C++ Polynomial Objects asssociated. {"precipitates Name": CppPolynomialObject}
         for x in pyPD:
             pyPrecipitateObj=pyPD[x]
+            #step0: Create a C++ object of type RadiusDistribution. Required for building Precipitate CppObject
+            CppHardeningRadDisDict[x]=RadiusDistribution(nugrodis.CellParam['spatialStep'][0],
+                          nugrodis.CellParam['minimumRadius'][0],
+                          nugrodis.HardeningParam['initialClassNumber'][0])
+            CppHardeningRadDisDict[x].Info()
             #Step1: Build A C++ object ChemicalComposition. necessary for building Precipitate CppObject
-            print("End of concevrsion######################################################################################")
+            print("End of coversion######################################################################################")
             exec "CppChemicalComposition"+x+"=ChemicalComposition(pyPrecipitateObj.chemicalComposition[0])"  # e.g.  CppChemicalCompositionGP, CppChemicalCompositionSprime, ...
             print("End of concevrsion######################################################################################")
             exec "CppCompo=CppChemicalComposition"+x #just to be more understandable
@@ -286,16 +289,16 @@ for computation in ComputationList:
             if pyPrecipitateObj.nature=="GuinierPreston":
                 #Create a GuinierPreston C++ object
                 print("  > Building a C++ GuinierPreston object named : <"+x+">")
-                CppPrecipitate=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDis)
+                CppPrecipitate=GuinierPreston(CppMaterial,CppCompo,CppHardeningRadDisDict[x])
                 CppPrecipitateDict[x]=CppPrecipitate 
                 #step3: Set specific GuinierPreston properties manually . (Or  with Precipitate.InitializeParameters() ? 
-                CppPrecipitate.nucleationSitesNumber=pyPrecipitateObj.initialNucleationSitesNb[0]
+                CppPrecipitate.initialNucleationSitesNumber=pyPrecipitateObj.initialNucleationSitesNb[0]
             #Step2: Create Precipitates: GuinierPreston , Sprime, and ....
             elif pyPrecipitateObj.nature=="Sprime":
                 #Create a Sprime C++ object
                 print("  > Building a C++ Sprime object named         : <"+x+">")
-               #exec "Cpp"+x+"=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])"
-                CppPrecipitate=Sprime(CppMaterial,CppCompo,CppHardeningRadDis,pyPrecipitateObj.wettingAngle[0])
+               #exec "Cpp"+x+"=Sprime(CppMaterial,CppCompo,CppHardeningRadDisDict[x],pyPrecipitateObj.wettingAngle[0])"
+                CppPrecipitate=Sprime(CppMaterial,CppCompo,CppHardeningRadDisDict[x],pyPrecipitateObj.wettingAngle[0])
                 CppPrecipitateDict[x]=CppPrecipitate
                 #step3: Set Sprime specifice properties manually or  with Precipitate.InitializeParameters(...)?
                 #Sprime did not have any other specific properties than wetting Angle which have been already setted in constructor
@@ -311,6 +314,7 @@ for computation in ComputationList:
             CppPrecipitate.molarVolume=pyPrecipitateObj.molarVolume[0]
             CppPrecipitate.deltaCell=pyPrecipitateObj.deltaCell[0]
             CppPrecipitate.ComputeDistorsionEnergy()
+            CppPrecipitate.ComputeNucleationSiteNb()
              #Set Precipitate Polynomial object
             polyDeg=len(pyPrecipitateObj.surfaceEnergyPolynomialModel[0])-1
             CppPrecipitate.SetSEPolynomialDegree(polyDeg)
@@ -404,7 +408,7 @@ for computation in ComputationList:
 ##    THERMAL LOADING
 ##    if computation == "ThermalLoading":
 ##        #Create an object of type ThermalLoading:
-##        ThermalLoading=thermalLoading()
+##        ThermalLoading=ThermalLoading(c)
 
 #toto=PyChemicalComposition("Al2Cu8")
 #print(toto)
@@ -451,11 +455,68 @@ CppPrecipitateDict["GP"].ComputeSurfaceEnergy()
 print("Surface energy of <GP> value ==============================================",CppPrecipitateDict["GP"].surfaceEnergyCurrentValue)
 
 
+
+
+
+##############  TEST DE LA BOUCLE TEMPORELLE ########################
+CppMaterial.UpdateVolumicValues()
+print("XvCuSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Cu").volumicValue)
+print("XvMgSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Mg").volumicValue)
+CppVacancy.ComputeDiffusionCoefValue()
+print("Dlac ",CppVacancy.vacancyDiffusionCoef)
+CppVacancy.ComputeEquilibriumConcentration()
+print("Xlaceq ",CppVacancy.equilibriumConc)
+
+CppMaterial.RunProcess()#RunProcess also run ProcessPrecipitatesNucleationRate() which run precipitate method ProcessNucleationRate()
+
+
+
+#test du solveur des concentrations d'equilibre####
+##K=CppPrecipitateDict["GP"].preExpTermForSolvus
+##DH=CppPrecipitateDict["GP"].solvusActivationEnergy
+##R=PhysicalConstantsDict["R"][0]
+##T=293.15
+##
+##f=K*exp(-DH/(R*T))
+##print("f",f,K,DH,R,T)
+##
+##DMgOverDCu=(1.2*10**(-4))/(6.5*10**(-5))
+##print("DMg/DCu",DMgOverDCu)
+##XvSSCu=1.22/100
+##XvPCu=7.02/100
+##XvSSMg=2.08/100
+##XvPMg=13.84/100
+##XCueq=1.
+##XMgeq=1.
+##
+##
+##CppPrecipitateDict["GP"].SolveEquilibriumConcentrationsEquations(f,\
+##                                                                 XvSSCu,\
+##                                                                 XvPCu,\
+##                                                                 DMgOverDCu,\
+##                                                                 XvSSMg,\
+##                                                                 XvPMg,\
+##                                                                 XCueq,\
+##                                                               XMgeq)
+##print("XeqCu from python: ",XCueq)
+##
+##CppPrecipitateDict["GP"].ComputeEquilibriumConcentrations()
+##print(CppPrecipitateDict["GP"].GetEquilibriumConcentrationForElement("Cu"))
+
+
+
+##############  FIN DE TEST DE LA BOUCLE TEMPORELLE ########################
+
+
+
+
 #CppPrecipitateDict["GP"].GetEquilibriumConcentrationForElement("Mg");
 #CppPrecipitateDict["GP"].GetEquilibriumConcentrationForElement("Cu");
 #CppPrecipitateDict["Sprime"].GetEquilibriumConcentrationForElement("Cu");
 #CppPrecipitateDict["Sprime"].ComputePhaseChangeVolumicEnergy()
 #print("Phase change energy is ",CppPrecipitateDict["Sprime"].phaseChangeVolumiqueEnergy)
+
+
 
 
 

@@ -63,6 +63,8 @@ public:
     //Compute and save equilibrium concentration of vacancies after solutionising. Was Xlacavtremp.  To do: check validity of the equation
     void ComputeConcentrationBeforeQuenching();
     
+    double ReturnConcentrationBeforeQuenching();
+    
     //Compute and set the current equilibrium concentration for the current temperature (Xlaceq)
     void ComputeEquilibriumConcentration();
     
@@ -152,19 +154,23 @@ private:
 };
 
     
-//return a coputed value of boost facto (return lambda=Xlac/Xlaceq)
+//return a computed value of boost facto (return lambda=Xlac/Xlaceq)
 inline const double  
 Vacancy::ReturnBoostFactor() const
 {
-  
+  std::cout<<"########## Vacancy::ReturnBoostFactor()"<<std::endl;
   assert( (equilibriumConc_>0)&&"In ReturnBoostFactor(): Equilibrium concentration has not been computed (it must be different from 0)");
   double XlacEq=this->ReturnEquilibriumConcentration();
+  
+  std::cout<<"DEBUG:  equilibriumConc_ = "<<equilibriumConc_<<" ; XlacEq="<<XlacEq<<" ; concentrationBeforeQuenching_= "<<concentrationBeforeQuenching_<<std::endl;
   assert ( (equilibriumConc_==XlacEq )&&"In ReturnBoostFactor():Equilibrium concentration has not\
   been actualize. Use method ComputeEquilibriumConcentration() before ReturnBoostFactor() ");
   
   double lambda=(concentration_/equilibriumConc_);
   
   assert( (lambda>0)&&"In ReturnBoostFactor(): diffusion Boost factor must be positive");
+  
+   std::cout<<"########## END Vacancy::ReturnBoostFactor()"<<std::endl;
   
   return lambda;
 }

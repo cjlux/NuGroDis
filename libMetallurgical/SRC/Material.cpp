@@ -24,7 +24,9 @@
 #include "Concentration.hpp"
 #include "Precipitate.hpp"
 #include "Vacancy.hpp"
-
+#include "Diffusion.hpp"
+#include "Computation.hpp"
+#include "RadiusDistribution.hpp"
 
 
 //FAKE METHOD
@@ -42,7 +44,7 @@ Material::test()
 
 Material::Material(Temperature& temp, 
 		   ChemicalElement& mainChemicalElem,
-		   ChemicalComposition& InitialCompo)
+		   ChemicalComposition& InitialCompo, Computation& computation)
   : temperature_(temp), 
     vacancy_(0), 
     grainList_(),
@@ -51,16 +53,15 @@ Material::Material(Temperature& temp,
     currentChemicalComposition_(* (InitialChemicalComposition_.Clone()) ),
     /*TODO*///currentChemicalComposition_(),
     soluteList_(),
+    computation_(computation),
     ssgrainPointer_(0),
     precipitateList_(),
     YoungModulus_(mainChemicalElem.GetYoungModulus()),
     PoissonCoeff_(mainChemicalElem.GetPoissonCoefficient()),
     latticeParameter_(mainChemicalElem.GetLatticeParameter())
 {
-  
-  
-  
-  
+  temperature_.SetMaterial(*this);
+  computation_.SetMaterial(*this);
   
   std::cout<<" >Building a C++ object Material"<<std::endl;
   InitialCompo.SetMaterial(*this);
@@ -113,6 +114,135 @@ Material::Material(Temperature& temp,
 Material::~Material()
 {
 }
+
+
+void // in TEST run beginning of "boucle temporelle"
+Material::RunProcess()
+{
+  std::cout<<"Material::RunProcess() ===>  Running Process "<<std::endl;
+  double t=0;
+  this->UpdateVolumicValues();
+  vacancy_->ComputeDiffusionCoefValue();
+  vacancy_->ComputeEquilibriumConcentration();
+  vacancy_->ComputeConcentrationBeforeQuenching();
+  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(t, vacancy_->GetConcentrationBeforeQuenching());
+
+  for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
+  {
+    (*i)->ComputeAtomicDiffusionCoefValue();
+  }
+  
+  this->ProcessPrecipitatesNucleationRate();
+  
+  this->ComputePrecipitatesAllInterfacialConcentrations();
+  
+  this->ComputePrecipitatesInterfacialVelocityList();
+  
+  this->ComputeCriticalInterfacialConcentration();
+  
+  this->ProcessComputationMaxTimeStep();
+  
+  this->AddNucleatedPrecipitates();
+  
+  this->SolveCineticLinearSytem();
+  
+   
+  std::cout<<std::endl;
+  std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;
+  std::cout<<std::endl;
+}
+
+
+//in TEST 
+void
+Material::ProcessPrecipitatesNucleationRate()
+{
+  std::cout<<"Material::ProcessPrecipitatesNucleationRate() : process Nucleation rate from C++, and for material"<<std::endl;
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->ProcessNucleationRate();
+  }
+}
+
+void
+Material::ComputePrecipitatesAllInterfacialConcentrations()
+{
+  std::cout<<"Material::ComputePrecipitatesAllInterfacialConcentrations() : Compute precipitates All interfacial concentration from C++, and for material"<<std::endl;
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->ComputeAllInterfacialConcentrations();
+  }
+}
+
+void
+Material::ComputePrecipitatesInterfacialVelocityList()
+{
+  std::cout<<"Material::ComputePrecipitatesInterfacialVelocityList() : Compute precipitates All interfacial velocities ( interfacialVelocityList) "<<std::endl;
+  
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->GetCurrentRadiusDistribution().ComputeInterfacialVelocityList();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesInterfacialVelocityList() +-+-+-+-"<<std::endl;
+}
+
+
+void
+Material::ComputeCriticalInterfacialConcentration()
+{
+  std::cout<<"Material::ComputeCriticalInterfacialConcentration() : Compute precipitates critical interfacial concentration  (XvIntcritique for each solute \
+  element of the precipitate) "<<std::endl;
+  
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->GetCurrentRadiusDistribution().ComputeCriticalInterfacialConcentration();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::ComputeCriticalInterfacialConcentration() +-+-+-+-"<<std::endl;
+  
+}
+
+
+void
+Material::ProcessComputationMaxTimeStep()
+{
+  std::cout<<"Material::ProcessComputationMaxTimeStep() : compute the maximum time step allowed for the Computation"<<std::endl; 
+  computation_.ComputeMaxTimeStep();
+  std::cout<<"+-+-+-+-   END: Running Material::ProcessComputationMaxTimeStep() +-+-+-+-"<<std::endl;
+}
+
+
+void
+Material::AddNucleatedPrecipitates()
+{
+  std::cout<<"Material::AddNucleatedPrecipitates() : Adding nucleated Precipites For all precipiates in the material "<<std::endl; 
+  
+  
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->AddNucleatedPrecipitates();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::AddNucleatedPrecipitates() +-+-+-+-"<<std::endl;
+  
+}
+
+
+void
+Material::SolveCineticLinearSytem()
+{
+  std::cout<<"Material::SolveCineticLinearSytem() : Solving cinetic liear system For all precipiates in the material "<<std::endl; 
+  
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->SolveCineticLinearSytem();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::SolveCineticLinearSytem() +-+-+-+-"<<std::endl;
+  
+}
+
 
 void
 Material::ReadData(std::string dataFileName)
@@ -358,12 +488,6 @@ Material::AddPrecipitate(Precipitate& P)
   
 }
 
-void 
-Material::SetTemperature(const Temperature &temperatureClass)
-{
-  //Unusefull? later
-  assert(0);
-}
 
 
 void

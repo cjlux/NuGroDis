@@ -13,13 +13,18 @@
 //
 
 #include <iostream>
+#include <cmath>
 
 #include "Sprime.hpp"
+#include "RadiusDistribution.hpp"
+#include "Material.hpp"
+#include "ChemicalElement.hpp"
 
 Sprime::Sprime(Material& mat,ChemicalComposition &CC, RadiusDistribution &initialRD,double wetA)
   :Precipitate(mat,CC,initialRD),
    wettingAngle_(wetA),
-   Stheta_(-1)
+   Stheta_(-1),
+   precipitateType_("Sprime")
 {  
 }
 
@@ -71,11 +76,91 @@ Sprime::ComputeCriticalTotalEnergy()
 void
 Sprime::ComputeNucleationSiteNb()
 {
+  std::cout<<"Computing Nucleation Site Number For Sprime Precipitate"<<std::endl;
+  
+  std::vector<Precipitate *> precipitateList = materialPointer_->GetPrecipitateList();
+  //TODO  
+  std::vector<Precipitate *> SprimeList;//List of Sprime
+  std::vector<Precipitate *> GPList;//List of GuinierPreston
+  
+  for ( unsigned int i=0; i<precipitateList.size(); ++i  )
+  {
+    std::string type= precipitateList[i]->GetPrecipitateType();
+    if (type=="GuinierPreston")
+    {
+      GPList.push_back(precipitateList[i]) ;
+    } 
+    if (type=="Sprime")
+    {
+      SprimeList.push_back(precipitateList[i]);
+    }
+  }
+  
+  double SumOfFracOfAllGP=0;
+  double SumOfFracOfAllSprime=0;
+  double am = materialPointer_->GetMainChemicalElement().GetLatticeParameter();
+  
+  for (unsigned int i=0; i<GPList.size(); ++i )
+  {
+    
+    double fracVol= GPList[i]->ReturnVolumicFraction();
+    
+    double NsGP_i=  (4/std::pow(am,3))*fracVol;
+    
+    assert (NsGP_i>=0);
+    
+    SumOfFracOfAllGP += NsGP_i;
+
+  }
+  
+  for (unsigned int i=0; i<SprimeList.size(); ++i )
+  {
+    
+    double fracVol= SprimeList[i]->ReturnVolumicFraction();
+    
+    double NsSprime_i=  (4/std::pow(am,3))*fracVol;
+    
+    assert (NsSprime_i>=0);
+    
+    SumOfFracOfAllSprime += NsSprime_i;
+  }
+  
+  nucleationSitesNumber_=SumOfFracOfAllGP-SumOfFracOfAllSprime;
+  
+  assert(nucleationSitesNumber_>=0);
+  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç Nucleation sites number: "<<nucleationSitesNumber_<<std::endl;
+
 }
+
+
+double 
+Sprime::ReturnVolumicFraction()
+{
+  double n=currentRadiusDistribution_->GetItemsValues().size();
+  
+  assert (n>0);
+  
+  double Sum=0;
+  for (unsigned int i=1; i<=n; ++i)
+  {
+    double sum_i;
+    double Ri=currentRadiusDistribution_->GetRadiusForClass(i);
+    double Ni=currentRadiusDistribution_->GetItemValueForClass(i);
+    sum_i= (4/3 + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
+    assert (sum_i >= 0);
+    Sum +=sum_i;
+  }
+  
+  assert(Sum>=0);
+  
+  return Sum;
+}
+
 
 void
 Sprime::ComputeVolumicFraction()
-{
+{  
+  volumicFraction_=this->ReturnVolumicFraction(); 
 }
 
 void

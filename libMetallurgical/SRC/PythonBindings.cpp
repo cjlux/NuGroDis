@@ -88,9 +88,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
   
     
-  boost::python::class_<Computation>("Computation", boost::python::init<>() )
+  boost::python::class_<Computation>("Computation", boost::python::init<double>() )
     .add_property("type", &Computation::GetType, &Computation::SetType)
     .def("Run", &Computation::Run) 
+    .def("Info", &Computation::Info)
     ;
     
     
@@ -196,12 +197,13 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("deltaCell", &Precipitate::GetDeltaCell,&Precipitate::SetDeltaCell)
     .add_property("solvusActivationEnergy", &Precipitate::GetSolvusActivationEnergy, &Precipitate::SetSolvusActivationEnergy)
     .add_property("distorsionEnergy", &Precipitate::GetDistorsionEnergy)
-    .add_property("nucleationSitesNumber", &Precipitate::GetNucleationSitesNumber,&Precipitate::SetNucleationSitesNumber)
+    .add_property("initialNucleationSitesNumber", &Precipitate::GetInitialNucleationSitesNumber,&Precipitate::SetInitialNucleationSitesNumber)
     .add_property("preExpTermForSolvus", &Precipitate::GetPreExpTermForSolvus,&Precipitate::SetPreExpTermForSolvus)
     .add_property("shapeFactor", &Precipitate::GetShapeFactor,&Precipitate::SetShapeFactor)
     .add_property("volumicFraction", &Precipitate::GetVolumicFraction,&Precipitate::SetVolumicFraction)
     .add_property("surfaceEnergyCurrentValue", &Precipitate::GetSurfaceEnergyCurrentValue)
-    .add_property("phaseChangeVolumiqueEnergy", &Precipitate::GetphaseChangeVolumicEnergy)
+    .add_property("phaseChangeVolumiqueEnergy", &Precipitate::GetPhaseChangeVolumicEnergy)
+    .def("ComputeNucleationSiteNb", &Precipitate::ComputeNucleationSiteNb)
     //.add_property("surfaceEnergyPolynomial", &Precipitate::GetSurfaceEnergyPolynomial)
     //.add_property("initialRadiusDistribution", &Precipitate::GetInitialRadiusDistribution)
     .def("ComputeDistorsionEnergy", &Precipitate::ComputeDistorsionEnergy)
@@ -213,6 +215,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("InitializeEquilibriumConcentrationMap", &Precipitate::InitializeEquilibriumConcentrationMap)
     .def("GetEquilibriumConcentrationForElement", &Precipitate::GetEquilibriumConcentrationForElement)
     .def("ComputePhaseChangeVolumicEnergy", &Precipitate::ComputePhaseChangeVolumicEnergy)
+    .def("SolveEquilibriumConcentrationsEquations", &Precipitate::SolveEquilibriumConcentrationsEquations)
+    .def("ComputeEquilibriumConcentrations", &Precipitate::ComputeEquilibriumConcentrations)
+    .def("ProcessNucleationRate", &Precipitate::ProcessNucleationRate)
+    .def("ComputeAllInterfacialConcentrations", &Precipitate::ComputeAllInterfacialConcentrations)
     .def("Info", &Precipitate::Info)
     ;
     
@@ -228,7 +234,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
     
   
-  boost::python::class_<Hardening>("Hardening", boost::python::init<double, double >() )
+  boost::python::class_<Hardening>("Hardening", boost::python::init<double, Computation& >() )
     .add_property("maxTimeStep", &Hardening::GetMaxTimeStep, &Hardening::SetMaxTimeStep)
     .add_property("duration", &Hardening::GetDuration)
     .def("Info", &Hardening::Info)
@@ -239,7 +245,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
     
   //TODO some stuff
-  boost::python::class_<Material>("Material", boost::python::init<Temperature&, ChemicalElement&, ChemicalComposition& >() )
+  boost::python::class_<Material>("Material", boost::python::init<Temperature&, ChemicalElement&, ChemicalComposition& , Computation& >() )
     //.add_property("temperature", &Material::GetTemperature,&Material::SetTemperature)
     //.add_property("vacancyList", &Material::GetVacancyList)
     .def("GetSSGrain", &Material::GetSSGrain,boost::python::return_internal_reference<>() ) //Gives the C++ object ssgrain
@@ -257,6 +263,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("ConvertVolumicToInitialMassicConcentration", &Material::ConvertVolumicToInitialMassicConcentration)
     .def("ReturnAtomicConcFromVolumicForElement", &Material::ReturnAtomicConcFromVolumicForElement)
     .def("UpdateVolumicValues", &Material::UpdateVolumicValues)
+    .def("RunProcess", &Material::RunProcess)
     .def("test", &Material::test)
     .def("Info", &Material::Info)
     ;
@@ -274,7 +281,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
     ;
     
-  boost::python::class_<Quenching>("Quenching", boost::python::init<double, double, double, boost::python::optional<double> >() )
+  boost::python::class_<Quenching>("Quenching", boost::python::init<Computation&, double, double, double, boost::python::optional<double> >() )
     .add_property("CoolingRate", &Quenching::GetCoolingRate)
     .add_property("TotIterationNumber", &Quenching::GetTotIterationNumber,&Quenching::SetTotIterationNumber)
     .add_property("FinalTemp", &Quenching::GetFinalTemp)
@@ -304,7 +311,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
     
     //TODO some stuff
-  boost::python::class_<ThermalLoading>("ThermalLoading", boost::python::init<>() )
+  boost::python::class_<ThermalLoading>("ThermalLoading", boost::python::init< Computation& >() )
     .add_property("duration", &ThermalLoading::GetDuration, &ThermalLoading::SetDuration)
     //.add_property("time_", &ThermalLoading::GetElementName)
     //.add_property("temperature_", &ThermalLoading::GetElementName)
@@ -327,7 +334,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("jumpFrequency", &Vacancy::GetJumpFrequency, &Vacancy::SetJumpFrequency)
     .add_property("preExpDiffusionValue", &Vacancy::GetPreExpDiffusionValue, &Vacancy::SetPreExpDiffusionValue)
     .add_property("solutionisingTemp", &Vacancy::GetSolutionisingTemp, &Vacancy::SetSolutionisingTemp)
+    .add_property("vacancyDiffusionCoef", &Vacancy::GetVacancyDiffusionCoef)
+    .add_property("equilibriumConc", &Vacancy::GetEquilibriumConcentration)
     .def("ComputeDiffusionCoefValue", &Vacancy::ComputeDiffusionCoefValue)
+    .def("ComputeEquilibriumConcentration", &Vacancy::ComputeEquilibriumConcentration)
     .def("Info", &Vacancy::Info)
     ;
 

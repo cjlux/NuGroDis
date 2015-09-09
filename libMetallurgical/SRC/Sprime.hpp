@@ -36,13 +36,18 @@ public:
     //The destructor
     ~Sprime();
     
+    const std::string GetPrecipitateType() { return precipitateType_ ;} ;
+    
     void Info() const;
     
     double ReturnCriticalTotalEnergy();
+    
     void ComputeCriticalTotalEnergy();
     
     //Compute the number of nucleation sites using  the Guinier-Preston RadiusDistribution::ComputeTotNbOfIte
     void ComputeNucleationSiteNb();
+    
+    double ReturnVolumicFraction();
     
     //compute the volumic fraction of Sprime precipitates
     void ComputeVolumicFraction();
@@ -70,6 +75,8 @@ private:
     
     //(was SthetaP2)
   double Stheta_;
+  
+  const std::string precipitateType_;
 
 
 };

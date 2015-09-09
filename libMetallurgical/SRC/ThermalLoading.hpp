@@ -17,13 +17,14 @@
 
 #include <string>
 
+class Computation; 
 class Temperature;
 
 class ThermalLoading
 {
 public:
     
-    ThermalLoading();
+    ThermalLoading(Computation& computation);
 
     ~ThermalLoading();
     
@@ -44,6 +45,11 @@ public:
     
     //Setter
     void SetDuration(const double &duration);
+    
+    void ComputeMaxTimeStep();//TODO only declaration have been made //TODO ERASE, unusefull ?
+    
+    //Relations
+    Computation& GetComputation() const {return computation_;};
 
 
 protected:
@@ -58,6 +64,11 @@ private:
     
     //Temperature vector of ThermalLoading. Unit: K
     double * temperature_;
+    
+    double maxTimeStep_; //TODO ERASE, unusefull ?
+    
+    //Relations
+    Computation& computation_;
 
 };
 
