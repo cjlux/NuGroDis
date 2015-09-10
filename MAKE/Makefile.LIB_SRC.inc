@@ -87,7 +87,9 @@ $(OBJ_DIR)/lib$(NAME).a: $(OBJ_FILE_LIST)
 	ar -rs $@ $?
 
 $(PYTHON-BINDING)/$(NAME).so: $(OBJ_DIR)/lib$(NAME).a
-	$(CXX) -shared -Wl,--whole-archive $? -Wl,--no-whole-archive -lboost_python -lboost_serialization -lboost_system -lboost_filesystem -L/usr/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) -L$MKLROOT/lib/intel64 -lmkl_blas95_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -pthread -o $@
+	$(CXX) -shared -Wl,--whole-archive $? -Wl,--no-whole-archive -lboost_python -lboost_serialization -lboost_system -lboost_filesystem \
+	-L/usr/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) \
+	-L$MKLROOT/lib/intel64 -lmkl_blas95_lp64 -lmkl_intel_lp64 -lmkl_rt -lmkl_core -lmkl_sequential -lmkl_blas95_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -pthread -o $@
 
 clean: purge
 	-rm -f *.[oad] 

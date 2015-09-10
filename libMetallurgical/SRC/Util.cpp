@@ -91,8 +91,8 @@ namespace Util
     if (a == 0)
       return SolveFirstDegreeEquation(b, c, x1);
 
-    const double delta = b*b-4*a*c;
-    const double oneOver2a = 1/(2*a);
+    const double delta = b*b-4.*a*c;
+    const double oneOver2a = 1./(2.*a);
 
     if (delta>=0)   // 2 real roots
       {

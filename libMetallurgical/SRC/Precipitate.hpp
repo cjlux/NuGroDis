@@ -102,6 +102,9 @@ public:
     
     void SolveCineticLinearSytem();
     
+    
+    void ResetCurrRadDisItemsIfValueIsLowerThan(double value);
+    
     //this method is in TEST
     void ComputeAllInterfacialConcentrations();
     
@@ -113,6 +116,7 @@ public:
     
     
     virtual double ReturnVolumicFraction()=0;
+    virtual void ComputeVolumicFraction()=0; // this method must use ReturnVolumicFraction()
     virtual const std::string GetPrecipitateType()=0;
    
     virtual void ComputeNucleationSiteNb()=0;

@@ -114,6 +114,8 @@ RadiusDistribution::GetItemValueForClass(unsigned int classId)
   assert ( (classId<=n)&&(classId>=1)&&"Given classId in argument is not in the range 1 to (size_of_RadiusDistribution)");
   
   double N = itemsValues_[classId-1];
+  
+  assert ( (N>=0)&&"Cannot GetItemValueForClass() because Item value Ni is negative !!!");
 
   return N; 
 }
@@ -217,11 +219,13 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   
   //j= fction(i)
   //with i the unknown variable, 2nd order Equation to solve is then: A*i^2 +(B-fC)*i -fD=0
-  
-  nbOfSol=Util::Util::SolveSecondDegreeEquation(constantA, constantB-f*constantC, -f*constantD,
+  const double k=1.e6;
+  nbOfSol=Util::Util::SolveSecondDegreeEquation(constantA/(k*k), (constantB-f*constantC)/k, -f*constantD,
 						solution1,
 						solution2,
 						false); // 6th argument is false because we dont want complex solutions!!!!
+  solution1.real()/=k;
+  solution2.real()/=k;
   
   if (nbOfSol==2)
   {
@@ -267,6 +271,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
       {
 	/*DEBUG*/std::cout<<" solution1.real() "<<solution1.real()<<" solution2.real() "<<solution2.real()<< "XvPi "<<XvPi<<std::endl;
 	std::cout<<" There is no solutions. The 2 roots are not in the range 0 to XvPi ]0;"<< XvPi<<"]"<<std::endl;
+	
 	//assert (!("TO DO. case 4: This case has not been implemented yet"));
       }
       
@@ -292,8 +297,10 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
     assert( Y>0);
     assert( Y < XvPj);
     
-      //DEBUG    
+      //DEBUG
+    
     std::cout<<"value solution X is: "<<X<<std::endl;
+    std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
     std::cout<<"value solution Y is: "<<Y<<std::endl;
     
     return 1; //There is a solution
@@ -672,12 +679,10 @@ RadiusDistribution::ComputeCriticalInterfacialConcentration()
 	  else 
 	  {
 	    assert (solutionCase==-1);
-	    double X = this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetLeftInterfacialConcValueForClass(1);
-	    double Y = this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).GetLeftInterfacialConcValueForClass(1);
 	    
-	    /**/std::cout<<"DEBUG: X= "<<X<<" Y= "<<Y<<std::endl;
-	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetCriticalInterfacialConcentration(X);
-	    this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).SetCriticalInterfacialConcentration(Y);
+	    std::cout<<"Critical interfacial concentration cannot be found at this time because we have no solution. "<<std::endl; //222.222 will be setted
+	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetCriticalInterfacialConcentration(222.222); //222.222 means "n'existe pas"
+	    this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).SetCriticalInterfacialConcentration(222.222); //222.222 means "n'existe pas"
 	  };
 	  
 	 

@@ -1145,12 +1145,15 @@ Precipitate::SolveCineticLinearSytem()
 {
   //TODO
   
+  std::cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@ Solving cinetic linear system for precipitate type <"<<this->GetPrecipitateType()<<"> which adress is <"<<this<<"> @@@@@@@@@@@@@@@@@@@@@@@@@@@\n"<<std::endl;
+  
   assert ((currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current RadiusDistribution");
   
   const int n= currentRadiusDistribution_->GetItemsValues().size(); //system size will be n*n
   const int nrhs = 1;	// number of RHS vectors
   
   ublas::matrix<double, ublas::column_major> A(n, n), Acopy(n,n);
+  A.clear();
   ublas::matrix<double, ublas::column_major> B(n, nrhs), Bcopy(n, nrhs);
   ublas::vector<double> V(n);
   ublas::matrix_column< ublas::matrix<double, ublas::column_major> > col(B, 0) ;
@@ -1236,42 +1239,51 @@ Precipitate::SolveCineticLinearSytem()
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////feeding A_2,2 to A_n-1,n-1 /////////////////////////////////////////
+  double Vleft,Vright;
+  
   for(int i=1; i<n-1; ++i)
     {
       int classId= i+1;
-      double Vleft, Vright;
       Vleft = IConcObjPtr->GetLeftInterfacialVelocityForClass(classId);
       Vright = IConcObjPtr->GetRightInterfacialVelocityForClass(classId);
       
       if ( Vright>0 && Vleft>0 )
       {
+	std::cout<<"case 1"<<std::endl;
 	A(i,i)=deltar/deltat +Vright;
 	A(i,i+1)=0;
-	A(1,i-1)= -Vleft;
+	A(i,i-1)= -Vleft;
       }
- 
-      if( Vright>0 && Vleft<0 )
+      else if( Vright>0 && Vleft<0 )
       {
+	std::cout<<"case 2"<<std::endl;
 	A(i,i)= deltar/deltat + Vright - Vleft;
 	A(i,i+1)=0;
-	A(1,i-1)=0;
+	A(i,i-1)=0;
       }
-      
-      if ( Vright<0 && Vleft<0 )
+      else if ( Vright<0 && Vleft<0 )
       {	
+	std::cout<<"case 3"<<std::endl;
 	A(i,i)= deltar/deltat -Vleft;
 	A(i,i+1)= Vright;
-	A(1,i-1)=0;
+	A(i,i-1)=0;
       }
-      
-      if ( Vright<0 && Vleft>0 ) //impossible case ??? 
+      else // ( Vright<0 && Vleft>0 ) //impossible case ??? 
       {
 	//Normally this is impossible case ???
+	std::cout<<"case 4"<<std::endl;
 	assert(!"An IMPOSSIBLE case has been found . leftInterfacialVelocity>0 AND rightInterfacialVelocity<0.   " ); 
 	A(i,i)= deltar/deltat;
 	A(i,i+1)= Vright;
-	A(1,i-1)= -Vleft;
+	A(i,i-1)= -Vleft;
       }  
+      std::cout<<"deltar  "<<deltar<<std::endl;
+      std::cout<<"deltat "<<deltat<<std::endl;
+      std::cout<<"Vright "<<Vright<<std::endl;
+      std::cout<<"Vleft "<<Vleft<<std::endl;
+      std::cout<<"A(i,i) "<<A(i,i)<<std::endl;
+      std::cout<<"A(i,i+1) "<<A(i,i+1)<<std::endl;
+      std::cout<<"A(i,i-1) "<<A(i,i-1)<<"\n"<<std::endl;
     }
 /////////////////////////////////////////////////// End: MATRIX FEEDING  ///////////////////////////////////////////////////////////
   Acopy=A; /*Just for verification*/
@@ -1280,7 +1292,7 @@ Precipitate::SolveCineticLinearSytem()
   {
     std::cout << "Matrix Aij :" << std::endl;
     std::cout << A << std::endl;
-  }
+  } 
   
   for(int i=0; i<n; ++i)
   {
@@ -1305,7 +1317,7 @@ Precipitate::SolveCineticLinearSytem()
   
   if (ierr != 0) 
     {
-      std::cout << "matrix is singular" << std::endl; 
+      assert(!"matrix is singular"); 
     }
   else
     {
@@ -1325,10 +1337,26 @@ Precipitate::SolveCineticLinearSytem()
 	}
     }
   
-  
 }
 
 
+void 
+Precipitate::ResetCurrRadDisItemsIfValueIsLowerThan(double value)
+{
+  assert((value>0)&&"Given argument value must strictly be positive");
+  
+  
+  int n=currentRadiusDistribution_->GetItemsValues().size();
+  
+  for ( int i=1; i<=n ; ++i)
+  {
+    if ( currentRadiusDistribution_->GetItemValueForClass(i) < value)
+    {
+      currentRadiusDistribution_->SetItemValueForClass( i, 0); //Reset to 0
+    }
+  }
+  
+}
 
 
 

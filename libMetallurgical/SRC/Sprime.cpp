@@ -127,6 +127,12 @@ Sprime::ComputeNucleationSiteNb()
   
   nucleationSitesNumber_=SumOfFracOfAllGP-SumOfFracOfAllSprime;
   
+  if( nucleationSitesNumber_<0)
+  {
+    std::cout<<"Nuclueation site Number for precipitate type <Sprime> at adress <"<<this<<"> is negative => IT WILL BE SETTED TO ZERO";
+    nucleationSitesNumber_=0;
+  }
+  
   assert(nucleationSitesNumber_>=0);
   /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç Nucleation sites number: "<<nucleationSitesNumber_<<std::endl;
 

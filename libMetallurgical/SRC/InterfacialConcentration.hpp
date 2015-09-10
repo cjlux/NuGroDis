@@ -91,6 +91,8 @@ InterfacialConcentration::GetCriticalInterfacialConcentration() const
   
   assert( (criticalInterfacialConcentration_ >=0)&&"Cannot get value because criticalInterfacialConcentration_ is not positive" );
   
+  assert( (criticalInterfacialConcentration_ !=222.222)&&"Cannot GetCriticalInterfacialConcentrationCritical() because: interfacial concentration Cannot be found at this time. No solution from Equation system." );
+  
   return criticalInterfacialConcentration_;
 }
 

@@ -107,6 +107,12 @@ GuinierPreston::ComputeNucleationSiteNb()
   
   nucleationSitesNumber_= initialNucleationSitesNumber_ - SumOfFracOfAllGP ;
   
+  if( nucleationSitesNumber_<0)
+  {
+    std::cout<<"Nuclueation site Number for precipitate type <GuinierPreston> at adress <"<<this<<"> is negative => IT WILL BE SETTED TO ZERO";
+    nucleationSitesNumber_=0;
+  }
+  
   assert (nucleationSitesNumber_>=0);
   
   /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç initialNucleationSitesNumber_ : "<<initialNucleationSitesNumber_<<std::endl;

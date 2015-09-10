@@ -132,7 +132,7 @@ Material::RunProcess()
     (*i)->ComputeAtomicDiffusionCoefValue();
   }
   
-  this->ProcessPrecipitatesNucleationRate();
+  this->ProcessPrecipitatesNucleationRate(); 
   
   this->ComputePrecipitatesAllInterfacialConcentrations();
   
@@ -141,7 +141,7 @@ Material::RunProcess()
   this->ComputeCriticalInterfacialConcentration();
   
   this->ProcessComputationMaxTimeStep();
-  
+   
   this->AddNucleatedPrecipitates();
   
   this->SolveCineticLinearSytem();
