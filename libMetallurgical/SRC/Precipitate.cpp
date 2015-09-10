@@ -1325,7 +1325,7 @@ Precipitate::SolveCineticLinearSytem()
       for(int i=0; i<n; ++i)
       {
 	int clId= i+1;
-	assert( (V(i)>0)&&"A Solution found when solving linear system is negative. (N<0) " );
+	assert( (V(i)>=0)&&"A Solution found when solving linear system is negative. (N<0) " );
 	currentRadiusDistribution_->SetItemValueForClass(clId, V(i) );
       }
       
