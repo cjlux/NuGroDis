@@ -144,13 +144,15 @@ Vacancy::ReturnEquilibriumConcentration() const
   double R=ThermoDynamicsConstant::GetR();
   double T=material_.GetTemperature().GetCurrentTemp();
   
- double sum_alpha_i=0;
+ double sum_alpha_i=0.;
  for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
  {
    std::string elementName = (*i)->GetElementName();
    double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
-   const bool usingEvac= (*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2);//Evac is interaction with vacancy. Also remember that -2 means unused
-   double Evac=0;
+   const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
+   double Evac=0.;
+   
+   /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
    
    if (usingEvac==true)
    {
@@ -158,17 +160,24 @@ Vacancy::ReturnEquilibriumConcentration() const
    }
    else
    {
-    Evac=1;
+    Evac=1.;
    };
    
-   sum_alpha_i += coordinationNumber_*atomicConc*( -1 + std::exp(Evac/(R*T)) );
+   sum_alpha_i += coordinationNumber_*atomicConc*( -1. + std::exp(Evac/(R*T)) );  // sum of i=1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
+    /*DEBUG*/ std::cout<<" TOPO TOPO atomicConc "<<atomicConc<<std::endl;
+    /*DEBUG*/ std::cout<<" TOPO TOPO Evac "<<Evac<<std::endl;
+    /*DEBUG*/ std::cout<<" TOPO TOPO coordinationNumber_ "<<coordinationNumber_<<std::endl;
  }
+ /*DEBUG*/ std::cout<<" TOPA sum_alpha_i "<<sum_alpha_i<<std::endl;
+ 
   
   //TODO alpha
-  double alpha= 1 + sum_alpha_i;
+  double alpha= 1. + sum_alpha_i;
   double equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
   assert ( (equilibriumConcValue>0)&&"In ReturnEquilibriumConcentration: Returned value is not positive");
   
+  /*DEBUG*/ std::cout<<" TOPO TOPO std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T)) "<<std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T))<<std::endl;
+  /*DEBUG*/ std::cout<<" TOPO TOPO vacCreationEntropy_   "<<vacCreationEntropy_<<"R "<<R<<"T "<<T<<" vacCreationEnthalpy_ "<<vacCreationEnthalpy_<<  std::endl;
   std::cout<<"############ equilibriumConcValue = "<<equilibriumConcValue<<std::endl;
   std::cout<<"################## END  Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
 
@@ -187,6 +196,12 @@ Vacancy::ReturnConcentrationBeforeQuenching()
   Xlacavtrempe = std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*solutionisingTemp_));
   
   assert(Xlacavtrempe>0);
+  
+  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() vacCreationEntropy_ is"<<vacCreationEntropy_<<std::endl;
+  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() R is"<<R<<std::endl;
+  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() vacCreationEnthalpy_ is"<<vacCreationEnthalpy_<<std::endl;
+  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() solutionisingTemp_ is"<<solutionisingTemp_<<std::endl;
+  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() Xlacavtrempe is"<<Xlacavtrempe<<std::endl;
   
   return Xlacavtrempe;
 }
@@ -213,10 +228,20 @@ Vacancy::ReturnCurrentConcentrationFromAnalyticalSolution(double duration, doubl
   
   double Tau=std::pow( halfSinkDistance_/2/M_PI ,2)/vacancyDiffusionCoef_;
   
+  /*DEBUG*/ std::cout<<"Tau "<<Tau << std::endl;
+  /*DEBUG*/ std::cout<<"halfSinkDistance_ "<<halfSinkDistance_ << std::endl;
+  /*DEBUG*/ std::cout<<"vacancyDiffusionCoef_ "<<vacancyDiffusionCoef_ << std::endl;
+  
   assert ( (equilibriumConc_!=0)&&"In ReturnCurrentConcentrationFromAnalyticalSolution: equilibriumConc_ must\
   be different from 0 . It has not been computed yet!");
   
   double Xlac=(initialEquilibriumConc-equilibriumConc_)*std::exp(-duration/Tau) + equilibriumConc_;
+  
+  /*DEBUG*/ std::cout<<"initialEquilibriumConc is "<<initialEquilibriumConc << std::endl;
+  /*DEBUG*/ std::cout<<"equilibriumConc_ is "<<equilibriumConc_ << std::endl;
+  /*DEBUG*/ std::cout<<"duration is "<<duration << std::endl;
+  /*DEBUG*/ std::cout<<"Tau is "<<Tau << std::endl;
+  /*DEBUG*/ std::cout<<"Xlac is "<<Xlac << std::endl;
   
   return Xlac;
 }

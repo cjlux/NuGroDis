@@ -17,8 +17,8 @@
 #include "Computation.hpp"
 
 ThermalLoading::ThermalLoading(Computation& computation)
-  :duration_(0),
-   time_(0),
+  :duration_(),
+   time_(),
    temperature_(0),
    maxTimeStep_(1),
    computation_(computation)
@@ -55,15 +55,7 @@ ThermalLoading::Info() const
   else
  {std::cout <<  "                                   duration: " << duration_ << " SI unit" << std::endl;};
 
-  if (time_==0)
- {std::cout <<  "                                       time: Is not defined yet"<< std::endl;}
-  else
- {std::cout <<  "                                       time: " << *time_ << " SI unit" << std::endl;};
- 
-  if (temperature_==0)
- {std::cout <<  "                                temperature: Is not defined yet"<< std::endl;}
-  else
- {std::cout <<  "                             temperature: " << *temperature_ << " SI unit" << std::endl;};
+ //TODO time_ and temperature_
   
  std::cout << std::endl;
 }

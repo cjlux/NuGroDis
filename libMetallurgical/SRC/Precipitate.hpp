@@ -105,6 +105,8 @@ public:
     
     void ResetCurrRadDisItemsIfValueIsLowerThan(double value);
     
+    void AddEmptyClassForCurrentRadiusDistributionWithCondition();
+    
     //this method is in TEST
     void ComputeAllInterfacialConcentrations();
     
@@ -293,6 +295,8 @@ private:
   
     
 };
+
+
 
 //TODO Inline Setters!!! (AND do not forget assrtions!!!!)
 

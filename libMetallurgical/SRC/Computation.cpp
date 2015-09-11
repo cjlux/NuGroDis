@@ -156,6 +156,14 @@ Computation::ComputeMaxTimeStep()
 }
 
 
+void
+Computation::UpdateTimeStep()
+{
+  currentTime_+=maxTimeStep_;
+}
+
+
+
 void 
 Computation::Info() const
 {

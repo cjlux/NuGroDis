@@ -108,6 +108,8 @@ public:
  //Set values for all items. Values can be the same for all classes or a list of values. /*comment by MG: SetAllItemsNumbers can also be called SetItemsValues*/
  void SetAllItemsValues(std::vector<double> NP1); 
  
+ void AddEmptyClass();
+ 
  
  double GetMinRadius() const { return minRadius_; };
  int GetInitialClassNumber() const { return initialClassNumber_; }; 
@@ -157,7 +159,14 @@ private:
 
 };
 
-
+inline void
+RadiusDistribution::AddEmptyClass()
+{
+  unsigned int n= itemsValues_.size();
+  itemsValues_.push_back(0);
+  
+  assert (itemsValues_.size()== n+1. );
+}
 
 inline double 
 RadiusDistribution::GetRadiusForClass(unsigned int classId)

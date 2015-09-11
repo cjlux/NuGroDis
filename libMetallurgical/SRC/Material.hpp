@@ -57,6 +57,12 @@ public:
   void AddNucleatedPrecipitates();
   
   void SolveCineticLinearSytem();
+  
+  void ComputePrecipitatesVolumicFraction();
+  
+  void ComputePrecipitatesNucleationSiteNb();
+  
+  void UpdateTimeStep(); //En cours
 
   void Info() const;
   void ReadData(std::string dataFileName);
@@ -70,7 +76,7 @@ public:
   Temperature & GetTemperature() const {return temperature_; } 
   const double GetYoungModulus() const { return YoungModulus_; }
   const double GetPoissonCoeff() const { return PoissonCoeff_; }
-  const double GetLatticeParameter() const { return latticeParameter_; }
+  const double GetLatticeParameter() const { assert ((latticeParameter_>0)&&"Cannot get Material lattice parameter. The value is not strictly positive!!! Material Lattice parameter has not been setted correctly ") ;return latticeParameter_; }
 
   //Setter
 

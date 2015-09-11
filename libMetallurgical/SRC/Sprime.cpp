@@ -58,7 +58,7 @@ Sprime::ReturnCriticalTotalEnergy()
   
   assert((phaseChangeVolumiqueEnergy_+distorsionEnergy_)!=0);
   
-  double criticalDeltaG= Stheta_*32/27*M_PI*std::pow(surfaceEnergyCurrentValue_,3)/std::pow( (phaseChangeVolumiqueEnergy_+distorsionEnergy_),2)*std::pow((shapeFactor_+2),3)/std::pow((shapeFactor_+4/3),2); 
+  double criticalDeltaG= Stheta_*32./27.*M_PI*std::pow(surfaceEnergyCurrentValue_,3.)/std::pow( (phaseChangeVolumiqueEnergy_+distorsionEnergy_),2.)*std::pow((shapeFactor_+2.),3.)/std::pow((shapeFactor_+4./3.),2.); 
   
   assert (criticalDeltaG>0);
   

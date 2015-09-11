@@ -116,6 +116,13 @@ Diffusion::ComputeAtomicDiffusionCoefValue()
   
   atomicDiffusionCoef_=lambda*preExpDiffusionCoef_*std::exp(-activationEnergy_/(R*T));
   
+  /*DEBUG*/std::cout<<" {{{{***************************lambda***************************}}}} "<< lambda<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************preExpDiffusionCoef_***************************}}}} "<< preExpDiffusionCoef_<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************activationEnergy_***************************}}}} "<< activationEnergy_<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************R***************************}}}} "<< R<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************T***************************}}}} "<< T<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************atomicDiffusionCoef***************************}}}} "<< atomicDiffusionCoef_<<std::endl;
+  
   std::cout<<"############# END    Diffusion::ComputeAtomicDiffusionCoefValue()   Computing Atomic DiffusionCoefValue"<<std::endl;
   
 }

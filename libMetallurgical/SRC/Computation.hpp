@@ -47,6 +47,8 @@ public:
   
   double GetMaxTimeStep() const { assert(maxTimeStep_>0) ;  return maxTimeStep_;};
   
+  void UpdateTimeStep();
+  
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
   void ComputeDuration();
 
@@ -60,6 +62,8 @@ public:
   void Info() const;
   
   void ComputeMaxTimeStep();
+  
+  double GetCurrentTime() const { assert (currentTime_>=0);  return currentTime_;}
   
   //Relations
   //setters

@@ -120,12 +120,15 @@ void // in TEST run beginning of "boucle temporelle"
 Material::RunProcess()
 {
   std::cout<<"Material::RunProcess() ===>  Running Process "<<std::endl;
-  double t=0;
+  
+  double time=0;
+  //assert (computation_->GetCurrentTime==0)
   this->UpdateVolumicValues();
   vacancy_->ComputeDiffusionCoefValue();
   vacancy_->ComputeEquilibriumConcentration();
   vacancy_->ComputeConcentrationBeforeQuenching();
-  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(t, vacancy_->GetConcentrationBeforeQuenching());
+  std::cout<<"MaterialGetConcentrationBeforeQuenching()  "<<vacancy_->GetConcentrationBeforeQuenching()<<std::endl;
+  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(time, vacancy_->GetConcentrationBeforeQuenching());
 
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
   {
@@ -133,6 +136,7 @@ Material::RunProcess()
   }
   
   this->ProcessPrecipitatesNucleationRate(); 
+  ///*DEBUG*/assert (!("Tpooet"));
   
   this->ComputePrecipitatesAllInterfacialConcentrations();
   
@@ -146,6 +150,42 @@ Material::RunProcess()
   
   this->SolveCineticLinearSytem();
   
+  /*
+  double cutOffvalue;
+  cutOffvalue=1.;
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->ResetCurrRadDisItemsIfValueIsLowerThan(cutOffvalue);
+  }
+  
+  
+  this->ComputePrecipitatesVolumicFraction();
+  
+  this->UpdateVolumicValues();
+  
+  this->ComputePrecipitatesNucleationSiteNb();
+  
+  this->UpdateTimeStep();
+  
+  this->ComputePrecipitatesAllInterfacialConcentrations();
+  
+  this->ComputePrecipitatesInterfacialVelocityList();
+  
+  this->ComputeCriticalInterfacialConcentration();
+  
+  this->ProcessComputationMaxTimeStep();
+  
+  //ajout d'une nouvelle classe dans la radDis si la derniere classe est vide
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->AddEmptyClassForCurrentRadiusDistributionWithCondition();
+  }
+  
+  this->UpdateVolumicValues();//Not needed?
+  vacancy_->ComputeDiffusionCoefValue();
+  vacancy_->ComputeEquilibriumConcentration();
+  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_->GetCurrentTime, vacancy_->GetConcentrationBeforeQuenching()); 
+  */
    
   std::cout<<std::endl;
   std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;
@@ -243,6 +283,41 @@ Material::SolveCineticLinearSytem()
   
 }
 
+void
+Material::ComputePrecipitatesVolumicFraction()
+{
+  std::cout<<"Material::ComputePrecipitatesVolumicFraction() : Computing volumic fraction for all precipitates in the material "<<std::endl; 
+  
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->ComputeVolumicFraction();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesVolumicFraction() +-+-+-+-"<<std::endl;
+  
+}
+
+void
+Material::ComputePrecipitatesNucleationSiteNb()
+{
+  std::cout<<"Material::ComputePrecipitatesNucleationSiteNb() : Computing nucleation sites number for all precipitates in the material "<<std::endl; 
+  
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->ComputeNucleationSiteNb();
+  }
+  
+  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesNucleationSiteNb() +-+-+-+-"<<std::endl;
+  
+}
+
+void
+Material::UpdateTimeStep()
+{
+  std::cout<<"Material::UpdateTimeStep() : Updating the current time step of the Computation"<<std::endl; 
+  computation_.UpdateTimeStep();
+  std::cout<<"+-+-+-+-   END: Running Material::UpdateTimeStep() +-+-+-+-"<<std::endl;
+}
 
 void
 Material::ReadData(std::string dataFileName)

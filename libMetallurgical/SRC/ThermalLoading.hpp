@@ -16,7 +16,7 @@
 #define __ThermalLoading__hpp__
 
 #include <string>
-
+#include <vector>
 class Computation; 
 class Temperature;
 
@@ -60,10 +60,10 @@ private:
     double duration_;
     
     //Time vector of temperature loading. Unit: s
-    double * time_;
+    std::vector<double>  time_;
     
     //Temperature vector of ThermalLoading. Unit: K
-    double * temperature_;
+    std::vector<double>  temperature_;
     
     double maxTimeStep_; //TODO ERASE, unusefull ?
     

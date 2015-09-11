@@ -137,6 +137,21 @@ Precipitate::GetEquilibriumConcentrationForElement(std::string elementSymbol)
   return it->second;
 }
 
+
+void
+Precipitate::AddEmptyClassForCurrentRadiusDistributionWithCondition()
+{
+  assert ((currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current radius distribution");
+  unsigned int n=currentRadiusDistribution_->GetItemsValues().size();
+  double lastValue = currentRadiusDistribution_->GetItemValueForClass(n);
+  
+  if (lastValue>0)
+  {
+    currentRadiusDistribution_->AddEmptyClass();
+  }
+  
+}
+
 //  Solve system of equations like:
 // (XvSSi-X)/(XvPi-X)= DjOverDi *(XvSSj-Y)/(XvPj-Y) AND   X*Y= f 
 // with unknown variables X>0 ,Y>0   
@@ -496,6 +511,8 @@ Precipitate::ComputeDistorsionEnergy()
   assert((deltaCell_!=-1)&&"Cannot compute Distorsion energy: Precipitate's deltaCell has not been defined");
   
   distorsionEnergy_=1000000*(materialPointer_->GetYoungModulus())/(1-materialPointer_->GetPoissonCoeff())*(deltaCell_)*(deltaCell_);
+  
+  /*DEBUG */std::cout<<"Deistorsion energy is "<<distorsionEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
 }
 
 
@@ -538,6 +555,8 @@ Precipitate::ComputePhaseChangeVolumicEnergy()
   assert( (molarVolume_>0)&&"In ComputePhaseChangeVolumicEnergy(): molarVolume has not been defined" );
   
   phaseChangeVolumiqueEnergy_=R*T/molarVolume_*std::log(product);
+  
+  /*DEBUG*/std::cout<<"DELTA Gv is "<<phaseChangeVolumiqueEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
   
   
   //post conditions
@@ -703,7 +722,11 @@ Precipitate::ReturnCriticalBeta()
 	  double Dcoef = (*i)->GetDiffusion().GetAtomicDiffusionCoef();
 	  assert(Dcoef>0);
 	  assert (currentAtomicConc>0);
-	  sum += 1/(currentAtomicConc*Dcoef);
+	  sum += 1./(currentAtomicConc*Dcoef);
+	  
+	  /*DEBUG*/std::cout<<"Elementname "<<it->first<<std::endl;
+	  /*DEBUG*/std::cout<<"DCoef "<<Dcoef<<std::endl;
+	  /*DEBUG*/std::cout<<"currentAtomicConc "<<currentAtomicConc<<std::endl;
 	};
       }
       
@@ -713,7 +736,10 @@ Precipitate::ReturnCriticalBeta()
   }
   
   assert( (sum!=0)&&(latticeParam!=0) );
-  double beta=4*M_PI*std::pow((criticalRadius_+deltaCriticalRadius_), 2)/std::pow(latticeParam,4)/sum;
+  double beta=4.*M_PI*std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)/sum;
+  
+  std::cout<<"latticeParam                "<<latticeParam<<" sum "<<sum<<std::endl;
+  /*DEBUG*/std::cout<<"DEBUG beta , std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)"<<std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)<<"\n\n\n"<<std::endl;
   
   return beta;
 }
@@ -740,6 +766,14 @@ Precipitate::ReturnNucleationRate()
   
   
   double J=Z*currentNucleationSiteNb*beta*std::exp(-DeltaG/(kB*T));
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Precipitatate type @@@@@@@@@@@@@@@@@ <"<<typeid(*this).name()<<"> \n\n\n"<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ J @@@@@@@@@@@@@@@@@"<<J<<"\n\n\n"<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ currentNucleationSiteNb @@@@@@@@@@@@@@@@@"<<currentNucleationSiteNb<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Z @@@@@@@@@@@@@@@@@"<<Z<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ beta @@@@@@@@@@@@@@@@@"<<beta<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ DeltaG @@@@@@@@@@@@@@@@@"<<DeltaG<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ kB @@@@@@@@@@@@@@@@@"<<kB<<std::endl;
+  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ T @@@@@@@@@@@@@@@@@"<<T<<std::endl;
   
   //post assertions?
   
@@ -1016,11 +1050,14 @@ void
 Precipitate::ProcessNucleationRate()
 {
   std::cout<<std::endl;
-  std::cout<<"-+-+-+-+-+ Run precipitate::ProcessNucleateRate() +-+-+-+-+-+-"<<std::endl;
+  std::cout<<"-+-+-+-+-+ Run precipitate::ProcessNucleateRate() for Precipitate <"<<typeid(*this).name()<<"> at adress <"<<this<<"> +-+-+-+-+-+-"<<std::endl;
   std::cout<<std::endl;
   this->ComputeEquilibriumConcentrations();
   this->ComputeSurfaceEnergy();
   this->ComputePhaseChangeVolumicEnergy();
+  /*DEBUG*/std::cout<<"Phase change Volumic Energy"<<phaseChangeVolumiqueEnergy_<<std::endl;
+  /*DEBUG*/std::cout<<"distorsionEnergy_"<<distorsionEnergy_<<std::endl;
+  
   
   // Preconditions!!!
   
@@ -1041,8 +1078,8 @@ Precipitate::ProcessNucleationRate()
   /*DEBUG*/ std::cout<<" isSolutesCurrentVolumicConcentrationNegativeOrNull  "<<isSolutesCurrentVolumicConcentrationNegativeOrNull<<" nucleationSitesNumber_ "<<nucleationSitesNumber_<<"distorsionEnergy_ + phaseChangeVolumiqueEnergy_   "<<distorsionEnergy_ + phaseChangeVolumiqueEnergy_<<std::endl;
   if ( (isSolutesCurrentVolumicConcentrationNegativeOrNull==true) || (nucleationSitesNumber_<=0) || ((distorsionEnergy_ + phaseChangeVolumiqueEnergy_) >= 0) )
   {
+    /*DEBUG*/std::cout<<">YRUTUIYYILYYUIOYUIYUIYUIYUIOHJKGHUK UIHUIOY   UIY UIH"<<std::endl;
     
-    /*DEBUG*/std::cout<<"Tpoue pe idhfh hhhhhhhhhhh jjjjjjjjjjjj kh j###############"<<std::endl;
     //TODO improve this part
     //  (-111.111) means : "ne s'applique pas"
     criticalRadius_=-111.111;
@@ -1055,8 +1092,11 @@ Precipitate::ProcessNucleationRate()
   else
   {
     this->ComputeCriticalRadius();
-    this->ComputeDeltaCriticalRadius();
+    /*DEBUG*/std::cout<<"criticalRadius_"<<criticalRadius_<<std::endl;
+    /*DEBUG*/this->ComputeDeltaCriticalRadius();
+    /*DEBUG*/std::cout<<"deltaCriticalRadius_"<<deltaCriticalRadius_<<std::endl;
     this->ComputeCriticalTotalEnergy();
+    /*DEBUG*/std::cout<<"criticalTotalEnergy_"<<criticalTotalEnergy_<<std::endl;
     this->ComputeZeldovichFactor();
     this->ComputeCriticalBeta();
     this->ComputeNucleationRate();
@@ -1128,8 +1168,9 @@ Precipitate::AddNucleatedPrecipitates()
     
     assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
     
-    std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] "<<std::endl;
+    std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
     currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
+    /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;
     
     
   };

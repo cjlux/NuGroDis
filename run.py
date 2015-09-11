@@ -41,6 +41,7 @@ import nugrodis
 from MetalUtils.Mendeleiev import PyChemicalElement, PyChemicalComposition #import python Class:  PyChemicalElement, PyChemicalComposition from module MetalUtils
 from MetalUtils.Grain import PyPrecipitate, PrecipitateNatureList #import:  python Class PyPrecipitate module MetalUtils, Precipitate nature list
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict #import Physical constants data dictionary from module MetalUtils
+from MetalUtils.ElementsData import Dict as ElementsDataDict
 
 
 
@@ -53,6 +54,7 @@ print ("|#######################################################################
 
 
 material = nugrodis.ComputationParam["Material"]
+
 print("  > importing module                 :",material)
 exec "import "+material #importing module material given by user
 exec 'L = dir('+material+')' #import  L=directory of module material
@@ -86,7 +88,7 @@ for key,value in AlloyInitialComposition.items():
 print("  > Computation.type                 :", c.type)
 
 
-
+mainElementLaticeParameter=ElementsDataDict[mainEl]["cellSize"][0]
 #Build the Mendeleiv table
 PyChemicalElement.initFromElementsData()
 ED = PyChemicalElement.GetElementsDict() #Mendeleiv  Table : a dictionary of chemichal Elements Names as keys with their chemicalElement python Objects associated. {"chemichal Elements Name": chemicalElementPyObject}
@@ -109,6 +111,8 @@ for pyElement in ConcernedPyChemicalElements:
                                         pyElement.symbol)")
     exec 'CppElementsDict[pyElement.symbol]='+CppElement
     exec CppElement+".Info()"
+    if CppElement==mainEl:
+        exec CppElement+".latticeParameter=mainElementLaticeParameter"
     exec "print ("+CppElement+")"
 print("  > C++ Elements Dictionary = ",CppElementsDict)
 

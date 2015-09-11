@@ -52,7 +52,7 @@ public:
     const double GetPoissonCoefficient() const {return PoissonCoefficient_; }
     const double GetYoungModulus()       const {return YoungModulus_; }
     std::string GetElementName()   const {return elementName_; }
-    const double  GetLatticeParameter() const { return latticeParameter_; }
+    const double  GetLatticeParameter() const { assert((latticeParameter_ > 0)&&"ChemicalElement lattice parameter has not been setted properly!!!"); return latticeParameter_; }
         
     //setters
     void SetLatticeParameter(double x) { assert(x > 0); latticeParameter_ = x; }

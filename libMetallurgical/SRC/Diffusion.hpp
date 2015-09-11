@@ -100,6 +100,7 @@ Diffusion::GetInteractionEnergyWithVacancy() const
 inline const bool 
 Diffusion::AssertInteractionEnergyWithVacancyValue(double valueAsserted) const
 {
+  /*DEBUG*/std::cout<<"value asserted is "<<valueAsserted<<" interactionEnergyWithVacancy_ is "<<interactionEnergyWithVacancy_<<std::endl;
   return interactionEnergyWithVacancy_==valueAsserted;
 }
 

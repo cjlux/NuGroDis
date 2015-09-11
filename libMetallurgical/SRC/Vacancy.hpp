@@ -170,6 +170,9 @@ Vacancy::ReturnBoostFactor() const
   
   assert( (lambda>0)&&"In ReturnBoostFactor(): diffusion Boost factor must be positive");
   
+  
+  /*DEBUG*/std::cout<<" }}}***************************Xlac***************************}}} "<< concentration_<<std::endl;
+  /*DEBUG*/std::cout<<" }}}***************************XlacEq***************************}}} "<< equilibriumConc_<<std::endl;
    std::cout<<"########## END Vacancy::ReturnBoostFactor()"<<std::endl;
   
   return lambda;

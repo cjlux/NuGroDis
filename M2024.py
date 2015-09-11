@@ -31,12 +31,13 @@ AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentr
 #################################################################################################################################
  
 VacanciesParam={
-"deltaHF": (72400,"J.mol^-1"), # Enthalpy of vacancy formation 
+"deltaHF": (72240,"J.mol^-1"), # Enthalpy of vacancy formation 
 "deltaHM":(62400,"J.mol^-1"), #Enthalpy of vacancy migration 
 "deltaSF": (17,"J.mol^-1.K^-1"), #Entropy of vacancy formation
 "fE": (10**13,"s^-1"), #Frequency of vacancy's jumps
 "halfSinkD": (30E-6,"m"), #Semi-distance between vacancy sinks
-"Tsol": (495,"Celsius degree"), #solutionazingTemp=InitialQuenching Temperature, [°C]
+"Tsol": (495+273.15,"K"), #solutionazingTemp=InitialQuenching Temperature, [°K]
+#"Tsol": (495,"Celsius degree"), #solutionazingTemp=InitialQuenching Temperature, [°C]
 "coordinationNumber": (12,"")#Coordination Number, is the number of near neighbours. For Aluminium structure FCC, it is 12. 
 #If coordinationNumber is not given, interaction with ChemicalElements between chemicalElement and vacancies will not be taken into account.
 #means alpha in Xlaceq will be equal to 1!!!
