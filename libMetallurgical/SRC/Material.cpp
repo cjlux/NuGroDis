@@ -73,7 +73,7 @@ Material::Material(Temperature& temp,
   std::cout<<"		material lattice param "<<latticeParameter_<<std::endl;
   
 
-  
+    
   // make the SSGrain:
   SSGrain *ssgrain= new SSGrain(*this);
   std::cout<<"Adress of ssgrain  Object ="<<ssgrain<<std::endl;
