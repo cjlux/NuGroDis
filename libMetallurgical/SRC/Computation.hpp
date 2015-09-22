@@ -42,12 +42,12 @@ public:
   // Setters:
   void SetType(const std::string &);
   std::string GetType() const;
-  void SetMaxComputationTime(const double &); 
+  void SetMaxComputationTime(const double ); 
   double GetMaxComputationTime() const;
   
   double GetMaxTimeStep() const { assert(maxTimeStep_>0) ;  return maxTimeStep_;};
   
-  void UpdateTimeStep();
+  void UpdateCurrentTime();
   
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
   void ComputeDuration();
@@ -65,6 +65,7 @@ public:
   
   double GetCurrentTime() const { assert (currentTime_>=0);  return currentTime_;}
   
+  int GetIncrement() const { return increment_;};
   //Relations
   //setters
   void SetHardening(Hardening& hardening);
@@ -108,6 +109,8 @@ private:
   //The maximum value allowed for any computed Time step. is deltat  Unit: s
   double maxTimeStep_;
   
+  int increment_;
+  
   
 };
 
@@ -127,7 +130,7 @@ Computation::GetType() const
 
 
 inline void
-Computation::SetMaxComputationTime(const double & maxCompTime) 
+Computation::SetMaxComputationTime(const double maxCompTime) 
 {
   maxComputationTime_= maxCompTime;
 }

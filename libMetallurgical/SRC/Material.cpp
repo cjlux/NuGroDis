@@ -15,6 +15,7 @@
 #include <cassert>
 #include <iostream>
 
+#include <Python.h>
 #include "Material.hpp"
 #include "Temperature.hpp"
 #include "ChemicalElement.hpp"
@@ -120,78 +121,175 @@ void // in TEST run beginning of "boucle temporelle"
 Material::RunProcess()
 {
   std::cout<<"Material::RunProcess() ===>  Running Process "<<std::endl;
+  double currentTime, computationDuration;
   
-  double time=0;
-  //assert (computation_->GetCurrentTime==0)
-  this->UpdateVolumicValues();
-  vacancy_->ComputeDiffusionCoefValue();
-  vacancy_->ComputeEquilibriumConcentration();
-  vacancy_->ComputeConcentrationBeforeQuenching();
-  std::cout<<"MaterialGetConcentrationBeforeQuenching()  "<<vacancy_->GetConcentrationBeforeQuenching()<<std::endl;
-  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(time, vacancy_->GetConcentrationBeforeQuenching());
+  currentTime=computation_.GetCurrentTime();
+  computationDuration=computation_.GetMaxComputationTime();
+  std::cout<<"Computation Duration is "<<computationDuration<<"\n"<<std::endl;
+  while ( currentTime<computationDuration)
+  {//Begin While
+    std::cout<<"Current time is "<<currentTime<<"\n\n\n\n\n"<<std::endl;
+    //assert (computation_->GetCurrentTime==0)
+    
+    this->UpdateVolumicValues();
+    
+    
+    //Update SurfeceEnergy (gamma) (at new temperature)
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->ComputeSurfaceEnergy();// Update gamma
+    }
+    
+    
+    this->UpdateAtomicDiffusionCoef();// Important! : Update of AtomicDiffusion coef
+    
+    this->ProcessPrecipitatesNucleationRate(); 
+    ///*DEBUG*/assert (!("Tpooet"));
+    
 
-  for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
-  {
-    (*i)->ComputeAtomicDiffusionCoefValue();
+    this->ComputePrecipitatesAllInterfacialConcentrations();
+    
+    this->ComputePrecipitatesInterfacialVelocityList();
+      
+    this->ComputeCriticalInterfacialConcentration();
+      
+    this->ProcessComputationMaxTimeStep();
+    
+    
+    this->AddNucleatedPrecipitates();
+    
+    this->SolveCineticLinearSytem();
+    
+    
+    //Cut of negligle value of RadiusHistogram(<1)
+    double cutOffvalue;
+    cutOffvalue=1.;
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->ResetCurrRadDisItemsIfValueIsLowerThan(cutOffvalue);
+    }
+    
+    //Cout RadiusDis
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->GetCurrentRadiusDistribution().CoutRadiusDistribution();
+    }
+    
+    /*
+    //plot histogram
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->GetCurrentRadiusDistribution().PlotPythonHistogram();
+    }*/
+    
+    
+    this->ComputePrecipitatesVolumicFraction();
+    
+    this->UpdateVolumicValues(); //Important
+    
+    this->ComputePrecipitatesNucleationSiteNb();
+    
+    
+    
+    this->UpdateComputationCurrentTime();
+    currentTime=computation_.GetCurrentTime();
+    if (currentTime>= computationDuration)
+    {
+      std::cout<<"Current time is equal or superior to Computation Duration. Current time just after update is "<<currentTime<<"\n\n\n\n\n"<<std::endl;
+    }
+    
+    //Update all properties that are dependent to temperature
+    
+    //TODO Update current Temperature
+    
+    
+    
+    
+    
+    //ajout d'une nouvelle classe dans la radDis si la derniere classe est vide
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->AddEmptyClassForCurrentRadiusDistributionWithCondition();
+    }
+    // Fin boucle
+    
+    
+    
+    
+
+    /*
+    this->UpdateVolumicValues();//Not needed?
+    vacancy_->ComputeDiffusionCoefValue();
+    vacancy_->ComputeEquilibriumConcentration();
+    vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching()); 
+    
+    for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
+    {
+      (*i)->ComputeAtomicDiffusionCoefValue();
+    }
+    
+    this->ProcessPrecipitatesNucleationRate();
+    
+    this->AddNucleatedPrecipitates();
+    
+    this->SolveCineticLinearSytem();
+    
+    //Cut of negligle value of RadiusHistogram(<1)
+    double cutOffvalue;
+    cutOffvalue=1.;
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->ResetCurrRadDisItemsIfValueIsLowerThan(cutOffvalue);
+    }
+    
+    //Cout RadiusDis
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->GetCurrentRadiusDistribution().CoutRadiusDistribution();
+    }
+    
+    this->ComputePrecipitatesVolumicFraction();
+    
+    this->UpdateVolumicValues();
+    
+    this->ComputePrecipitatesNucleationSiteNb();
+    
+    this->UpdateComputationCurrentTime();*/
+  
+  //End While
   }
   
-  this->ProcessPrecipitatesNucleationRate(); 
-  ///*DEBUG*/assert (!("Tpooet"));
   
-  this->ComputePrecipitatesAllInterfacialConcentrations();
-  
-  this->ComputePrecipitatesInterfacialVelocityList();
-  
-  this->ComputeCriticalInterfacialConcentration();
-  
-  this->ProcessComputationMaxTimeStep();
+    //plot histogram
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->GetCurrentRadiusDistribution().PlotPythonHistogram();
+    }
    
-  this->AddNucleatedPrecipitates();
-  
-  this->SolveCineticLinearSytem();
-  
-  /*
-  double cutOffvalue;
-  cutOffvalue=1.;
-  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
-  {
-    (*i)->ResetCurrRadDisItemsIfValueIsLowerThan(cutOffvalue);
-  }
-  
-  
-  this->ComputePrecipitatesVolumicFraction();
-  
-  this->UpdateVolumicValues();
-  
-  this->ComputePrecipitatesNucleationSiteNb();
-  
-  this->UpdateTimeStep();
-  
-  this->ComputePrecipitatesAllInterfacialConcentrations();
-  
-  this->ComputePrecipitatesInterfacialVelocityList();
-  
-  this->ComputeCriticalInterfacialConcentration();
-  
-  this->ProcessComputationMaxTimeStep();
-  
-  //ajout d'une nouvelle classe dans la radDis si la derniere classe est vide
-  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
-  {
-    (*i)->AddEmptyClassForCurrentRadiusDistributionWithCondition();
-  }
-  
-  this->UpdateVolumicValues();//Not needed?
-  vacancy_->ComputeDiffusionCoefValue();
-  vacancy_->ComputeEquilibriumConcentration();
-  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_->GetCurrentTime, vacancy_->GetConcentrationBeforeQuenching()); 
-  */
-   
-  std::cout<<std::endl;
+  std::cout<<"\n\n\n\n"<<std::endl;
   std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;
   std::cout<<std::endl;
 }
 
+
+void Material::UpdateAtomicDiffusionCoef()
+{
+  vacancy_->ComputeDiffusionCoefValue();
+  vacancy_->ComputeEquilibriumConcentration();
+  if (computation_.GetCurrentTime()==0)
+  {
+    std::cout<<"Computing Concentration before quenching\n"<<std::endl;
+    vacancy_->ComputeConcentrationBeforeQuenching();
+  }
+  
+  std::cout<<"MaterialGetConcentrationBeforeQuenching()  "<<vacancy_->GetConcentrationBeforeQuenching()<<std::endl;
+  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
+  
+  for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
+  {
+    (*i)->ComputeAtomicDiffusionCoefValue();
+  }
+}
 
 //in TEST 
 void
@@ -312,10 +410,10 @@ Material::ComputePrecipitatesNucleationSiteNb()
 }
 
 void
-Material::UpdateTimeStep()
+Material::UpdateComputationCurrentTime()
 {
   std::cout<<"Material::UpdateTimeStep() : Updating the current time step of the Computation"<<std::endl; 
-  computation_.UpdateTimeStep();
+  computation_.UpdateCurrentTime();
   std::cout<<"+-+-+-+-   END: Running Material::UpdateTimeStep() +-+-+-+-"<<std::endl;
 }
 
@@ -392,17 +490,16 @@ Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
   assert( (it!=currentConcMap.end())&&"Cannot find given symbol in concentrationMap of Material's current Chemical composition " );
   
   
-    double volumicConc=0;
-    double elementRho=0;
-    double elementMolarMass=0;
-    double sum=0;
+    double volumicConc=0.;
+    double elementRho=0.;
+    double elementMolarMass=0.;
+    double sum=0.;
     for (it2=currentConcMap.begin(); it2!=currentConcMap.end(); ++it2)
     {
       volumicConc=it2->second->GetVolumicValue();
       elementRho=it2->second->GetChemicalElement().GetDensity();
       elementMolarMass=it2->second->GetChemicalElement().GetMolarMass();
-      sum+=volumicConc*elementRho*1000/elementMolarMass;
-      
+      sum+=volumicConc*elementRho*1000./elementMolarMass;
     }
     
     volumicConc=it->second->GetVolumicValue();
@@ -413,7 +510,7 @@ Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
     
     
     
-    double computedAtomicConc= (volumicConc*elementRho*1000/elementMolarMass)/sum;
+    double computedAtomicConc= (volumicConc*elementRho*1000./elementMolarMass)/sum;
    
     std::cout<<"===================== VALUE RETURNED FOR ATOMIC CONC OF ELEMENT <"<<it->first<<"> IN MATERIAL IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
   
@@ -493,6 +590,12 @@ Material::UpdateVolumicValues()
       
       for( std::vector<Precipitate*>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
       {
+	double oldVolumicFraction, VolumicFraction;
+	oldVolumicFraction=(*i)->GetVolumicFraction();
+	VolumicFraction=(*i)->ReturnVolumicFraction();
+	
+	assert ( (VolumicFraction==oldVolumicFraction)&&"Volumic fraction of precipitates must be computed before run method Material::UpdateVolumicValues()");
+	
 	std::map<std::string, Concentration*>::iterator iter;
 	double precipitateFracVol=(*i)->GetVolumicFraction();
 	double elementVolumicConcInPrecipitate=(*i)->GetChemicalComposition().GetConcentrationForElement(it->first).GetVolumicValue();

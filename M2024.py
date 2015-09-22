@@ -13,6 +13,7 @@ from MetalUtils.ElementsData import Dict as ElementsDataDict
 from MetalUtils.ElementsData import ComputeMolarVolume
 from MetalUtils.Mendeleiev import PyChemicalComposition
 import Utils
+import math
 #ALL CONCENTRATIONS MUST BE THOSE AFTER SOLUTIONIZING
 
 AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentration, in range [0,1]
@@ -106,6 +107,6 @@ Sprime={
 #"surfaceEnergyPolynomialModel":([0,0,0,1],"J.m^-2"),
 "shapeFactor":(20,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP2
 "deltaCell":(1/100,"m.m^-1") , #difference between precipitate and solid solution cell size , was deltamailleP2
-"wettingAngle":(30,"degree") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
-}
+"wettingAngle":(30*math.pi/180,"rad") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
+} 
 

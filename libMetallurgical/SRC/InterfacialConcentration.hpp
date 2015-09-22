@@ -62,6 +62,8 @@ public:
   void SetItemValueInInterfConcList(const double &computedValueOfItemInInterfConcList);
   void SetCriticalInterfacialConcentration(const double & computedValueOfCriticalInterfacialConcentration);
   
+  void IncrementWithEmptyValues();
+  
   
   
   //RELATIONS
@@ -83,6 +85,9 @@ private:
   const ChemicalElement& chemicalElement_;
 
 };
+
+
+
 
 inline  double 
 InterfacialConcentration::GetCriticalInterfacialConcentration() const

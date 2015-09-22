@@ -15,6 +15,7 @@
 #include <cassert>
 #include <map>
 #include <cmath>
+#include <Python.h>
  
 #include "RadiusDistribution.hpp"
 #include "Precipitate.hpp"
@@ -72,6 +73,128 @@ RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialC
 
 RadiusDistribution::~RadiusDistribution()
 {
+}
+
+
+void
+RadiusDistribution::AddEmptyClass()
+{
+  assert ((precipitate_!=0)&&"radiusDistribution does not belong to any precipitate");
+  
+  std::cout<<" Adding an empty class to RadiusDistribution of precipitate type <"<<typeid(precipitate_).name()<<"> ; precipitate adress is <"<<precipitate_<<"> "<<std::endl;
+  unsigned int n= itemsValues_.size();
+  itemsValues_.push_back(0);
+  assert (itemsValues_.size()== n+1. );
+  
+  std::map<std::string , InterfacialConcentration*>::iterator it;
+  for (it=interfConcentrationObjectMap_.begin(); it!=interfConcentrationObjectMap_.end(); ++it )
+  {
+    std::cout<<"Incrementing with empty value the InterfacialConcentration Object for Element "<<it->first<<";InterfacialConcentration Object Adress is :"<<it->second<<std::endl;
+    it->second->IncrementWithEmptyValues();
+  }
+  
+}
+
+
+void
+RadiusDistribution::PlotPythonHistogram()
+{
+  
+
+  std::cout<<"\n\n\n Printing distribution of precipitate <"<<typeid(*precipitate_).name()<<"> at adress <"<<precipitate_<<"> "<<std::endl;
+  boost::python::list itemsValuesPyList;
+  boost::python::list radiusPyList;
+  unsigned int n=itemsValues_.size();
+  
+  for (unsigned int i=0; i<n; ++i )
+  {
+    itemsValuesPyList.append(itemsValues_[i]);
+  }
+  assert ( boost::python::len(itemsValuesPyList)== n);
+  
+  assert ( boost::python::len(radiusPyList)== 0);
+  radiusPyList.append( this->GetLeftRadiusForClass(1)  );
+  assert ( boost::python::len(radiusPyList)== 1);
+  for (unsigned int i=1; i<=n; ++i )
+  {
+    radiusPyList.append( this->GetRightRadiusForClass(i)  );
+  }
+  assert ( boost::python::len(radiusPyList)== n+1);
+  
+  
+
+  std::stringstream nPy, R1, NPy_n;
+  nPy<<n;
+  
+  
+  std::string rListString="[";
+  R1<< (this->GetLeftRadiusForClass(1));
+  rListString += R1.str();
+  for (unsigned int i=1; i<=n; ++i )
+  {
+    std::stringstream RR;
+    rListString +=",";
+    RR<< (this->GetRightRadiusForClass(i));
+    rListString += RR.str();
+  }
+  rListString +="]";
+  
+  
+  std::string NlistString="[";
+  for (unsigned int i=0; i<n-1; ++i )
+  {
+    std::stringstream NPy;
+    NPy<< (itemsValues_[i]);
+    NlistString +=NPy.str();
+    NlistString +=",";
+  }
+  NPy_n<<(itemsValues_[n-1]);
+  NlistString+=NPy_n.str();
+  NlistString +=",0]";
+  
+  
+  
+  
+  //boost::python::str m=(radiusPyList);
+  
+  
+  
+  
+  
+  
+  std::string A = "P.hist(";
+  std::string x=rListString;
+  std::string B = ",bins=";
+  std::string PyNumberOfBins= nPy.str();
+  std::string C = ", histtype='bar', weights=";
+  std::string PyWeights= NlistString;
+  std::string D = ")";
+  
+  const char* expression= (A+x+B+PyNumberOfBins+C+PyWeights+D).c_str();
+  
+  
+  std::cout<<"A "<<A<<"\nx "<<x<<"\nB "<<B<<"\nPynumberofbins "<<PyNumberOfBins<<"\nC "<<C<<"\npyweights "<<PyWeights<<"\nD "<<D;
+
+  
+  Py_Initialize();
+  PyRun_SimpleString("import pylab as P");
+  //PyRun_SimpleString("P.hist([3,4,5], bins=2,histtype='bar', weights=[1,2,0])");
+  PyRun_SimpleString(expression);
+  PyRun_SimpleString("P.show()");
+  //Py_Exit(0);
+   
+}
+
+
+   
+   
+void
+RadiusDistribution::CoutRadiusDistribution()
+{
+  for (unsigned int i=0; i<itemsValues_.size(); ++i)
+  {
+    std::cout<<"| Class <"<<i+1<<"> ;  N = << "<<itemsValues_[i]<<" >> |\n";
+  }
 }
 
 void 
@@ -219,7 +342,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   
   //j= fction(i)
   //with i the unknown variable, 2nd order Equation to solve is then: A*i^2 +(B-fC)*i -fD=0
-  const double k=1.e6;
+  const double k=1.e30;
   nbOfSol=Util::Util::SolveSecondDegreeEquation(constantA/(k*k), (constantB-f*constantC)/k, -f*constantD,
 						solution1,
 						solution2,
@@ -292,7 +415,8 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   
     
     assert( X != -constantD/constantC );// because denominator of Y must be different from 0
-    Y = (constantA*X +constantB)/(constantC*X +constantD);  
+    //Y = (constantA*X +constantB)/(constantC*X +constantD);  
+    Y=f/X;
     assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
     assert( Y>0);
     assert( Y < XvPj);
@@ -302,7 +426,10 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
     std::cout<<"value solution X is: "<<X<<std::endl;
     std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
     std::cout<<"value solution Y is: "<<Y<<std::endl;
-    
+    std::cout<<"X*Y = : "<<X*Y<<std::endl;
+    std::cout<<"f = : "<<f<<std::endl;
+    std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+    std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
     return 1; //There is a solution
   }
   else //There is no solution
@@ -338,7 +465,13 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
   assert ( (precipitate_ != 0)&&"Radius distribution is not linked to any precipitate!"    ); 
   assert ( ( P->GetMaterialPointer()!=0)&&"In ComputeInterfacialConcentration(): Precipitate is not linked to any material !!!");
   
-  this->InitializeInterfConc();
+  
+  if ((interfConcentrationObjectMap_.size()==0)&&(chemicalElementList_.size()==0))
+  {
+    this->InitializeInterfConc();
+  }
+  
+  
   
   assert( (interfConcentrationObjectMap_.size()!=0)&&"Interfacial concentratration have not been initialized for RadiusDisutribution.\
   Run RadiusDistribution::InitializeInterfConc() before Computing Interfacial Concentrations " );
@@ -380,30 +513,27 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	double alphaP= P->GetShapeFactor();
 	double Vm= P->GetMolarVolume();
       
-	// BEGIN: Compute gamma, DeltaGv, DeltaGe and CHECK IF they have been updated before//
+	// BEGIN: Compute gamma, DeltaGe, and CHECK IF they have been updated before//
 	
 	/*DEBUG*/ std::cout<<"In RadiusDis, adress of precipitate P is "<<P<<std::endl;
 	double oldGamma=P->GetSurfaceEnergyCurrentValue();
-	double oldDeltaGv=P->GetPhaseChangeVolumicEnergy();
 	double oldDeltaGe=P->GetDistorsionEnergy();
-	P->ComputePhaseChangeVolumicEnergy();//compute another value of phaseChangeVolumiqueEnergy_
 	P->ComputeDistorsionEnergy(); //compute another value of distorsionEnergy_
-	P->ComputeSurfaceEnergy();
+	P->ComputeSurfaceEnergy();// compute gamma
   
 	double gamma= P->GetSurfaceEnergyCurrentValue();
-	double DeltaGv= P->GetPhaseChangeVolumicEnergy();
 	double DeltaGe= P->GetDistorsionEnergy();
 	
+	std::map<std::string, Concentration*> materialCurrentConcMap=P->GetMaterial().GetCurrentChemicalComposition().GetConcentrationMap();
 
 	
 	
 	assert ( (gamma==oldGamma)&&"may be surfaceEnergyCurrentValue_ has not been computed before\
 	running method ComputeInterfacialConcentrations");
-	assert ( (DeltaGv==oldDeltaGv)&&"may be phaseChangeVolumiqueEnergy_ has not been computed before.\
-	Error when running method Precipitate::ReturnCriticalRadius()");
+
 	assert ( (DeltaGe==oldDeltaGe)&&"may be distorsionEnergy_ has not been computed before.\
 	Error when running method Precipitate::ReturnCriticalRadius()");
-      // END: Compute gamma, DeltaGv, DeltaGe and CHECK IF they have been updated before //
+      // END: Compute gamma, DeltaGe, and CHECK IF they have been updated before //
 	
 	std::vector<const ChemicalElement*> soluteList =P->GetMaterial().GetSoluteList();
 	
@@ -412,12 +542,36 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	assert (soluteList[0]->GetDiffusion().GetAtomicDiffusionCoef()!=0&&"AtomicDiffusion coef is 0: No sense");
 	
 	
+// 	//Begin assert if D_i_SS has been computed before and if they have been updated
+// 	//TODO
+// 	std::string element_O_name= soluteList[0]->GetElementName();
+// 	std::string element_1_name= soluteList[1]->GetElementName();
+// 	
+
+// 	
+// 	double oldXvSS_O= materialCurrentConcMap[element_O_name]->GetVolumicValue();
+// 	double oldXvSS_1= materialCurrentConcMap[element_1_name]->GetVolumicValue();
+// 	
+// 	precipitate_->GetMaterial().UpdateVolumicValues(); 
+// 	
+// 	double XvSS_O=materialCurrentConcMap[element_O_name]->GetVolumicValue();
+// 	double XvSS_1= materialCurrentConcMap[element_1_name]->GetVolumicValue();	
+// 	
+// 	/*DEBUG*/std::cout<<"oldXvSS_O "<<oldXvSS_O<<" XvSS_O "<<XvSS_O<<"oldXvSS_1"<<oldXvSS_1<<"XvSS_1"<<XvSS_1<<  std::endl;
+// 	/*DEBUG */std::cout<< " oldXvSS_O-XvSS_O "<<oldXvSS_O-XvSS_O<<" oldXvSS_1-XvSS_1 "<<oldXvSS_1-XvSS_1<<std::endl; 
+	
+	//assert ( (oldXvSS_O==XvSS_O)&&(oldXvSS_1==XvSS_1)&&"may be volumic values has not been computed or updated before. Error when running method RadiusDistribution::ComputeAllInterfacialConcentrations()");
+// 	
+// 	//TODO pas fini encore. Il Reste à checker les valeurs des coefficient des diffusion atomic D_i_SS. N'est cer pas mieux tout simplement de faire l'update avant la methode RadiusDistribution::ComputeAllInterfacialConcentrations() ?
+// 	
+// 	//End assert if D_i_SS has been computed before and if they have been updated
+	
+	
 	double DjOverDi= soluteList[1]->GetDiffusion().GetAtomicDiffusionCoef()/soluteList[0]->GetDiffusion().GetAtomicDiffusionCoef();// example: D_Mg_SS/D_Cu_SS
 	//Because of ratio DjOverDi , solution for soluteList[0] will be X or i and solution for soluteList[1] will be Y or j
 	double solX=-1, solY=-1;
 	double XvPj=precipitateConcMap[soluteList[1]->GetElementName()]->GetVolumicValue();
 	double XvPi=precipitateConcMap[soluteList[0]->GetElementName()]->GetVolumicValue();
-	std::map<std::string, Concentration*> materialCurrentConcMap= P->GetMaterial().GetCurrentChemicalComposition().GetConcentrationMap();
 	double XvSSj =materialCurrentConcMap[soluteList[1]->GetElementName()]->GetVolumicValue();
 	double XvSSi =materialCurrentConcMap[soluteList[0]->GetElementName()]->GetVolumicValue();
 	double rightRadius, leftRadius;
@@ -746,8 +900,10 @@ RadiusDistribution::ReturnCriticalInterfacialVelocity()
   
   for (unsigned int i=0; i<elementsCriticalVelocityList.size()-1; ++i)
   {
+    
+    /*DEBUG*/std::cout<<"elementsCriticalVelocityList[i] = "<<elementsCriticalVelocityList[i]<<"\n elementsCriticalVelocityList[i+1] = "<<elementsCriticalVelocityList[i+1]<<"\n\n"<<std::endl;
     //The critical velocities must be the same whatever the element choose!!!
-    assert ( elementsCriticalVelocityList[i]==elementsCriticalVelocityList[i+1] );
+    //TODO assert ( elementsCriticalVelocityList[i]==elementsCriticalVelocityList[i+1] );
   }
   
   assert (elementsCriticalVelocityList.size()>0);

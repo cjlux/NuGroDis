@@ -37,7 +37,8 @@ Computation::Computation(double initialTimeStep)
     type_(""),
     currentTime_(0),
     defaulTimeStep_(initialTimeStep),
-    maxTimeStep_(defaulTimeStep_)
+    maxTimeStep_(defaulTimeStep_),
+    increment_(1)
     
 {  
 std::cout << "   .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-. " << std::endl;
@@ -157,9 +158,10 @@ Computation::ComputeMaxTimeStep()
 
 
 void
-Computation::UpdateTimeStep()
+Computation::UpdateCurrentTime()
 {
   currentTime_+=maxTimeStep_;
+  std::cout<<">>>>>>>>>>>>>>>>> Update Current computation time. CurrentTime is now :  "<<currentTime_<<"\n\n"<<std::endl;
 }
 
 

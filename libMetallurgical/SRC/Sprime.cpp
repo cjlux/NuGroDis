@@ -45,15 +45,16 @@ Sprime::ReturnCriticalTotalEnergy()
   this->ComputePhaseChangeVolumicEnergy();//compute another value of phaseChangeVolumiqueEnergy_
   this->ComputeDistorsionEnergy(); //compute another value of distorsionEnergy_
   this->ComputeSurfaceEnergy();
-  this->WettingFunction(wettingAngle_);
+  double CurrentStheta=this->ReturnWettingFunction();
   assert ( (phaseChangeVolumiqueEnergy_==oldDeltaGv)&&"may be phaseChangeVolumiqueEnergy_ has not been computed before\
-  running method ReturnCriticalRadius()");
+  running method ReturnCriticalTotalEnergy()");
   assert ( (distorsionEnergy_==oldDeltaGe)&&"may be distorsionEnergy_ has not been computed before\
-  running method ReturnCriticalRadius()");
+  running method ReturnCriticalTotalEnergy()");
   assert ( (surfaceEnergyCurrentValue_==oldGamma)&&"may be surfaceEnergyCurrentValue_ has not been computed before\
-  running method ReturnCriticalRadius()");
-  assert ( (Stheta_==oldStheta)&&"may be Stheta_ has not been computed before\
-  running method ReturnCriticalRadius()");
+  running method ReturnCriticalTotalEnergy()");
+  /*Debug*/ std::cout<<"Stheta_ = "<<Stheta_<<"oldStheta = "<<oldStheta<<std::endl;
+  assert ( (CurrentStheta==oldStheta)&&"may be Stheta_ has not been computed before\
+  running method ReturnCriticalTotalEnergy()");
   
   
   assert((phaseChangeVolumiqueEnergy_+distorsionEnergy_)!=0);

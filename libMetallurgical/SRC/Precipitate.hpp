@@ -140,7 +140,8 @@ public:
     int GetVolNbPrecipitates() const  { assert(!"Method GetVolNbPrecipitates() has no sense for Precipitates!!! "); }; //precipitates cant be contained in a precipitae
     //void SetSSGrainChemicalComposition(const ChemicalComposition &CC) { assert(!"SetSSGrainChemicalComposition does not exist for pecipitate!!!")  ;};
 
-  virtual double WettingFunction(double theta) = 0;
+  virtual void ComputeWettingFunction() = 0;
+  virtual double ReturnWettingFunction()= 0;
   
   
   //Concentration conversion functions

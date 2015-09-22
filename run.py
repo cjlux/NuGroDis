@@ -305,6 +305,7 @@ for computation in ComputationList:
                 CppPrecipitate=Sprime(CppMaterial,CppCompo,CppHardeningRadDisDict[x],pyPrecipitateObj.wettingAngle[0])
                 CppPrecipitateDict[x]=CppPrecipitate
                 #step3: Set Sprime specifice properties manually or  with Precipitate.InitializeParameters(...)?
+                CppPrecipitate.ComputeWettingFunction()
                 #Sprime did not have any other specific properties than wetting Angle which have been already setted in constructor
             else:
                 print("Precipitate nature should be Guinier Preston or Sprime")
@@ -412,7 +413,7 @@ for computation in ComputationList:
 ##    THERMAL LOADING
 ##    if computation == "ThermalLoading":
 ##        #Create an object of type ThermalLoading:
-##        ThermalLoading=ThermalLoading(c)
+##        CppThermalLoading=ThermalLoading(c)
 
 #toto=PyChemicalComposition("Al2Cu8")
 #print(toto)
@@ -471,6 +472,7 @@ print("Dlac ",CppVacancy.vacancyDiffusionCoef)
 CppVacancy.ComputeEquilibriumConcentration()
 print("Xlaceq ",CppVacancy.equilibriumConc)
 
+c.maxComputationTime=CppHardening.duration #CppHardening.duration + CppThermalLoading.duration
 CppMaterial.RunProcess()#RunProcess also run ProcessPrecipitatesNucleationRate() which run precipitate method ProcessNucleationRate()
 
 

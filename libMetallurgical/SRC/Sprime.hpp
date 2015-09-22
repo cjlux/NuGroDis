@@ -58,7 +58,8 @@ public:
     
     //Setter
     //compute value of Stheta
-    double WettingFunction(double theta);
+    void ComputeWettingFunction();
+    double ReturnWettingFunction();
     
     //Getter
     double GetWettingAngle() const {return wettingAngle_;};
@@ -82,12 +83,19 @@ private:
 };
 
 
-double inline
-Sprime::WettingFunction(double theta)
+void inline //Compute and set value of Stheta
+Sprime::ComputeWettingFunction()
 {
   assert( (Stheta_==-1) && "WettingFunction: Stheta has already been computed" );
-  Stheta_=(1-cos(wettingAngle_))*(1-cos(wettingAngle_))*(2+cos(wettingAngle_))/4;
-  return 0; // TODO
+  Stheta_=this->ReturnWettingFunction();
+}
+
+double inline
+Sprime::ReturnWettingFunction()
+{
+  double Stheta;
+  Stheta=(1.-cos(wettingAngle_))*(1.-cos(wettingAngle_))*(2.+cos(wettingAngle_))/4.;
+  return Stheta;
 }
 
 #endif

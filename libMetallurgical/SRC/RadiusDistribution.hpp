@@ -110,6 +110,9 @@ public:
  
  void AddEmptyClass();
  
+ void CoutRadiusDistribution();
+ void PlotPythonHistogram();
+ 
  
  double GetMinRadius() const { return minRadius_; };
  int GetInitialClassNumber() const { return initialClassNumber_; }; 
@@ -159,14 +162,6 @@ private:
 
 };
 
-inline void
-RadiusDistribution::AddEmptyClass()
-{
-  unsigned int n= itemsValues_.size();
-  itemsValues_.push_back(0);
-  
-  assert (itemsValues_.size()== n+1. );
-}
 
 inline double 
 RadiusDistribution::GetRadiusForClass(unsigned int classId)

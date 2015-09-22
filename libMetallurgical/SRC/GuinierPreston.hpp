@@ -43,7 +43,10 @@ public:
     
     void ReadDataValue(std::string fileName);
 
-    double WettingFunction(double theta) { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
+    void ComputeWettingFunction() { assert(!"ComputeWettingFunction has no sense for GP!!! Tchao"); };
+    double ReturnWettingFunction() {
+      assert(!"ReturnWettingFunction has no sense for GP!!! Tchao");
+    };
     
     
 

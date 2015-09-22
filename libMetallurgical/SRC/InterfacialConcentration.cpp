@@ -54,6 +54,28 @@ InterfacialConcentration::~InterfacialConcentration()
 }
 
 
+void 
+InterfacialConcentration::IncrementWithEmptyValues()
+{
+  
+  int previous_n=interfacialConcentrationValuesList_.size()-1;
+  
+  const int current_n= radiusDistribution_.GetItemsValues().size();
+  
+  assert ( (previous_n != current_n)&&"this InterfacialConcentration object does not need to be Incremented. Error in InterfacialConcentration::IncrementWithEmptyValues()" );
+  
+  assert ( (current_n==previous_n+1)&&"Whhen radius sistribution size is incremented, InterfacialConcentration must be incremented to. It means the difference of size must be only 1 " );
+  
+  /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
+  
+  interfacialConcentrationValuesList_.push_back(0);
+  
+  /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
+  std::cout<<" previous_n "<<previous_n << "current_n "<<current_n<<std::endl;
+  assert ( (int)interfacialConcentrationValuesList_.size() == (current_n+1) );
+  
+}
+
 
 const double 
 InterfacialConcentration::GetLeftInterfacialVelocityForClass(unsigned int classId)  //classId varies from 1 to n
@@ -152,7 +174,7 @@ InterfacialConcentration::SetRightInterfacialConcValueForClass(double value,unsi
   
   n= radiusDistribution_.GetItemsValues().size();
   
-  
+  /*DEBUG*/ std::cout<< "interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<" n "<< n<<std::endl;
   assert(  (interfacialConcentrationValuesList_.size()== n+1)&&"In SetRightInterfacialConcValueForClass(int  classId) : interfacialConcentrationValuesList_.size() \
   and radiusDistribution_.GetItemsValues().size() are incompatible!!! interfacialConcentrationValuesList_.size() must be = radiusDistribution_.GetItemsValues().size() +1 " );
   

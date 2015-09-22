@@ -90,6 +90,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
   boost::python::class_<Computation>("Computation", boost::python::init<double>() )
     .add_property("type", &Computation::GetType, &Computation::SetType)
+    .add_property("maxComputationTime", &Computation::GetMaxComputationTime, &Computation::SetMaxComputationTime)
     .def("Run", &Computation::Run) 
     .def("Info", &Computation::Info)
     ;
@@ -230,6 +231,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
   boost::python::class_<Sprime,boost::python::bases<Precipitate> >("Sprime", boost::python::init<Material&, ChemicalComposition&, RadiusDistribution&, double>()  )
     .add_property("wettingAngle", &Sprime::GetWettingAngle)
     .add_property("Stheta", &Sprime::GetStheta)
+    .def("ComputeWettingFunction", &Sprime::ComputeWettingFunction)
     .def("Info", &Sprime::Info)
     ;
     

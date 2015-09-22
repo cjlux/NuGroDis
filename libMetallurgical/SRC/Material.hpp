@@ -43,6 +43,8 @@ public:
   
   
   void RunProcess();
+  
+  void UpdateAtomicDiffusionCoef(); //TODO After , make this function take arguments for dealing with thermalloading
 
   void ProcessPrecipitatesNucleationRate();
   
@@ -62,7 +64,7 @@ public:
   
   void ComputePrecipitatesNucleationSiteNb();
   
-  void UpdateTimeStep(); //En cours
+  void UpdateComputationCurrentTime(); //En cours
 
   void Info() const;
   void ReadData(std::string dataFileName);

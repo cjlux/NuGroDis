@@ -250,17 +250,23 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
   assert ( (X!=-1 )&&"Solution X may have not been computed" );
   assert( X > 0);
   assert( X != -constantD/constantC );
-  assert( X != XvPi);
+  assert( X != XvPi); //Denominator not null
   Y = (constantA*X +constantB)/(constantC*X +constantD);  
   assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
   assert( Y>0);
-  assert( Y!= XvPj);
+  assert( Y!= XvPj);//Denominator not null
   
   
   //DEBUG    
-  std::cout<<"value solution X is: "<<X<<std::endl;
+  std::cout<<"Xveq value solution X is: "<<X<<std::endl;
   std::cout<<"value solution Y is: "<<Y<<std::endl;
   
+  std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+  std::cout<<"value solution Y is: "<<Y<<std::endl;
+    std::cout<<"X*Y = : "<<X*Y<<std::endl;
+    std::cout<<"f = : "<<f<<std::endl;
+    std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+    std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
 }
 
 
@@ -618,12 +624,12 @@ Precipitate::ReturnDeltaCriticalRadius()
   Error when running method Precipitate::ReturnCriticalRadius()");
   
   
-  a=M_PI*(shapeFactor_ + 4/3)*(distorsionEnergy_ + phaseChangeVolumiqueEnergy_);
+  a=M_PI*(shapeFactor_ + 4./3.)*(distorsionEnergy_ + phaseChangeVolumiqueEnergy_);
   //assert that a!=0  ( equation a*x^3+ b*x^2+ c*x + d)
   assert((a!=0)&&"Precipitate::ReturnDeltaCriticalRadius() : coefficient of third order monom (x^3) is 0 ");
   
-  b= (-2)*(shapeFactor_ + 2)*surfaceEnergyCurrentValue_*M_PI;
-  c= 0;
+  b= (-2.)*(shapeFactor_ + 2.)*surfaceEnergyCurrentValue_*M_PI;
+  c= 0.;
   d= T*ThermoDynamicsConstant::GetkB();
 
   Util::Util::SolveThirdDegreeEquation(a, b, c, d,
@@ -706,7 +712,7 @@ Precipitate::ReturnCriticalBeta()
   //std::map<std::string, Concentration*>::iterator it2;
   std::vector<const ChemicalElement*> soluteList =materialPointer_->GetSoluteList();
   
-  double sum=0; // sum of 1/(D_i_SS*X_at_i)
+  double sum=0.; // sum of 1/(D_i_SS*X_at_i)
   
   for (it=precipitateConcMap.begin(); it!=precipitateConcMap.end(); ++it )
   {
@@ -722,11 +728,15 @@ Precipitate::ReturnCriticalBeta()
 	  double Dcoef = (*i)->GetDiffusion().GetAtomicDiffusionCoef();
 	  assert(Dcoef>0);
 	  assert (currentAtomicConc>0);
-	  sum += 1./(currentAtomicConc*Dcoef);
+	  sum += 1./(Dcoef*currentAtomicConc);
 	  
 	  /*DEBUG*/std::cout<<"Elementname "<<it->first<<std::endl;
 	  /*DEBUG*/std::cout<<"DCoef "<<Dcoef<<std::endl;
 	  /*DEBUG*/std::cout<<"currentAtomicConc "<<currentAtomicConc<<std::endl;
+	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
+	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ 1./(currentAtomicConc*Dcoef) = "<<1./(currentAtomicConc*Dcoef)<<"\n\n\n\n\n\n\n\n"<<std::endl;
+	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ currentAtomicConc = "<<currentAtomicConc<<"\n"<<std::endl;
+	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ Dcoef = "<<Dcoef<<"\n"<<std::endl;
 	};
       }
       
@@ -735,6 +745,7 @@ Precipitate::ReturnCriticalBeta()
     
   }
   
+  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
   assert( (sum!=0)&&(latticeParam!=0) );
   double beta=4.*M_PI*std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)/sum;
   
@@ -1195,6 +1206,7 @@ Precipitate::SolveCineticLinearSytem()
   
   ublas::matrix<double, ublas::column_major> A(n, n), Acopy(n,n);
   A.clear();
+  Acopy.clear();
   ublas::matrix<double, ublas::column_major> B(n, nrhs), Bcopy(n, nrhs);
   ublas::vector<double> V(n);
   ublas::matrix_column< ublas::matrix<double, ublas::column_major> > col(B, 0) ;
@@ -1365,9 +1377,10 @@ Precipitate::SolveCineticLinearSytem()
       //Set solutions for currentRadiusDistribution values
       for(int i=0; i<n; ++i)
       {
+	/*DEBUG*/ std::cout<<"B(i,j) is "<<B(i,0)<<std::endl;
 	int clId= i+1;
-	assert( (V(i)>=0)&&"A Solution found when solving linear system is negative. (N<0) " );
-	currentRadiusDistribution_->SetItemValueForClass(clId, V(i) );
+	assert( (B(i,0)>=0)&&"A Solution found when solving linear system is negative. (N<0) " );
+	currentRadiusDistribution_->SetItemValueForClass(clId, B(i,0) );
       }
       
       if (n<=100)
