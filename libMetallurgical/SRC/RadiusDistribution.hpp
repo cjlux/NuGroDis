@@ -112,7 +112,7 @@ public:
  
  void CoutRadiusDistribution();
  void PlotPythonHistogram();
- 
+ void PlotRadiusDistribution();
  
  double GetMinRadius() const { return minRadius_; };
  int GetInitialClassNumber() const { return initialClassNumber_; }; 

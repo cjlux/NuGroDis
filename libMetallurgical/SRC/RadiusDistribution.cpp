@@ -178,14 +178,36 @@ RadiusDistribution::PlotPythonHistogram()
   
   Py_Initialize();
   PyRun_SimpleString("import pylab as P");
+  
   //PyRun_SimpleString("P.hist([3,4,5], bins=2,histtype='bar', weights=[1,2,0])");
   PyRun_SimpleString(expression);
   PyRun_SimpleString("P.show()");
   //Py_Exit(0);
+  
+  
+  //Plotting the radius distribution
+  const char* plottingExpression= ("X,Y="+rListString+","+NlistString).c_str();
+  PyRun_SimpleString("import matplotlib.pyplot as plt");
+  PyRun_SimpleString(plottingExpression);
+  PyRun_SimpleString("fig, ax = plt.subplots()");
+  PyRun_SimpleString("ax.plot(X,Y)");
+  PyRun_SimpleString("ax.grid(True)");
+  PyRun_SimpleString("ax.set_xlabel(u'Rayon [m]',color='green')");
+  PyRun_SimpleString("ax.set_ylabel(u'Nombre de particules N ',color='red')");
+  PyRun_SimpleString("plt.show()");
+  
+  
+  //Py_Exit(0);
+  
    
 }
 
 
+void
+RadiusDistribution::PlotRadiusDistribution()
+{  
+ //TODO 
+}
    
    
 void

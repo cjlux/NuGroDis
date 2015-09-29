@@ -28,7 +28,7 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (1000,"s"), # hardening duration
+"duration": (50000,"s"), # hardening duration
 "initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
 
