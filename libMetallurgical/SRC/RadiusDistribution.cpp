@@ -12,9 +12,12 @@
 // Copyright (C) 20014-2015 Jean-luc CHARLES, Dominique COUPARD, Moubarak GADO, Ivan IORDANOFF.
 //
 #include <iostream>
+#include <iomanip> //std::setw
 #include <cassert>
 #include <map>
 #include <cmath>
+#include <fstream>
+#include <iterator>
 #include <Python.h>
  
 #include "RadiusDistribution.hpp"
@@ -28,6 +31,7 @@
 #include "ThermoDynamicsConstant.hpp"
 #include "Temperature.hpp"
 #include "Diffusion.hpp"
+#include "Computation.hpp"
 
 RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialClassNb, Precipitate& P)
   :itemsValues_(),
@@ -95,6 +99,71 @@ RadiusDistribution::AddEmptyClass()
   
 }
 
+void
+RadiusDistribution::SaveDistribution()
+{
+  std::stringstream line;
+  
+  line<<"ClassId"<<std::setw(20)<<"R"<<std::setw(20)<<"NP"<<"\n"; 
+  
+  std::vector<double> RR=this->ReturnRadiusList();
+  
+  std::vector<std::string> lineStringVector;
+  
+  assert (lineStringVector.size()==0);
+  lineStringVector.push_back(line.str());
+  assert (lineStringVector.size()==1);
+  
+  
+  for (unsigned int i=0; i<itemsValues_.size(); ++i )
+  {
+    std::stringstream lineStream;
+    lineStream<<i+1<<std::setw(20)<<RR[i]<<std::setw(20)<<itemsValues_[i]<<"\n";
+    lineStringVector.push_back(lineStream.str());
+  }
+  
+  
+  std::string precipitateType= precipitate_->GetPrecipitateType();
+  
+  assert((precipitate_!=0)&&"radiusDistribution is not linked to any precipitate");
+  
+  std::string ResultsDirectoryPath= precipitate_->GetMaterial().GetComputation().GetResultsDirectory();
+  
+  double CurrentTime = precipitate_->GetMaterial().GetComputation().GetCurrentTime();
+  
+  std::stringstream timeStrstream;
+  timeStrstream<<CurrentTime;
+  
+  
+  std::string fileName= precipitateType+"_RadDis_"+"time_"+timeStrstream.str()+".txt";
+  std::string path=ResultsDirectoryPath+"/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str());
+  
+  
+  
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+  
+  
+}
+
+std::vector<double> 
+RadiusDistribution::ReturnRadiusList()
+{
+  unsigned int n=itemsValues_.size();
+  std::vector<double> RR;
+  
+  assert (RR.size()==0);
+  
+  for (unsigned int i=1; i<=n; ++i )
+  {
+    RR.push_back(this->GetRadiusForClass(i));
+  }
+  assert (RR.size()==n);
+  
+  return RR;
+}
 
 void
 RadiusDistribution::PlotPythonHistogram()

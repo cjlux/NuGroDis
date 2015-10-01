@@ -53,6 +53,8 @@ public:
  
  void Info() const;
  
+ void SaveDistribution();
+ 
  
  void Initialize();
  
@@ -119,6 +121,8 @@ public:
  double GetSpatialStep() const { return spatialStep_; };
  std::vector<double> GetItemsValues() { return itemsValues_; };//Gives values for all items. Values can be the same for all classes or a list of values
  const std::vector<double> GetItemsValues() const { return itemsValues_; };
+ 
+ std::vector<double> ReturnRadiusList();
  
  
  //RELATIONS

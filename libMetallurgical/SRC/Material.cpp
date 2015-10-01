@@ -211,12 +211,8 @@ Material::RunProcess()
     {
       (*i)->AddEmptyClassForCurrentRadiusDistributionWithCondition();
     }
-    // Fin boucle
     
     
-    
-    
-
     /*
     this->UpdateVolumicValues();//Not needed?
     vacancy_->ComputeDiffusionCoefValue();
@@ -256,15 +252,30 @@ Material::RunProcess()
     
     this->UpdateComputationCurrentTime();*/
   
-  //End While
+    
+    
+    //Save RadiusDistribution of all precipitates
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->GetCurrentRadiusDistribution().SaveDistribution();
+    }
+    
+    
+    
+  //End WHILE
   }
   
   
+    /*TODO uncomment if you want to plot the last distribution
     //plot histogram
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
     {
       (*i)->GetCurrentRadiusDistribution().PlotPythonHistogram();
     }
+    */
+    
+
+   
    
   std::cout<<"\n\n\n\n"<<std::endl;
   std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;

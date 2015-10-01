@@ -32,7 +32,7 @@ class Computation
 
 public:
   // The constructor :
-  Computation(double initialTimeStep);
+  Computation(double initialTimeStep, std::string ResultsDirectory="");
 
   // The destructor
   ~Computation();
@@ -59,6 +59,8 @@ public:
 
   void Run();
   
+  void CreateResultsDirectory();
+  
   void Info() const;
   
   void ComputeMaxTimeStep();
@@ -66,6 +68,8 @@ public:
   double GetCurrentTime() const { assert (currentTime_>=0);  return currentTime_;}
   
   int GetIncrement() const { return increment_;};
+  std::string GetResultsDirectory() const {return resultsDirectory_;};
+  
   //Relations
   //setters
   void SetHardening(Hardening& hardening);
@@ -110,6 +114,8 @@ private:
   double maxTimeStep_;
   
   int increment_;
+  
+  std::string resultsDirectory_;
   
   
 };

@@ -17,6 +17,9 @@
 #include <cassert>
 #include <vector>
 #include <algorithm>
+#include <iomanip> //put_time 
+#include <ctime>
+#include <sys/stat.h> //mkdir
 
 
 #include "Computation.hpp"
@@ -27,7 +30,7 @@
 #include "Precipitate.hpp"
 #include "RadiusDistribution.hpp"
 
-Computation::Computation(double initialTimeStep)
+Computation::Computation(double initialTimeStep, std::string ResultsDirectory)
   : radiusDistribution_(0),
     quenching_(0),
     hardening_(0),
@@ -70,10 +73,35 @@ std::cout <<""<<std::endl;
 std::cout << "Building Object <Computation>" << std::endl;
 
 
+  if (ResultsDirectory=="")
+  {
+    // current date/time based on current system
+    std::time_t now = time(0);
+    
+    char buffer[100];
+    // convert now to string form
+    //char* dt = std::ctime(&now);
+    
+    std::strftime(buffer, sizeof(buffer), "%a_%b_%d_%Hhr_%Mmin_%Ss_%Y", std::localtime(&now));
+    
+
+    
+    resultsDirectory_= buffer;
+  }
+  else
+  {
+    resultsDirectory_=ResultsDirectory;
+  }
+
+this->CreateResultsDirectory();
+
 }
 
 Computation::~Computation()
 {
+  
+ 
+  /*DEBUG*/ std::cout<< "resultsDirectory_ "<<resultsDirectory_<<std::endl;
   std::cout << "Destruction d'un objet Computation" << std::endl << std::flush;
   //delete hardening_; //TODO ?
   //delete thermalLoading_; //TODO ?
@@ -164,6 +192,15 @@ Computation::UpdateCurrentTime()
   std::cout<<">>>>>>>>>>>>>>>>> Update Current computation time. CurrentTime is now :  "<<currentTime_<<"\n\n"<<std::endl;
 }
 
+
+void
+Computation::CreateResultsDirectory()
+{  
+  
+  mkdir(resultsDirectory_.c_str(), 0777);
+   
+   
+}
 
 
 void 
