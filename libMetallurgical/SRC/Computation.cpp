@@ -90,7 +90,16 @@ std::cout << "Building Object <Computation>" << std::endl;
   }
   else
   {
-    resultsDirectory_=ResultsDirectory;
+    // current date/time based on current system
+    std::time_t now = time(0);
+    
+    char buffer[100];
+    // convert now to string form
+    //char* dt = std::ctime(&now);
+    
+    std::strftime(buffer, sizeof(buffer), "%a_%b_%d_%Hhr_%Mmin_%Ss_%Y", std::localtime(&now));
+    
+    resultsDirectory_=ResultsDirectory+"/"+buffer;
   }
 
 this->CreateResultsDirectory();

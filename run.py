@@ -62,7 +62,7 @@ print("  > material read is                 :",material)
 
 
 # Create a C++ object of type Computation:
-c = Computation(nugrodis.ComputationParam["initialTimeStep"][0])
+c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],nugrodis.savePath)
 c.Info()
 c.type = nugrodis.ComputationParam["Type"]
 

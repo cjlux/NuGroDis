@@ -8,7 +8,7 @@ from MetalUtils.ElementsData import Dict as ElementsDataDict
 
 NuGroDisVersion="1.0"
 
-savePath=""
+savePath="/home/mgado"
 
 ComputationParam={            "Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering

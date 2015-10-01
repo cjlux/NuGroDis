@@ -88,7 +88,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
   
     
-  boost::python::class_<Computation>("Computation", boost::python::init<double>() )
+  boost::python::class_<Computation>("Computation", boost::python::init<double, boost::python::optional<std::string> >() )
     .add_property("type", &Computation::GetType, &Computation::SetType)
     .add_property("maxComputationTime", &Computation::GetMaxComputationTime, &Computation::SetMaxComputationTime)
     .def("Run", &Computation::Run) 
