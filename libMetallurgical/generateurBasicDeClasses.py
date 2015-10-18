@@ -1,41 +1,60 @@
-# -*- coding: utf-8 -*-
-import os
+# -*- Coding: utf-8 -*-
+from __future__ import division, print_function
 
+import sys, os
 
-globalSaveDirectory="/home/users/mgado/phd/biblio/Git/NuGroDis/libMetallurgical/";
+# get the users's home directory:
+usersNugrodisRoot = {'/home/jlc'        : "/work/Projets/NuGroDis/",
+                     '/home/users/jlc'  : "/work/Projets/NuGroDis/",                    
+                     '/home/gado'       : "/phd/biblio/Git/NuGroDis/",
+                     '/home/users/gado' : "/phd/biblio/Git/NuGroDis/"}
+userHome = os.path.expanduser("~")
+
+if usersNugrodisRoot.get(userHome, None) is None:
+    print("Unknown user environment : please update the dictionnary 'usersNugrodisRoot' ...")
+    sys.exit()
+
+nugrodisRoot = userHome + usersNugrodisRoot[userHome]
+
+    
+libMetallurgical_dir    = nugrodisRoot + "libMetallurgical/"
+libMetallurgicalSRC_dir = libMetallurgical_dir + "SRC/"
 #/home/mgado/diskBasile/phd/PJE9-2014/NuGroDis/libMetallurgical/
 
-
 #Read classNames text file
-listeDesClasses=open(globalSaveDirectory+'listeDesClasses.txt');
+fileName = libMetallurgical_dir + 'listeDesClasses.txt'
+with open(fileName, "r") as classesList:
+    # list of classNames
+    classNames = classesList.read().split()
 
-# list of classNames
-ClassNames=listeDesClasses.read().split();
-
+print(classNames)
 
 #create .hpp
-for Class in ClassNames:
-    if not os.path.exists(globalSaveDirectory+'SRC/'+Class+'.hpp'):
-        file = open(globalSaveDirectory+'SRC/'+Class+'.hpp', 'w+')
-        file.write('class '+Class+'\n')
-        file.write('{\n\n')
+for className in classNames:
+    class_hpp = libMetallurgicalSRC_dir + className + '.hpp'
+    class_cpp = libMetallurgicalSRC_dir + className + '.cpp'
+    
+    if not os.path.exists(class_hpp):
+        print("\tCreating file <" + class_hpp + ">")
+        file = open(class_hpp, 'w')
+        file.write('class ' + className + '\n')
+        file.write('{\n')
         file.write('public:\n')
-        file.write(Class+'();\n')
-        file.write('~'+Class+'();\n\n')
+        file.write('  ' + className + '();\n')
+        file.write('  ' + '~' + className + '();\n\n')
         file.write('protected:\n\n')
         file.write('private:\n\n')
         file.write('};')
+        file.close()
 
-#create .cpp
-for Class in ClassNames:
-    if not os.path.exists(globalSaveDirectory+'SRC/'+Class+'.cpp'):
-        file = open(globalSaveDirectory+'SRC/'+Class+'.cpp', 'w+')
-        file.write('')
-        file.write('#include "'+Class+'.hpp"\n\n')
-        file.write(Class+'::'+Class+'()\n')
-        file.write('{\n')
-        file.write('}\n\n')
-        file.write(Class+'::~'+Class+'()\n')
-        file.write('{\n')
-        file.write('}\n')
-    
+    #create .cpp
+    if not os.path.exists(class_cpp):
+        print("\tCreating file <" + class_cpp + ">")
+        file = open(class_cpp, 'w')
+        file.write('#include "' + className + '.hpp"\n\n')
+        file.write(className + '::' + className + '()\n')
+        file.write('{\n}\n\n')
+        file.write(className + '::~' + className + '()\n')
+        file.write('{\n}\n')
+        file.close()
+        
