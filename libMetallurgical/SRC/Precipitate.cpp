@@ -18,6 +18,10 @@
 #include <map>
 #include <cassert>
 #include <cmath>
+#include <iomanip> //std::setw
+#include <fstream>
+#include <iterator>
+#include <algorithm>
 
 #include "Material.hpp"
 #include "Precipitate.hpp"
@@ -42,6 +46,9 @@
 #include <boost/numeric/bindings/lapack/gesv.hpp>
 #include <boost/numeric/bindings/traits/ublas_matrix.hpp>
 #include <boost/numeric/bindings/traits/std_vector.hpp>
+
+
+
 namespace ublas  = boost::numeric::ublas;
 namespace lapack = boost::numeric::bindings::lapack;
 
@@ -96,6 +103,7 @@ Precipitate::~Precipitate()
 }
 
 
+
 void 
 Precipitate::InitializeEquilibriumConcentrationMap()
 {
@@ -117,6 +125,138 @@ Precipitate::InitializeEquilibriumConcentrationMap()
 
   
 }
+
+unsigned int
+Precipitate::ReturnRDFirstNotEmptyClassIdAfterNucleation()
+{
+  unsigned int firstNotEmptyClassIdAfterNucleation;
+  
+  assert ((currentRadiusDistribution_!=0)&&"Precipitate do not have any Current RadiusDistribution");
+  
+  unsigned int n= currentRadiusDistribution_->GetItemsValues().size();
+  
+  double nucleusRadius=criticalRadius_+deltaCriticalRadius_;
+  
+  double RDminRadius= currentRadiusDistribution_->GetMinRadius();
+  
+  double RDmaxRadius= currentRadiusDistribution_->GetRightRadiusForClass(n);
+  
+  std::vector<unsigned int> ListOfUnemptyClassId;
+  assert(ListOfUnemptyClassId.size()==0);
+
+  
+  for (unsigned int i=1; i<=n; ++i )
+  {
+    double Ni= currentRadiusDistribution_->GetItemValueForClass(i);
+    if (Ni>0)
+    {
+      ListOfUnemptyClassId.push_back(i);
+    } 
+  }
+  
+  if ( (nucleusRadius>RDminRadius)&&(nucleusRadius<RDmaxRadius) ) 
+  {
+    unsigned int nucleusClassId = currentRadiusDistribution_->FindClassForRadius(nucleusRadius);
+    
+    ListOfUnemptyClassId.push_back(nucleusClassId);
+  }
+  
+  
+  if (ListOfUnemptyClassId.size()==0)
+  {
+    //means all class are empty and nucleus radius is not in the radius distribution
+    
+    std::cout<<"In Precipitate::ReturnRDFirstNotEmptyClassIdAfterNucleation(): all class are empty and nucleus radius is not in the radius distribution therefore, firstNotEmptyClassIdAfterNucleation will be 1 (the first class of the distribution) \n";
+    firstNotEmptyClassIdAfterNucleation=0; // All class are empty even after nucleation, then there is no classId  ==> classId=0.
+  }
+  else
+  {
+    //Means there is at least one unempty class
+    
+    std::vector<unsigned int>::const_iterator it_MinValue;
+    it_MinValue = std::min_element(ListOfUnemptyClassId.begin(), ListOfUnemptyClassId.end());
+    
+    firstNotEmptyClassIdAfterNucleation=*it_MinValue;
+    
+    assert (firstNotEmptyClassIdAfterNucleation >=1);
+    
+  };
+
+  
+ 
+  
+ return firstNotEmptyClassIdAfterNucleation;
+}
+
+
+
+void
+Precipitate::SavePrecipitateAttributes()
+{
+
+  
+  
+  std::string precipitateType= this->GetPrecipitateType();
+  
+  
+  std::string ResultsDirectoryPath= materialPointer_->GetComputation().GetResultsDirectory();
+  
+  
+  std::string fileName= precipitateType+"_Attributes_"+".txt";
+  std::string path=ResultsDirectoryPath+"/PrecipitatesAttributes"+"/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str(), std::ios_base::app);
+  
+  
+  //Check if file is empty
+  
+  std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+  
+  
+  std::stringstream line;
+  double CurrentTime = materialPointer_->GetComputation().GetCurrentTime();
+  
+  std::vector<std::string> lineStringVector;
+  
+  assert (lineStringVector.size()==0);
+  
+  if ( in.tellg() == 0 /*check if it is empty*/      )
+  {
+    // file is empty
+    
+    line<<"time"<<"\t"<<"Vf"<<"\t"<<"DeltaGv"<<"\t"<<"DeltaGe"<<"\t"<<"NuclSiteDensity"<<"\t"<<"gamma"<<"\t"<<"r*"<<"\t"<<"delta_r*"<<"\t"<<"Real r*"<<"\t"<<"Delta_G*"<<"\t"<<"Z"<<"\t"<<"Beta*"<<"\t"<<"J*"<<"\n"; 
+    
+    lineStringVector.push_back(line.str());
+    assert (lineStringVector.size()==1);
+  }
+  
+  
+
+    std::stringstream lineStream;
+    
+    lineStream<<CurrentTime<<"\t"<<volumicFraction_<<"\t"<<phaseChangeVolumiqueEnergy_<<"\t"<<distorsionEnergy_<<"\t"<<nucleationSitesNumber_<<"\t"<<surfaceEnergyCurrentValue_<<"\t"<<criticalRadius_<<"\t"<<deltaCriticalRadius_<<"\t"<<deltaCriticalRadius_+criticalRadius_<<"\t"<<criticalTotalEnergy_<<"\t"<<ZeldovichFactor_<<"\t"<<criticalBeta_<<"\t"<<nucleationRate_<<"\n";
+    
+    lineStringVector.push_back(lineStream.str());
+  
+  
+  
+  
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+  
+  
+  
+  
+}
+
+
+
+
+
+
+
+
+
 
 double 
 Precipitate::GetEquilibriumConcentrationForElement(std::string elementSymbol)
@@ -182,8 +322,8 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
   // system to solve:  1)  j=(A*i+B)/(C*i+D);  2)  i*j=f
   constantA= DjOverDi*XvSSj-XvPj;
   constantB= XvSSi*XvPj-DjOverDi*XvPi*XvSSj;
-  constantC= DjOverDi-1;
-  constantD= -XvSSi-DjOverDi*XvPi;
+  constantC= DjOverDi-1.;
+  constantD= XvSSi-DjOverDi*XvPi;
   
   //j= fction(i)
   //with i the unknown variable, 2nd order Equation to solve is then: A*i^2 +(B-fC)*i -fD=0
@@ -338,7 +478,7 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
 //       constantA= DjOverDi*XvSSj-XvPj;
 //       constantB= XvSSi*XvPj-DjOverDi*XvPi*XvSSj;
 //       constantC= DjOverDi-1;
-//       constantD= -XvSSi-DjOverDi*XvPi;
+//       constantD= XvSSi-DjOverDi*XvPi;
 //       
 //      
 //       //j= fction(i)
@@ -507,7 +647,50 @@ Precipitate::ComputeEquilibriumConcentrations()
 }
 
 
-
+bool 
+Precipitate::CheckIfPrecipitationIsPossible() const
+{
+  double R=ThermoDynamicsConstant::GetR();
+  double T=materialPointer_->GetTemperature().GetCurrentTemp();
+  std::string mainElementSymbol=materialPointer_->GetMainChemicalElement().GetElementName();
+  
+  double DeltaH= solvusActivationEnergy_;
+  double K_infini=preExpTermForSolvus_;
+  double K_eq= K_infini*std::exp(-DeltaH/(R*T));
+  
+  double K_SS, product=1.;
+  
+  std::map<std::string, Concentration*>::iterator it;
+  std::map<std::string, Concentration*> precipitateConcMap=chemicalComposition_.GetConcentrationMap();
+  std::map<std::string, Concentration*> materialCurrentConcMap= materialPointer_->GetCurrentChemicalComposition().GetConcentrationMap();
+  
+  
+  for (it=precipitateConcMap.begin(); it!=precipitateConcMap.end(); ++it )
+  {
+    if ( it->first != mainElementSymbol  )
+    {
+      int stoiCoef= it->second->GetStoichiometricCoef();
+      std::cout<<"TPOTOTOTOTOTOTOTTO1\n";
+      double XvSS=  materialCurrentConcMap[it->first]->GetVolumicValue();
+      std::cout<<"TPOTOTOTOTOTOTOTTO2\n";
+      assert ( (XvSS>0)&&"Current volumic concentration in material must be superior to 0");
+      
+      product *= std::pow(XvSS,stoiCoef); 
+    }
+  }
+  
+  K_SS=product;
+  
+  std::cout<<"Solid solution current solubility product is"<<K_SS<<std::endl;
+  
+  bool IsPrecipitationPossible = (K_eq <= K_SS);
+  
+  //If IsPrecipitationPossible== true then precipitation is possible
+  
+  /*DEbug*/ std::cout<<"IsPrecipitationPossible "<<IsPrecipitationPossible<<"\n";
+  
+  return IsPrecipitationPossible;
+}
 
 //Compute and Set distorsion Energy
 void 
@@ -529,47 +712,62 @@ Precipitate::ComputePhaseChangeVolumicEnergy()
 { 
   
   std::cout<<"/////////////////////COMPUTING PHASE CHANGE VOLUMIC ENERGY////////////////////////////"<<std::endl;
-  double R=ThermoDynamicsConstant::GetR();
-  double T=materialPointer_->GetTemperature().GetCurrentTemp();
-  std::string mainElementSymbol=materialPointer_->GetMainChemicalElement().GetElementName();
-  std::map<std::string, Concentration*> materialCurrentConcMap= materialPointer_->GetCurrentChemicalComposition().GetConcentrationMap();
-  std::map<std::string, Concentration*> precipitateConcMap=chemicalComposition_.GetConcentrationMap();
-  std::map<std::string, Concentration*>::iterator it;
-  double product=1;
   
-  for (it=precipitateConcMap.begin(); it!=precipitateConcMap.end(); ++it )
+  bool IsPrecipitationPossible= this->CheckIfPrecipitationIsPossible();
+  
+  if (IsPrecipitationPossible)
   {
-    
-    if ( it->first != mainElementSymbol  )
-    {
-      assert( ( equilibriumConcMap_[it->first]!=-1)&&"in ComputePhaseChangeVolumicEnergy(): equilibrium concentration for precipitate has not been computed yet " );
-      int stoiCoef= it->second->GetStoichiometricCoef();
-      double XvEq=equilibriumConcMap_[it->first];
-      double XvSS=  materialCurrentConcMap[it->first]->GetVolumicValue();
-      
-      std::cout<<"XvSS = "<<XvSS<<std::endl;
-      std::cout<<"stoiCoef = "<<stoiCoef<<std::endl;
-      std::cout<<"XvEq = "<<XvEq<<std::endl;
-      
-      assert ( (XvSS>0)&&"Current volumic concentration in material must be superior to 0");
-      product*=std::pow( XvEq/XvSS,stoiCoef);  
-    };
+	double R=ThermoDynamicsConstant::GetR();
+	double T=materialPointer_->GetTemperature().GetCurrentTemp();
+	std::string mainElementSymbol=materialPointer_->GetMainChemicalElement().GetElementName();
+	std::map<std::string, Concentration*> materialCurrentConcMap= materialPointer_->GetCurrentChemicalComposition().GetConcentrationMap();
+	std::map<std::string, Concentration*> precipitateConcMap=chemicalComposition_.GetConcentrationMap();
+	std::map<std::string, Concentration*>::iterator it;
+	double product=1.;
+	
+	for (it=precipitateConcMap.begin(); it!=precipitateConcMap.end(); ++it )
+	{
+	  
+	  if ( it->first != mainElementSymbol  )
+	  {
+	    assert( ( equilibriumConcMap_[it->first]!=-1)&&"in ComputePhaseChangeVolumicEnergy(): equilibrium concentration for precipitate has not been computed yet " );
+	    int stoiCoef= it->second->GetStoichiometricCoef();
+	    double XvEq=equilibriumConcMap_[it->first];
+	    double XvSS=  materialCurrentConcMap[it->first]->GetVolumicValue();
+	    
+	    std::cout<<"XvSS = "<<XvSS<<std::endl;
+	    std::cout<<"stoiCoef = "<<stoiCoef<<std::endl;
+	    std::cout<<"XvEq = "<<XvEq<<std::endl;
+	    /*DEBUG*/ std::cout<<"XvEq/XvSS "<<XvEq/XvSS<<"\n"; 
+	    
+	    assert ( (XvSS>0)&&"Current volumic concentration in material must be superior to 0");
+	    product*=std::pow( XvEq/XvSS,stoiCoef);  
+	  };
+	}
+	
+	std::cout<<"product is"<<product<<std::endl;
+	
+	assert( (molarVolume_>0)&&"In ComputePhaseChangeVolumicEnergy(): molarVolume has not been defined" );
+	
+	phaseChangeVolumiqueEnergy_=R*T/molarVolume_*std::log(product);
+	
+	/*DEBUG*/std::cout<<"DELTA Gv is "<<phaseChangeVolumiqueEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
+	
+	
+	//post conditions
+	assert( (phaseChangeVolumiqueEnergy_ !=1)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): phaseChangeVolumiqueEnergy_ may have not been computed!!!" );
+	
+	//assert if computed value is negative. phaseChangeVolumiqueEnergy_ must always be negative
+	/*DEBUG*/ std::cout<<"product "<<product<<" \n";
+	assert( (phaseChangeVolumiqueEnergy_ <= 0)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): value computed for phaseChangeVolumiqueEnergy_ is not negative!!!" );
   }
-  
-  std::cout<<"product is"<<product<<std::endl;
-  
-  assert( (molarVolume_>0)&&"In ComputePhaseChangeVolumicEnergy(): molarVolume has not been defined" );
-  
-  phaseChangeVolumiqueEnergy_=R*T/molarVolume_*std::log(product);
-  
-  /*DEBUG*/std::cout<<"DELTA Gv is "<<phaseChangeVolumiqueEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
+  else //  IsPrecipitationPossible==false, precipitation is not possible
+  {
+    phaseChangeVolumiqueEnergy_=111.111; // 111.111 means "ne s'applique pas"
+  };
   
   
-  //post conditions
-  assert( (phaseChangeVolumiqueEnergy_ !=1)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): phaseChangeVolumiqueEnergy_ may have not been computed!!!" );
-  
-  //assert if computed value is negative. phaseChangeVolumiqueEnergy_ must always be negative
-  assert( (phaseChangeVolumiqueEnergy_ <= 0)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): value computed for phaseChangeVolumiqueEnergy_ is not negative!!!" );
+
   
 }
 
@@ -787,6 +985,16 @@ Precipitate::ReturnNucleationRate()
   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ T @@@@@@@@@@@@@@@@@"<<T<<std::endl;
   
   //post assertions?
+  
+  /*
+  // Begin: in TEST 
+  if (J<1)
+  {
+    std::cout<<"Nucleatiion rate (= ["<<J<<"] )is inferior to 1, thus it will be setted to O  (do J=0) \n";
+    J=0;
+  }
+  //ENd: in TEST
+  */
   
   
   return J;
@@ -1087,9 +1295,8 @@ Precipitate::ProcessNucleationRate()
   }
   
   /*DEBUG*/ std::cout<<" isSolutesCurrentVolumicConcentrationNegativeOrNull  "<<isSolutesCurrentVolumicConcentrationNegativeOrNull<<" nucleationSitesNumber_ "<<nucleationSitesNumber_<<"distorsionEnergy_ + phaseChangeVolumiqueEnergy_   "<<distorsionEnergy_ + phaseChangeVolumiqueEnergy_<<std::endl;
-  if ( (isSolutesCurrentVolumicConcentrationNegativeOrNull==true) || (nucleationSitesNumber_<=0) || ((distorsionEnergy_ + phaseChangeVolumiqueEnergy_) >= 0) )
+  if ( (isSolutesCurrentVolumicConcentrationNegativeOrNull==true) || (nucleationSitesNumber_<=0) || ((distorsionEnergy_ + phaseChangeVolumiqueEnergy_) >= 0) ||  (phaseChangeVolumiqueEnergy_==111.111)   )
   {
-    /*DEBUG*/std::cout<<">YRUTUIYYILYYUIOYUIYUIYUIYUIOHJKGHUK UIHUIOY   UIY UIH"<<std::endl;
     
     //TODO improve this part
     //  (-111.111) means : "ne s'applique pas"
@@ -1137,10 +1344,17 @@ Precipitate::ReturnCriticalTimeStep()
   double criticaltimeStepP, criticalV, deltar;// critical time step for Precipitate
   
   assert ( (currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current Radius Distribution");
+  
   criticalV= currentRadiusDistribution_->ReturnCriticalInterfacialVelocity();
+  
   deltar=currentRadiusDistribution_->GetSpatialStep();
   
+
+  
   criticaltimeStepP= deltar/2/std::abs(criticalV);
+  
+    /*TODO erase*/ std::cout<<"criticaltimeStepP toto "<<criticaltimeStepP<< "  "<<typeid(*this).name()<<"\n";
+  std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
   
   assert  (criticaltimeStepP>0);
   
@@ -1151,6 +1365,8 @@ Precipitate::ReturnCriticalTimeStep()
 void 
 Precipitate::AddNucleatedPrecipitates()
 {
+  
+  std::cout<<"Adding Nucleus For precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
   assert (currentRadiusDistribution_!=0);
   
   int n=currentRadiusDistribution_->GetItemsValues().size();
@@ -1159,6 +1375,8 @@ Precipitate::AddNucleatedPrecipitates()
   double maxRadius=currentRadiusDistribution_->GetRadiusForClass(n);
   double nucleationRadius= criticalRadius_+deltaCriticalRadius_;
   
+  /*DEBUG*/std::cout<<"DEBUG  r* "<<criticalRadius_<<" delta r* "<<deltaCriticalRadius_<<"\n";
+  
   if ( (criticalRadius_==-111.111)&&(deltaCriticalRadius_==-111.111) ) // -111.111 means "ne s'applique pas"
   { 
     std::cout<<"There is no new nucleus for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
@@ -1166,23 +1384,52 @@ Precipitate::AddNucleatedPrecipitates()
   else if (  (nucleationRadius>0)&&(nucleationRadius<=minRadius)  )
   {
     std::cout<<"Computed nucleation radius (r* + dr*) is not in the range between 0 and Rmin of the RadisDistribution"<<std::endl;
+    /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
     std::cout<<"Therefore, no new nucleus for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> will be considered "<<std::endl;
   }
   else
   {
      /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
-    assert ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is not in the range of the current RadiusDistribution");
-    
-    double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
-    unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
-    double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
-    
-    assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
-    
-    std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
-    currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
-    /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;
-    
+     
+     if (nucleationSitesNumber_==0)
+     { 
+       
+       std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<" does not have any available nucleationSiteNumber (Ns=0), thus AddNucleatedPrecipitates() will do nothing"<<std::endl;
+     }
+     else //nucleationSitesNumber_!=0
+     {
+       //nucleationSitesNumber_!=0
+       
+       /*DEBUG*/std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> \n";
+       /*DEBUG*/ std::cout<<"DEBUG: nucleationSitesNumber_ "<<nucleationSitesNumber_<<"\n";
+       /*DEBUG*/ std::cout<<"DEBUG: computation currentTime is  "<<materialPointer_->GetComputation().GetCurrentTime() <<"\n";
+       
+       
+       /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
+       if ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius) )
+       {
+	  assert ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is not in the range of the current RadiusDistribution");
+	  
+	  double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
+	  unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
+	  double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
+	  
+	  assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
+	  
+	  std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
+	  currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
+	  /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;  
+	 
+       }
+	 
+       
+       
+
+     };
+     
+     
+     
+     
     
   };
   
@@ -1215,12 +1462,13 @@ Precipitate::SolveCineticLinearSytem()
   std::string elementName;
   double deltar, deltat;
   
-  std::vector<ChemicalElement *> CEList = currentRadiusDistribution_->GetChemicalElementsList();
-  elementName=CEList[0]->GetElementName();
+  InterfacialConcentration* IConcObjPtr =  & (currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed() );
   
-  std::map<std::string, InterfacialConcentration *> IConcObjMap= currentRadiusDistribution_->GetInterfConcentrationObjectMap(); 
+
+  elementName= IConcObjPtr->GetChemicalElement().GetElementName();
   
-  InterfacialConcentration* IConcObjPtr = IConcObjMap[elementName];
+  std::cout<<"Element Name is "<<elementName<<"\n";
+  
   VintList = IConcObjPtr->GetInterfacialVelocityList();
   
   deltar = currentRadiusDistribution_->GetSpatialStep();
@@ -1325,7 +1573,9 @@ Precipitate::SolveCineticLinearSytem()
       {
 	//Normally this is impossible case ???
 	std::cout<<"case 4"<<std::endl;
-	assert(!"An IMPOSSIBLE case has been found . leftInterfacialVelocity>0 AND rightInterfacialVelocity<0.   " ); 
+	
+	/*TODO check if not needed or not*/  assert(!"An IMPOSSIBLE case has been found . leftInterfacialVelocity>0 AND rightInterfacialVelocity<0.   " );
+	
 	A(i,i)= deltar/deltat;
 	A(i,i+1)= Vright;
 	A(i,i-1)= -Vleft;

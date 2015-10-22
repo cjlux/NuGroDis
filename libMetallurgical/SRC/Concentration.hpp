@@ -127,6 +127,9 @@ Concentration::SetInitialAtomicValue(const double initialAtomicValue)
 inline void
 Concentration::SetVolumicValue(const double volumicValue)
 {
+  // /*DEBUG*/std::cout<<"DEBUG: element name is "<<chemicalElement_.GetElementName()<<"\n";
+  
+  assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
   volumicValue_=volumicValue;
 }
 

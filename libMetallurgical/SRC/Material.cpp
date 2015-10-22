@@ -143,6 +143,8 @@ Material::RunProcess()
     
     this->UpdateAtomicDiffusionCoef();// Important! : Update of AtomicDiffusion coef
     
+    this->SaveMaterialVacancyProperties();
+    
     this->ProcessPrecipitatesNucleationRate(); 
     ///*DEBUG*/assert (!("Tpooet"));
     
@@ -201,6 +203,7 @@ Material::RunProcess()
     //Update all properties that are dependent to temperature
     
     //TODO Update current Temperature
+    /*Just for debug*/this->GetTemperature().SetCurrentTemp(295.15);
     
     
     
@@ -254,11 +257,21 @@ Material::RunProcess()
   
     
     
+    
+    
     //Save RadiusDistribution of all precipitates
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
     {
       (*i)->GetCurrentRadiusDistribution().SaveDistribution();
     }
+    
+    //Save Attributes values of all precipitates
+    for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+    {
+      (*i)->SavePrecipitateAttributes();
+    }
+    
+    this->SaveMaterialCurrentChemicalCompo();
     
     
     
@@ -281,6 +294,8 @@ Material::RunProcess()
   std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;
   std::cout<<std::endl;
 }
+
+
 
 
 void Material::UpdateAtomicDiffusionCoef()
@@ -527,6 +542,7 @@ Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
   
   
   //Post conditions
+  /*DEBUG*/ std::cout<<" computedAtomicConc is "<<computedAtomicConc<<"volumic conc is"<<volumicConc<<"Element name is "<<elementName<< "\n";
   assert( (computedAtomicConc>0)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must be positive" );
   assert( (computedAtomicConc<=1)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must inferior to 1" );
   
@@ -676,6 +692,117 @@ Material::AddPrecipitate(Precipitate& P)
  // later...
   
 }
+
+void
+Material::SaveMaterialVacancyProperties()
+{
+  std::string ResultsDirectoryPath= computation_.GetResultsDirectory();
+  
+  std::string fileName= "MaterialVacancyProperties.txt";
+  std::string path=ResultsDirectoryPath+"/MaterialCurrentCompo/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str(), std::ios_base::app);
+  
+  //Check if file is empty
+  std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+  
+  std::stringstream line;
+  double CurrentTime = computation_.GetCurrentTime();
+  std::vector<std::string> lineStringVector;
+  assert (lineStringVector.size()==0);
+    
+  
+  if ( in.tellg() == 0 /*check if it is empty*/      )
+  {
+    // file is empty
+    line<<"time"<<"\t"<<"Dlac"<<"\t"<<"Xlac"<<"\t"<<"XlacEq"<<"\t"<<"lambda"<<"\t"<<"halSinkDistance"<<"\t";
+    lineStringVector.push_back(line.str());
+    assert (lineStringVector.size()==1);
+  }
+  
+  double Dlac,Xlac, XlacEq, lambda, halfSinkD;
+  
+  halfSinkD= this->GetVacancy().GetHalfSinkDistance();
+  XlacEq=this->GetVacancy().GetEquilibriumConcentration();
+  Xlac=this->GetVacancy().GetConcentration();
+  lambda= this->GetVacancy().ReturnBoostFactor();
+  Dlac= this->GetVacancy().GetVacancyDiffusionCoef();
+  
+  std::stringstream lineStream;
+  lineStream<<CurrentTime<<"\t";
+  lineStream<<Dlac<<"\t"<<Xlac<<"\t"<<XlacEq<<"\t"<<lambda<<"\t"<<halfSinkD<<"\t";
+  
+  lineStringVector.push_back(lineStream.str());
+  
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+  
+}
+
+
+void 
+Material::SaveMaterialCurrentChemicalCompo()
+{
+
+  std::string ResultsDirectoryPath= computation_.GetResultsDirectory();
+  
+  std::string fileName= "MaterialChemicalCompo.txt";
+  std::string path=ResultsDirectoryPath+"/MaterialCurrentCompo/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str(), std::ios_base::app);
+  
+  //Check if file is empty
+  std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+  
+  std::stringstream line;
+  double CurrentTime = computation_.GetCurrentTime();
+  std::vector<std::string> lineStringVector;
+  
+  assert (lineStringVector.size()==0);
+  
+  std::map<std::string, Concentration*>::iterator it;
+  
+  std::vector<std::string> ElementsName;
+  std::vector<double> ElementVolumicConc;
+  std::map<std::string, Concentration*> concMap= currentChemicalComposition_.GetConcentrationMap();
+  
+  
+  assert (ElementsName.size()==0);
+  for (it=concMap.begin(); it!=concMap.end(); ++it)
+    {
+      ElementsName.push_back(it->first);
+      ElementVolumicConc.push_back(it->second->GetVolumicValue());      
+    }
+  
+  assert (ElementsName.size()==ElementVolumicConc.size());
+  
+  if ( in.tellg() == 0 /*check if it is empty*/      )
+  {
+    // file is empty
+    line<<"time"<<"\t";
+    for (unsigned int i=0; i<ElementsName.size(); ++i)
+    {
+      line<<"Xv"+ElementsName[i]<<"\t";
+    } 
+    
+    lineStringVector.push_back(line.str());
+    assert (lineStringVector.size()==1);
+  }
+    
+  std::stringstream lineStream;
+  lineStream<<CurrentTime<<"\t";
+  for (unsigned int i=0; i<ElementsName.size(); ++i)
+  {
+    lineStream<<ElementVolumicConc[i]<<"\t";
+  } 
+  
+  lineStringVector.push_back(lineStream.str());
+  
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+  
+}
+
 
 
 

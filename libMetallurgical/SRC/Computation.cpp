@@ -160,6 +160,8 @@ Computation::ComputeMaxTimeStep()
   std::vector<Precipitate*> precipitateReallyFoundInMaterial;
   assert (precipitateReallyFoundInMaterial.size()==0);
   
+  
+  
   for (unsigned int i=0; i<PrecipitateList.size(); ++i )
   { 
    double SumP = PrecipitateList[i]->GetCurrentRadiusDistribution().ReturnTotNbOfItems();
@@ -177,12 +179,15 @@ Computation::ComputeMaxTimeStep()
   }
   else //means at least one precipitate
   {
+    
     std::vector<double> listOfPrecipitatesCriticalTimeStep;
     for (unsigned int i=0; i<precipitateReallyFoundInMaterial.size(); ++i  )
     {
+      
       double deltatP= precipitateReallyFoundInMaterial[i]->ReturnCriticalTimeStep();
       listOfPrecipitatesCriticalTimeStep.push_back(deltatP);
     }
+    
     std::vector<double>::const_iterator it;
     it = std::min_element(listOfPrecipitatesCriticalTimeStep.begin(), listOfPrecipitatesCriticalTimeStep.end());
     assert ((*it)>0);
@@ -190,6 +195,13 @@ Computation::ComputeMaxTimeStep()
     maxTimeStep_= *it;
     std::cout<<"crtitical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;  
   };
+  
+  
+  
+  if ( (currentTime_+maxTimeStep_) > maxComputationTime_)
+  {
+    maxTimeStep_=maxComputationTime_-currentTime_;
+  }
   
 }
 
@@ -206,7 +218,11 @@ void
 Computation::CreateResultsDirectory()
 {  
   
+  
   mkdir(resultsDirectory_.c_str(), 0777);
+  mkdir((resultsDirectory_+"/RadDisFiles").c_str(),0777); //
+  mkdir((resultsDirectory_+"/PrecipitatesAttributes").c_str(),0777);
+  mkdir((resultsDirectory_+"/MaterialCurrentCompo").c_str(),0777);
    
    
 }

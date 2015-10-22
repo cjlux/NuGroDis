@@ -23,7 +23,8 @@
 			ThermoDynamicsConstant.cpp \
 			Vacancy.cpp\
 			PythonBindings.cpp\
-			Util.cpp
+			Util.cpp\
+			PolynomialRootFinder.cpp
 			
 
 #			PythonBindings.cpp \ Diffusion.cpp\ InterfacialConcentration.cpp\

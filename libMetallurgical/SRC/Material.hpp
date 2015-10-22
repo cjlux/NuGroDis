@@ -42,6 +42,9 @@ public:
   ~Material();
   
   
+  void SaveMaterialCurrentChemicalCompo();
+  void SaveMaterialVacancyProperties();
+  
   void RunProcess();
   
   void UpdateAtomicDiffusionCoef(); //TODO After , make this function take arguments for dealing with thermalloading

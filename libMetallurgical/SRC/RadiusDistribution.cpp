@@ -33,6 +33,9 @@
 #include "Diffusion.hpp"
 #include "Computation.hpp"
 
+
+
+
 RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialClassNb, Precipitate& P)
   :itemsValues_(),
    initialClassNumber_(initialClassNb),
@@ -40,7 +43,9 @@ RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialC
    spatialStep_(deltar),
    precipitate_(&P),
    chemicalElementList_(),
-   interfConcentrationObjectMap_()
+   interfConcentrationObjectMap_(),
+   InterfacialConcentrationObjectUsed_(0),
+   InterfacialConcentrationObjectUsedHasBeenChosen_(false)
 {
   
   std::cout <<  "Building object <RadiusDistribution> " << std::endl;
@@ -62,7 +67,9 @@ RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialC
    spatialStep_(deltar),
    precipitate_(0),
    chemicalElementList_(),
-   interfConcentrationObjectMap_()
+   interfConcentrationObjectMap_(),
+   InterfacialConcentrationObjectUsed_(0),
+   InterfacialConcentrationObjectUsedHasBeenChosen_(false)
 {
   std::cout <<  "Building object <RadiusDistribution> which is not linked to any Precipitate" << std::endl;
   assert (deltar>0);
@@ -136,7 +143,7 @@ RadiusDistribution::SaveDistribution()
   
   
   std::string fileName= precipitateType+"_RadDis_"+"time_"+timeStrstream.str()+".txt";
-  std::string path=ResultsDirectoryPath+"/"+fileName;
+  std::string path=ResultsDirectoryPath+"/RadDisFiles"+"/"+fileName;
   std::ofstream output_file;
   output_file.open(path.c_str());
   
@@ -428,12 +435,12 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   // system to solve:  1)  j=(A*i+B)/(C*i+D);  2)  i*j=f
   constantA= DjOverDi*XvSSj-XvPj;
   constantB= XvSSi*XvPj-DjOverDi*XvPi*XvSSj;
-  constantC= DjOverDi-1;
-  constantD= -XvSSi-DjOverDi*XvPi;
+  constantC= DjOverDi-1.;
+  constantD= XvSSi-DjOverDi*XvPi;
   
   //j= fction(i)
   //with i the unknown variable, 2nd order Equation to solve is then: A*i^2 +(B-fC)*i -fD=0
-  const double k=1.e30;
+  const double k=1;
   nbOfSol=Util::Util::SolveSecondDegreeEquation(constantA/(k*k), (constantB-f*constantC)/k, -f*constantD,
 						solution1,
 						solution2,
@@ -500,28 +507,108 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   
   if(  (X!=-1)&&(X > 0)&&(X < XvPi)  ) //there is a solution
   {
-    assert ( (X!=-1 )&&"Solution X may have not been computed" );
-    assert( X > 0);
-    assert( X < XvPi);
-  
+	assert ( (X!=-1 )&&"Solution X may have not been computed" );
+	assert( X > 0);
+	assert( X < XvPi);
+	
+	/*DEBUG:*/std::cout<<"DEBUG: Value Found using discriminant is"<<X<<"\n";
+	/*DEBUG*/std::cout<<" P(X) with discriminant= "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+	////////////// Use dichotomous ////////////// 
+	/*
+	
+	double leftLimit, rightLimit;
+	
+// 	double X2; // inadmissible solution
+// 	if (X==solution1.real())
+// 	{
+// 	  X2= solution2.real();
+// 	  
+// 	}
+// 	else if (X== solution2.real())
+// 	{
+// 	  X2= solution1.real();
+// 	}
+// 	else
+// 	{
+// 	  assert (!"there is something wrong with the 2 solutions ");
+// 	};
+// 	
+// 	if (X>X2)
+// 	{
+// 	  leftLimit=X2;
+// 	  rightLimit=X;
+// 	}
+// 	else if (X<X2)
+// 	{
+// 	  leftLimit=X;
+// 	  rightLimit=X2;
+// 	}
+// 	else // X==X2
+// 	{
+// 	  assert (X==X2);
+// 	  leftLimit=0;
+// 	  rightLimit=XvPi;
+// 	};
+	
+	  
+	leftLimit=0;
+ 	rightLimit=XvPi;
+	double dichoSolution=Util::Util::DichotomousMethodForSecondDegreeEquation(constantA , (constantB-f*constantC), -f*constantD, X, leftLimit, rightLimit ); // epsilon and alpha are optionnal. by default, epsilon=1.e-16 and alpha=0.1;
+	X=dichoSolution;
+	*/
+	//////////// End ofuse dichotomous //////////// 
+	
+	
+	assert( X != -constantD/constantC );// because denominator of Y must be different from 0
+	//Y = (constantA*X +constantB)/(constantC*X +constantD);  
+	Y=f/X;
+	/*DEBUG*/std::cout<<"DEBUG if Y = (AX+B)/(CX+D) then Y= "<< (constantA*X + constantB)/(constantC*X + constantD)<<"n";
+	assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
+	
+	
+	/*Before the part in TEST we have:
+	  assert( Y>0);
+	  assert( Y < XvPj);
+	  std::cout<<"value solution X is: "<<X<<std::endl;
+	  std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+	  std::cout<<"value solution Y is: "<<Y<<std::endl;
+	  std::cout<<"X*Y = : "<<X*Y<<std::endl;
+	  std::cout<<"f = : "<<f<<std::endl;
+	  std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+	  std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+	  return 1; //There is a solution
+	  
+	*/
+	
+	
+	
+	/*This part is in TEST*/
+	if( (Y>0)&&(Y<XvPj) )
+	{
+	  assert( Y>0);
+	  assert( Y < XvPj);
+	  std::cout<<"value solution X is: "<<X<<std::endl;
+	  std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+	  std::cout<<"value solution Y is: "<<Y<<std::endl;
+	  std::cout<<"X*Y = : "<<X*Y<<std::endl;
+	  std::cout<<"f = : "<<f<<std::endl;
+	  std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+	  std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+	  return 1; //There is a solution
+	  
+	}
+	else //Y solution is not admissible, then, its means there is no admissible couple {X,Y} solution
+	{ 
+	  std::cout<<" Y= <"<<Y<<"> is not an admissible solution, then, its means there is no admissible couple {X,Y} solution \n";
+	  std::cout<<"Y= <"<<Y<<"> is not in range ]0;"<<XvPj<<"[ \n"; 
+	  return -1;
+	};
+	/*This part is in TEST*/
+	
+
+	
     
-    assert( X != -constantD/constantC );// because denominator of Y must be different from 0
-    //Y = (constantA*X +constantB)/(constantC*X +constantD);  
-    Y=f/X;
-    assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
-    assert( Y>0);
-    assert( Y < XvPj);
-    
-      //DEBUG
-    
-    std::cout<<"value solution X is: "<<X<<std::endl;
-    std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
-    std::cout<<"value solution Y is: "<<Y<<std::endl;
-    std::cout<<"X*Y = : "<<X*Y<<std::endl;
-    std::cout<<"f = : "<<f<<std::endl;
-    std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
-    std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
-    return 1; //There is a solution
+
   }
   else //There is no solution
   {
@@ -961,13 +1048,29 @@ void
 RadiusDistribution::ComputeInterfacialVelocityList()
 {
   
-   
-  std::string elementName;
+  if ( InterfacialConcentrationObjectUsedHasBeenChosen_== false)
+  {
+    assert ((InterfacialConcentrationObjectUsedHasBeenChosen_==false)&&"InterfacialConcentration Object used for Interfacial Velocity has already been chosen");
+    
+    std::string elementName;
   
-  elementName=chemicalElementList_[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+    elementName=chemicalElementList_[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
 							// So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result
+    std::cout<<"Element chosen is : "<<elementName<<"\n";
   
-  interfConcentrationObjectMap_[elementName]->ComputeInterfacialVelocityList();
+  
+   InterfacialConcentrationObjectUsed_= interfConcentrationObjectMap_[elementName];
+   InterfacialConcentrationObjectUsedHasBeenChosen_=true;
+   
+   InterfacialConcentrationObjectUsed_->ComputeInterfacialVelocityList();
+  
+  }
+  else //  (InterfacialConcentrationObjectUsedHasBeenChosen_== true)
+  {
+    assert ((InterfacialConcentrationObjectUsedHasBeenChosen_==true)&&"InterfacialConcentration Object used for Interfacial Velocity has not been chosen");
+    InterfacialConcentrationObjectUsed_->ComputeInterfacialVelocityList();
+  };
+   
 }
 
 
@@ -983,10 +1086,14 @@ RadiusDistribution::ReturnCriticalInterfacialVelocity()
   std::vector<double> elementsCriticalVelocityList;
   for (it=interfConcentrationObjectMap_.begin(); it!=interfConcentrationObjectMap_.end(); ++it )
   {
+    
     double criticalV;
+    
     criticalV= it->second->ReturnCriticalInterfacialVelocity();//it->second is an InterfacialCocentratyion Object!!!
+    
     elementsCriticalVelocityList.push_back(criticalV); 
   }
+  
   
   
   for (unsigned int i=0; i<elementsCriticalVelocityList.size()-1; ++i)
@@ -1003,6 +1110,22 @@ RadiusDistribution::ReturnCriticalInterfacialVelocity()
   
 
 
+
+double
+RadiusDistribution::ReturnInterfacialVelocityListFirstElement()
+{
+  std::string elementName;
+  
+  elementName=chemicalElementList_[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+							// So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result
+  
+  
+  
+   std::vector<double>ICList= this->GetInterfConcentrationObjectForElement(elementName).GetInterfacialVelocityList();
+  
+  return ICList[0];
+
+}
 
 
 

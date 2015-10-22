@@ -20,7 +20,6 @@
 #include <vector>
 #include <map>
 #include <boost/python.hpp>
-
 #include "SSGrain.hpp"
 
 
@@ -52,6 +51,9 @@ public:
     
     void Info() const;
     
+    void SavePrecipitateAttributes();
+    
+    
     
     
 
@@ -77,6 +79,9 @@ public:
 						 double XvPj,
 						 double & solX,
 						 double & solY);
+    
+    bool CheckIfPrecipitationIsPossible() const;
+    
     
     //Compute(not set, only estimate) and return a value. The value computed is not set!!!
     double ReturnCriticalRadius();
@@ -165,6 +170,7 @@ public:
     return criticalInterfacialConcentrationRadius;
   }
   
+  unsigned int ReturnRDFirstNotEmptyClassIdAfterNucleation();
   
   
   //Getter

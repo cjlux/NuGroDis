@@ -72,7 +72,7 @@ Mg={
                   "Q": (131000,"J.mol^-1"), #Activation energy of diffusion for magnesium
                "EVac": (19264,"J.mol^-1") #magnesium-Vacancy interaction energy, #CHECK. If this parameter is not needed, user must write :==> (None,None)
 
-#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) . He can also give both
+#WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) . He can also give both VacancyDiffusion(Evac) and AtomicDiffusion(Q & preExpDiffusionCoef)
 }
 
 
@@ -86,7 +86,7 @@ GP={
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,
 "solvusActivationEnergy":(36000,"J.mol^-1"), # DeltaHP1
-"surfaceEnergyPolynomialModel":([0.04],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
+"surfaceEnergyPolynomialModel":([0.044],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(0,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP
 "deltaCell":(1/100,"m.m^-1") , # difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate)
 #REMEMBER: At the moment, molar volume of GuinierPreston precipitates must be define by the user. But, subsequently, it can be computed automatically taking into account the structure of the precipitate.  

@@ -35,6 +35,8 @@ Concentration::~Concentration()
 }
 
 
+
+
 //TODO could be inline
 const int 
 Concentration::GetStoichiometricCoef() const

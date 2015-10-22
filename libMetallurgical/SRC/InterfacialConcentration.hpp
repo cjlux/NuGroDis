@@ -46,7 +46,7 @@ public:
   
   const std::vector<double> GetInterfacialVelocityList(); // get list of VINT
   
-  const double ReturnCriticalInterfacialVelocity();// VINTcritique_El_P . example VINTcritique_Cu_P
+  const double ReturnCriticalInterfacialVelocity() const;// VINTcritique_El_P . example VINTcritique_Cu_P
 
   //GETTERS
   //return list (all values) of interfacial concentration
@@ -63,6 +63,8 @@ public:
   void SetCriticalInterfacialConcentration(const double & computedValueOfCriticalInterfacialConcentration);
   
   void IncrementWithEmptyValues();
+  
+  double ReturnRDInterfacialVelocityListFirstElement() ;
   
   
   

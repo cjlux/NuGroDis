@@ -8,7 +8,7 @@ from MetalUtils.ElementsData import Dict as ElementsDataDict
 
 NuGroDisVersion="1.0"
 
-savePath="/home/mgado"
+savePath=""
 
 ComputationParam={            "Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
@@ -30,7 +30,7 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (150000,"s"), # hardening duration
+"duration": (50000,"s"), # hardening duration
 "initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
 

@@ -82,10 +82,14 @@ void  //TODO
 Vacancy::ComputeEquilibriumConcentration()
 {
   /*  formula  */
-  
-  std::cout<<"Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl;
+   
+      std::cout<<"Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl;
   equilibriumConc_=this->ReturnEquilibriumConcentration();
+  
+  /*DEBUG */std::cout<<"Equilibrium concentration for vacancy is"<<equilibriumConc_<<"\n";
   std::cout<<"##########  END Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl; 
+  
+
 }
 
 
@@ -140,6 +144,16 @@ const double  //TODO
 Vacancy::ReturnEquilibriumConcentration() const
 {  
   
+    int tempCurrentSize = material_.GetTemperature().GetTemperatureList().size();
+  
+
+  
+  if( (tempCurrentSize ==1 ) ||
+    (  (tempCurrentSize!=1)&&(material_.GetTemperature().GetTemperatureList()[tempCurrentSize-1] !=  material_.GetTemperature().GetCurrentTemp()) ) 
+  )
+  {
+  
+  
   std::cout<<"################## Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
   double R=ThermoDynamicsConstant::GetR();
   double T=material_.GetTemperature().GetCurrentTemp();
@@ -183,6 +197,11 @@ Vacancy::ReturnEquilibriumConcentration() const
 
   return equilibriumConcValue;
   
+  }
+  else
+  {
+    return equilibriumConc_;
+  }
 }
 
 

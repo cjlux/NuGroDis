@@ -42,6 +42,7 @@ from MetalUtils.Mendeleiev import PyChemicalElement, PyChemicalComposition #impo
 from MetalUtils.Grain import PyPrecipitate, PrecipitateNatureList #import:  python Class PyPrecipitate module MetalUtils, Precipitate nature list
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict #import Physical constants data dictionary from module MetalUtils
 from MetalUtils.ElementsData import Dict as ElementsDataDict
+import script
 
 
 
@@ -65,6 +66,8 @@ print("  > material read is                 :",material)
 c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],nugrodis.savePath)
 c.Info()
 c.type = nugrodis.ComputationParam["Type"]
+
+ComputationResultsDirectory=c.resultsDirectory
 
 # Create a C++ object of type ThermoDynamicsConstant:
 thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
@@ -527,7 +530,10 @@ CppMaterial.RunProcess()#RunProcess also run ProcessPrecipitatesNucleationRate()
 
 
 
+
 c.Run()
+script.OutputDistributionCurves(ComputationResultsDirectory+"/")
+script.OutputAttributes(ComputationResultsDirectory+"/")
 
 
 

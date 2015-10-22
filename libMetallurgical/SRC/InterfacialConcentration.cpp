@@ -83,6 +83,8 @@ InterfacialConcentration::GetLeftInterfacialVelocityForClass(unsigned int classI
   unsigned int n;
   n= radiusDistribution_.GetItemsValues().size();
   
+  
+  /*debug */ std::cout<<"Element Name is: "<<chemicalElement_.GetElementName()<<" interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<" n+1 "<<n+1<<"\n";
   assert(  (interfacialVelocityList_.size()== (n+1) )&&"In GetLeftInterfacialVelocityForClass(int  classId) : interfacialVelocityList_.size() \
   and radiusDistribution_.GetItemsValues().size() are incompatible!!! interfacialVelocityList_.size() must be = radiusDistribution_.GetItemsValues().size() +1 " );
   assert ( (classId>=1)&&"InterfacialConcentration::GetLeftInterfacialVelocityForClass():   ClassId must be in the range 1 to n");
@@ -258,7 +260,7 @@ InterfacialConcentration::ComputeInterfacialVelocityList()
 
 
 const double 
-InterfacialConcentration::ReturnCriticalInterfacialVelocity()
+InterfacialConcentration::ReturnCriticalInterfacialVelocity() const
 {
   std::string elementSymbol = chemicalElement_.GetElementName();
   std::map<std::string, Concentration*> materialCurrentConcMap= radiusDistribution_.GetPrecipitate().GetMaterial().GetCurrentChemicalComposition().GetConcentrationMap();
@@ -268,9 +270,11 @@ InterfacialConcentration::ReturnCriticalInterfacialVelocity()
   double XvP=  precipitateConcMap[elementSymbol]->GetVolumicValue();
   double criticalIntR,criticalXvInt,criticalVint,rEtoile;
   
+  
   rEtoile = radiusDistribution_.GetPrecipitate().GetCriticalRadius();
   if (rEtoile!=-111.111)
   {
+    
   criticalXvInt=criticalInterfacialConcentration_;
   assert (criticalXvInt>0);
 
@@ -281,13 +285,53 @@ InterfacialConcentration::ReturnCriticalInterfacialVelocity()
   criticalVint=DiffusionCoef/criticalIntR*(XvSS-criticalXvInt)/(XvP-criticalXvInt);
   }
   else
-  { assert(rEtoile==-111.111);
+  { 
+    assert( (rEtoile==-111.111)&&"rEtoile is not equal to -111.111 which means 'ne s'applique pas' ");
     // Si  retoile ne s'applique pas, on utilise la première vitesse d'interface comme vitesse critique.
-    criticalVint= interfacialVelocityList_[0];
+    
+    /*debug */std::cout<<" size of interfacialVelocityList_ "<<interfacialVelocityList_.size()<<"\n";
+    std::cout<<"TPOTOTOTOTOTOTOTTO3\n";
+    
+    /*DEBUG*/std::cout<<"precipitate Type "<< radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+    /*DEBUG*/std::cout<<"Elemenent name"<<chemicalElement_.GetElementName() <<"\n";
+    
+    
+    radiusDistribution_.CheckIfInterfacialConcentrationObjectUsedHasBeenChosen()==true;
+    
+    criticalVint=radiusDistribution_.GetInterfacialConcentrationObjectUsed().GetInterfacialVelocityList()[0];
+    
+    //criticalVint= interfacialVelocityList_[0];
+    
+    //*DEBUG* criticalVint=this->ReturnRDInterfacialVelocityListFirstElement(); // Si  retoile ne s'applique pas, on utilise la première vitesse d'interface comme vitesse critique.
+    
+    //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+    // So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result, But We have arbitrarily choosen to considered chemicalElementList_[0]
+    
+    /*DEBUG*/std::cout<<"TPOTOTOTOTOTOTOTTO4\n";
     assert (criticalVint!=0);
   };
 
   return criticalVint;
+}
+
+
+double
+InterfacialConcentration::ReturnRDInterfacialVelocityListFirstElement()
+{
+  /*
+  std::string elementName;
+  
+  elementName= radiusDistribution_.GetChemicalElementsList()[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+							// So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result
+  
+  
+  
+   std::vector<double>ICList= radiusDistribution_.GetInterfConcentrationObjectForElement(elementName).GetInterfacialVelocityList();
+  
+  return ICList[0];*/
+  
+  return 12;
+
 }
 
 

@@ -79,6 +79,8 @@ public:
  
  const double ReturnCriticalInterfacialVelocity();//return VINTcritique
  
+ bool CheckIfInterfacialConcentrationObjectUsedHasBeenChosen() const {return InterfacialConcentrationObjectUsedHasBeenChosen_;};
+ 
 
  //Computes (but not set) and return the total number(value) of items. Use to find nucleation site number
  const double ReturnTotNbOfItems();
@@ -122,7 +124,10 @@ public:
  std::vector<double> GetItemsValues() { return itemsValues_; };//Gives values for all items. Values can be the same for all classes or a list of values
  const std::vector<double> GetItemsValues() const { return itemsValues_; };
  
+ InterfacialConcentration& GetInterfacialConcentrationObjectUsed() const { assert ((InterfacialConcentrationObjectUsed_!=0)&&"No interfacial COncentration has been defined to used.") ; return *InterfacialConcentrationObjectUsed_; };
+ 
  std::vector<double> ReturnRadiusList();
+ double ReturnInterfacialVelocityListFirstElement(); 
  
  
  //RELATIONS
@@ -162,6 +167,8 @@ private:
     
     std::vector<ChemicalElement *>  chemicalElementList_;
     std::map<std::string, InterfacialConcentration *> interfConcentrationObjectMap_;
+    InterfacialConcentration* InterfacialConcentrationObjectUsed_;
+    bool InterfacialConcentrationObjectUsedHasBeenChosen_;
     
 
 };
@@ -318,6 +325,8 @@ RadiusDistribution::GetInterfConcentrationObjectForElement(std::string elementSy
 }
 
 
+
+
 inline void
 RadiusDistribution::SetItemValueForClass(unsigned int classId, double itemValue)
 {
@@ -341,6 +350,7 @@ RadiusDistribution::SetAllItemsValues(std::vector<double> NP1)//TO DO   /*commen
 {
   // itemsValues_=...
 }
+
 
 
 

@@ -87,6 +87,9 @@ namespace Util
                                            std::complex<double> & x2,
                                            std::complex<double> & x3,
                                            std::complex<double> & x4);
+      
+      static double DichotomousMethodForSecondDegreeEquation(double a, double b, double c,
+					   double solutionToImprove,double leftValue, double rightValue, double epsilon=1.e-16, double alpha=0.1);
     };
 
 }
