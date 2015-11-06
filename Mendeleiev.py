@@ -13,8 +13,8 @@ class PyChemicalElement:
     
     # static private attribute data holds the coma separated string "Symbol AtomicNumber density massMolaire E nhu,..." 
     __data = """ Al 13 2698 26.98 70000 0.3,
-                 Mg 12 1738 24.31 45000 0.35,
-                 Cu 29 8960 64.54 124000 0.33
+                 Cu 29 8960 64.54 124000 0.33,
+                 Mg 12 1738 24.31 45000 0.35
             """ 
     # the static private attribute Mendeleiv : dictionnary of pairs {symbol: atomic number}
     __MendeleievDic = {}

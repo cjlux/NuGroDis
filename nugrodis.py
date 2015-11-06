@@ -30,8 +30,9 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (50000,"s"), # hardening duration
-"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless. 
+"duration": (77636,"s"), # hardening duration
+"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
+#"initialClassNumber" : (117, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
 
 #initialRadiusDistribution={
@@ -70,9 +71,11 @@ InitialGlobalData={
 #################################################################################################################################
 CellParam ={
 "spatialStep"  : (1E-10,"m") , #Spatial discretisation step
+#"spatialStep"  : (1E-11,"m") , #n=122
 "initialClassNumber" : (20, ""), # Initial number for radiusDistribution Class, unitless. This is the default value use when an radiusDistribution object is instanciate
 }  #avant : (4* CellParam["spatialStep"],"m")
 CellParam["minimumRadius"] = (4*CellParam["spatialStep"][0],CellParam["spatialStep"][1]) #not useful in cellParam ???? argument for object RadiusDiustribution contructor or not????
+#CellParam["minimumRadius"] = (1E-10,CellParam["spatialStep"][1])
 #*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~
 #*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~#*~ 
  

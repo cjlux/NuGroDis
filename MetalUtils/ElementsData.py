@@ -21,7 +21,14 @@ Dict={
             "atomsPerCell":(4,"") , #number of atoms per cell
             "atomicNumber":(13,"")
          },
-    
+
+    #Magnesium
+    "Mg":{  "density" : (1738,"Kg.m^-3"),#Volumetric mass density, [Kg/m^3]
+            "molarMass": (24.31,"Kg.mol^-1"),#Molar Mass, [g/mol]
+            "PoissonCoeff": (0.35,""), #Poisson coefficient
+            "YoungModulus": (45000,"MPa"),#Young modulus, [MPa]
+            "atomicNumber":(12,"")
+         },
                 
     
     #Copper
@@ -30,14 +37,6 @@ Dict={
             "PoissonCoeff": (0.33,""), #Poisson coefficient
             "YoungModulus": (124000,"MPa"),  #Young modulus, [MPa]
             "atomicNumber":(29,"")
-         },
-    
-    #Magnesium
-    "Mg":{  "density" : (1738,"Kg.m^-3"),#Volumetric mass density, [Kg/m^3]
-            "molarMass": (24.31,"Kg.mol^-1"),#Molar Mass, [g/mol]
-            "PoissonCoeff": (0.35,""), #Poisson coefficient
-            "YoungModulus": (45000,"MPa"),#Young modulus, [MPa]
-            "atomicNumber":(12,"")
          }
     
     #Oxygen

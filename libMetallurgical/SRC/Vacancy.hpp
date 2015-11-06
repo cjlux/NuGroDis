@@ -54,6 +54,9 @@ public:
     double GetPreExpDiffusionValue() const;
     
     
+    const double ReturnAlpha(double Temperature) const; //return alpha  where alpha is used to compute equilibrium conc. equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
+    
+    
     //Computes and set the vacancy diffusion coefficient for the current value of temperature(was compute Dlac)  . Unit: K
     void ComputeDiffusionCoefValue();
 

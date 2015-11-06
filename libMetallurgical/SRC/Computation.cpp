@@ -193,8 +193,12 @@ Computation::ComputeMaxTimeStep()
     assert ((*it)>0);
     
     maxTimeStep_= *it;
-    std::cout<<"crtitical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;  
+    std::cout<<"crtitical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;
+    
+    
+    
   };
+  
   
   
   
@@ -223,8 +227,16 @@ Computation::CreateResultsDirectory()
   mkdir((resultsDirectory_+"/RadDisFiles").c_str(),0777); //
   mkdir((resultsDirectory_+"/PrecipitatesAttributes").c_str(),0777);
   mkdir((resultsDirectory_+"/MaterialCurrentCompo").c_str(),0777);
+  mkdir((resultsDirectory_+"/PrecipitatesInterfacialProperties").c_str(),0777);
    
    
+}
+
+
+void 
+Computation::CreateDirectory(std::string relativePathOfTheWantedFolder)
+{
+  mkdir((resultsDirectory_+"/"+relativePathOfTheWantedFolder).c_str(),0777); // 
 }
 
 

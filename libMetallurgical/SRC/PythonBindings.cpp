@@ -75,11 +75,13 @@ BOOST_PYTHON_MODULE(Metallurgical)
 
    
     
+    
+    
     //TODO some stuff
   boost::python::class_<Concentration>("Concentration", boost::python::init<ChemicalElement&, ChemicalComposition& >() )
     
     //.add_property("ChemicalComposition", &Concentration::GetChemicalComposition)
-    .add_property("volumicValue", &Concentration::GetVolumicValue,&Concentration::SetVolumicValue)
+    .add_property("volumicValue", &Concentration::GetVolumicValue, &Concentration::SetVolumicValue)
     .add_property("initialAtomicValue", &Concentration::GetInitialAtomicValue,&Concentration::SetInitialAtomicValue)
     .add_property("initialMassicValue", &Concentration::GetInitialMassicValue,&Concentration::SetInitialMassicValue)
     .add_property("stoichiometricCoef", &Concentration::GetStoichiometricCoef,&Concentration::SetStoichiometricCoef)
@@ -362,3 +364,11 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
   //How to make inheritance
   // class_<Derived, bases<Base> >("Derived")
+  
+  //////
+  // documentations:
+  //////
+  
+  //link-->   https://wiki.python.org/moin/boost.python/HowTo
+  
+  // fundtion overloading -->   https://wiki.python.org/moin/boost.python/FunctionOverloading

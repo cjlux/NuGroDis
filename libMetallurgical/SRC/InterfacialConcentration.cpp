@@ -44,9 +44,12 @@ InterfacialConcentration::InterfacialConcentration(RadiusDistribution& RD,Chemic
   for (unsigned int i=1; i <= n+1; ++i)
   {
     interfacialConcentrationValuesList_.push_back(0);
+    interfacialVelocityList_.push_back(0);
   }
   
   assert ( (interfacialConcentrationValuesList_.size()== n+1)&&"InterfacialConcentrationValuesList_ do not have a compatible size with RadiusDistribution size" ); 
+  
+  assert ( (interfacialVelocityList_.size()== n+1)&&"interfacialVelocityList_ do not have a compatible size with RadiusDistribution size and InterfacialConcentrationValuesList_ size" ); 
 }
 
 InterfacialConcentration::~InterfacialConcentration()
@@ -57,6 +60,12 @@ InterfacialConcentration::~InterfacialConcentration()
 void 
 InterfacialConcentration::IncrementWithEmptyValues()
 {
+  /*debug*/ std::cout<<"Precipoitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+  /*Debug */ std::cout<<"interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<"\n";
+  /*Debug */ std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<"\n";
+  
+  assert ( (interfacialConcentrationValuesList_.size()==interfacialVelocityList_.size())&&"Before incrementing with empty values, Interfacial concentration list and Interfacial Velocity list does not have the same size ! there is a problem" );
+  
   
   int previous_n=interfacialConcentrationValuesList_.size()-1;
   
@@ -64,15 +73,21 @@ InterfacialConcentration::IncrementWithEmptyValues()
   
   assert ( (previous_n != current_n)&&"this InterfacialConcentration object does not need to be Incremented. Error in InterfacialConcentration::IncrementWithEmptyValues()" );
   
+  
   assert ( (current_n==previous_n+1)&&"Whhen radius sistribution size is incremented, InterfacialConcentration must be incremented to. It means the difference of size must be only 1 " );
   
   /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
   
   interfacialConcentrationValuesList_.push_back(0);
   
+  interfacialVelocityList_.push_back(0);
+  
   /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
   std::cout<<" previous_n "<<previous_n << "current_n "<<current_n<<std::endl;
   assert ( (int)interfacialConcentrationValuesList_.size() == (current_n+1) );
+  
+  
+  assert ( (interfacialConcentrationValuesList_.size()==interfacialVelocityList_.size())&&"After incrementing with empty values, Interfacial concentration list and Interfacial Velovity list does not have the same size ! there is a problem" );
   
 }
 
@@ -151,7 +166,13 @@ InterfacialConcentration::GetRightInterfacialConcValueForClass(unsigned int clas
 void 
 InterfacialConcentration::SetLeftInterfacialConcValueForClass(double value, unsigned int classId)
 {
-  assert ((value>=0)&&"SetLeftInterfacialConcValueForClass(value, classId) : given value must be positive");
+  
+  /*debug*/ std::cout<<"Value is :" <<value<<"\n";
+  
+  
+  assert ((value>0)&&"SetLeftInterfacialConcValueForClass(value, classId) : given value must be positive");
+  
+  
   
   unsigned int n;
   
@@ -170,13 +191,17 @@ InterfacialConcentration::SetLeftInterfacialConcValueForClass(double value, unsi
 void 
 InterfacialConcentration::SetRightInterfacialConcValueForClass(double value,unsigned int classId)
 {
-  assert ((value>=0)&&"SetLeftInterfacialConcValueForClass(value, classId) : given value must be positive");
+  assert ((value>0)&&"SetLeftInterfacialConcValueForClass(value, classId) : given value must be positive");
   
   unsigned int n;
   
   n= radiusDistribution_.GetItemsValues().size();
+  /*DEBUG*/ std::cout<<"Element is"<<chemicalElement_.GetElementName()<<"\n";
   
-  /*DEBUG*/ std::cout<< "interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<" n "<< n<<std::endl;
+
+  
+  /*DEBUG*/ std::cout<<"Precipitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+  /*DEBUG*/ std::cout<< "interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<" AND n "<< n<<std::endl;
   assert(  (interfacialConcentrationValuesList_.size()== n+1)&&"In SetRightInterfacialConcValueForClass(int  classId) : interfacialConcentrationValuesList_.size() \
   and radiusDistribution_.GetItemsValues().size() are incompatible!!! interfacialConcentrationValuesList_.size() must be = radiusDistribution_.GetItemsValues().size() +1 " );
   
@@ -220,6 +245,8 @@ InterfacialConcentration::ReturnInterfacialVelocityList()
   double R,XvInt,Vint,R0,XvInt0,Vint0;
   
   assert (interfacialConcentrationValuesList_.size()>0);
+  
+  assert (interfacialVelocityList.size()==0);
   
   //First value. the value at left of class 1
   R0= radiusDistribution_.GetLeftRadiusForClass(1);

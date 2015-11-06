@@ -169,6 +169,7 @@ private:
     std::map<std::string, InterfacialConcentration *> interfConcentrationObjectMap_;
     InterfacialConcentration* InterfacialConcentrationObjectUsed_;
     bool InterfacialConcentrationObjectUsedHasBeenChosen_;
+    ChemicalElement * chemicalElementChosen_; // this element is chosen when using method this->ComputeInterfacialVelocityList()
     
 
 };

@@ -194,16 +194,17 @@ void
 Precipitate::SavePrecipitateAttributes()
 {
 
-  
-  
   std::string precipitateType= this->GetPrecipitateType();
+  
+  std::string relativeSaveFolderPath="PrecipitatesAttributes/"+precipitateType;
+  materialPointer_->GetComputation().CreateDirectory(relativeSaveFolderPath);
   
   
   std::string ResultsDirectoryPath= materialPointer_->GetComputation().GetResultsDirectory();
   
   
   std::string fileName= precipitateType+"_Attributes_"+".txt";
-  std::string path=ResultsDirectoryPath+"/PrecipitatesAttributes"+"/"+fileName;
+  std::string path=ResultsDirectoryPath+"/"+relativeSaveFolderPath+"/"+fileName;
   std::ofstream output_file;
   output_file.open(path.c_str(), std::ios_base::app);
   
@@ -220,25 +221,51 @@ Precipitate::SavePrecipitateAttributes()
   
   assert (lineStringVector.size()==0);
   
+  std::string mainElementSymbol=materialPointer_->GetMainChemicalElement().GetElementName();
+  
   if ( in.tellg() == 0 /*check if it is empty*/      )
   {
     // file is empty
     
-    line<<"time"<<"\t"<<"Vf"<<"\t"<<"DeltaGv"<<"\t"<<"DeltaGe"<<"\t"<<"NuclSiteDensity"<<"\t"<<"gamma"<<"\t"<<"r*"<<"\t"<<"delta_r*"<<"\t"<<"Real r*"<<"\t"<<"Delta_G*"<<"\t"<<"Z"<<"\t"<<"Beta*"<<"\t"<<"J*"<<"\n"; 
+    line<<"time"<<"\t"<<"Vf"<<"\t"<<"DeltaGv"<<"\t"<<"DeltaGe"<<"\t"<<"NuclSiteDensity"<<"\t"<<"gamma"<<"\t"<<"rEtoile"<<"\t"<<"delta_rEtoile"<<"\t"<<"Real_rEtoile"<<"\t"<<"Delta_GEtoile"<<"\t"<<"Z"<<"\t"<<"BetaEtoile"<<"\t"<<"JEtoile"; 
+    
+    std::map<std::string, double>::iterator it;
+    for (it=equilibriumConcMap_.begin(); it!=equilibriumConcMap_.end(); ++it )
+    {
+      if ( it->first != mainElementSymbol  )
+      {
+	line<<"\t"<<"Xv"+it->first+"EqSS"; 
+      };
+      
+    }
+    
+    line<<"\n";
     
     lineStringVector.push_back(line.str());
     assert (lineStringVector.size()==1);
   }
   
+  std::stringstream lineStream;
+    
+  lineStream<<CurrentTime<<"\t"<<volumicFraction_<<"\t"<<phaseChangeVolumiqueEnergy_<<"\t"<<distorsionEnergy_<<"\t"<<nucleationSitesNumber_<<"\t"<<surfaceEnergyCurrentValue_<<"\t"<<criticalRadius_<<"\t"<<deltaCriticalRadius_<<"\t"<<deltaCriticalRadius_+criticalRadius_<<"\t"<<criticalTotalEnergy_<<"\t"<<ZeldovichFactor_<<"\t"<<criticalBeta_<<"\t"<<nucleationRate_;
+  
+  std::map<std::string, double>::iterator it;
+  for (it=equilibriumConcMap_.begin(); it!=equilibriumConcMap_.end(); ++it )
+  {
+    if ( it->first != mainElementSymbol  )
+    {
+     lineStream<<"\t"<<it->second; 
+    };
+  }
+  
+  lineStream<<"\n";
+    
+    
+    
+  lineStringVector.push_back(lineStream.str());
+  
   
 
-    std::stringstream lineStream;
-    
-    lineStream<<CurrentTime<<"\t"<<volumicFraction_<<"\t"<<phaseChangeVolumiqueEnergy_<<"\t"<<distorsionEnergy_<<"\t"<<nucleationSitesNumber_<<"\t"<<surfaceEnergyCurrentValue_<<"\t"<<criticalRadius_<<"\t"<<deltaCriticalRadius_<<"\t"<<deltaCriticalRadius_+criticalRadius_<<"\t"<<criticalTotalEnergy_<<"\t"<<ZeldovichFactor_<<"\t"<<criticalBeta_<<"\t"<<nucleationRate_<<"\n";
-    
-    lineStringVector.push_back(lineStream.str());
-  
-  
   
   
   std::ostream_iterator<std::string> output_iterator(output_file, "\n");
@@ -250,6 +277,197 @@ Precipitate::SavePrecipitateAttributes()
 }
 
 
+
+
+void
+Precipitate::SavePrecipitateInterfacialConcentrations()
+{
+
+  std::string precipitateType= this->GetPrecipitateType();
+  
+  std::string relativeSaveFolderPath="PrecipitatesInterfacialProperties/"+precipitateType;
+  materialPointer_->GetComputation().CreateDirectory(relativeSaveFolderPath);
+
+  
+  std::string ResultsDirectoryPath= materialPointer_->GetComputation().GetResultsDirectory();
+  
+  
+  std::string fileName= precipitateType+"_InterfacialConcentrations_"+".txt";
+  std::string path=ResultsDirectoryPath+"/"+relativeSaveFolderPath+"/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str(), std::ios_base::app);
+  
+ 
+  
+  
+   
+  assert ((currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current Radius Dstribution");
+  
+  InterfacialConcentration * IntConcObjUsed=0;
+   
+  IntConcObjUsed = & ( currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed() );
+  assert (IntConcObjUsed!=0);
+   
+  std::string chemicalElementUsedName= IntConcObjUsed->GetChemicalElement().GetElementName();
+  
+  
+  //Check if file is empty
+  std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+  std::stringstream line;
+  std::vector<std::string> lineStringVector;
+  assert (lineStringVector.size()==0);
+  if ( in.tellg() == 0 /*check if it is empty*/      )
+  {
+    // file is empty
+    line<<"Chemical Element used is : "<<chemicalElementUsedName<<"\n";
+    line<<"time"<<" >>>>>>>\t \t"<<"List Of XvINT"<<"\n"; 
+    
+    lineStringVector.push_back(line.str());
+    assert (lineStringVector.size()==1);
+  }
+   
+  
+  double CurrentTime = materialPointer_->GetComputation().GetCurrentTime();
+   
+  std::stringstream lineStream;
+  unsigned int NumberOfClass = currentRadiusDistribution_->GetItemsValues().size();
+  
+  assert ( NumberOfClass+1==IntConcObjUsed->GetInterfacialConcentrationValuesList().size() );
+   
+  lineStream<<CurrentTime<<" >>>>>>>\t \t";
+  
+  
+  
+  
+  for (unsigned int i=0; i<IntConcObjUsed->GetInterfacialConcentrationValuesList().size(); ++i )
+  {
+    if (i==0)
+    {
+      //Add The left interface of the first class (class1) 
+      lineStream<< IntConcObjUsed->GetLeftInterfacialConcValueForClass(i+1);
+    }
+    else
+    {
+      //Add right interface value
+      assert(i!=0);
+      lineStream<<"\t"<<IntConcObjUsed->GetRightInterfacialConcValueForClass(i);
+    };
+    
+  }
+  
+  lineStream<<"\n\n";  
+  lineStringVector.push_back(lineStream.str());
+   
+  
+  
+  
+  
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+   
+  
+}
+
+void
+Precipitate::SavePrecipitateInterfacialVelocities()
+{
+  
+  if (volumicFraction_>0)
+  {
+    std::string precipitateType= this->GetPrecipitateType();
+    
+    std::string relativeSaveFolderPath="PrecipitatesInterfacialProperties/"+precipitateType;
+    materialPointer_->GetComputation().CreateDirectory(relativeSaveFolderPath);
+    
+    std::string ResultsDirectoryPath= materialPointer_->GetComputation().GetResultsDirectory();
+    
+    
+    std::string fileName= precipitateType+"_InterfacialVelocities_"+".txt";
+    std::string path=ResultsDirectoryPath+"/"+relativeSaveFolderPath+"/"+fileName;
+    std::ofstream output_file;
+    output_file.open(path.c_str(), std::ios_base::app);
+    
+  
+    
+    
+    
+    assert ((currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current Radius Dstribution");
+    
+    InterfacialConcentration * IntConcObjUsed=0;
+    
+    IntConcObjUsed = & ( currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed() );
+    assert (IntConcObjUsed!=0);
+    
+    std::string chemicalElementUsedName= IntConcObjUsed->GetChemicalElement().GetElementName();
+    
+    
+    //Check if file is empty
+    std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+    std::stringstream line;
+    std::vector<std::string> lineStringVector;
+    assert (lineStringVector.size()==0);
+    if ( in.tellg() == 0 /*check if it is empty*/      )
+    {
+      // file is empty
+      line<<"Chemical Element used is : "<<chemicalElementUsedName<<"\n";
+      line<<"time"<<" >>>>>>>\t \t"<<"List Of VINT"<<"\n"; 
+      
+      lineStringVector.push_back(line.str());
+      assert (lineStringVector.size()==1);
+    };
+    
+    double CurrentTime = materialPointer_->GetComputation().GetCurrentTime();
+    
+    std::stringstream lineStream;
+    unsigned int NumberOfClass = currentRadiusDistribution_->GetItemsValues().size();
+    
+    //TODO debug std::cout<<"NumberOfClass toto"<<NumberOfClass<<" IntConcObjUsed size " <<IntConcObjUsed->GetInterfacialVelocityList().size();
+    unsigned int toto= IntConcObjUsed->GetInterfacialVelocityList().size();
+    
+    std::cout<<"Type : "<<this->GetPrecipitateType()<<"\n";
+    std::cout<< "toto tototo"<<toto<<"\n";
+    std::cout<< "NumberOfClass tototo"<<NumberOfClass<<"\n";
+    
+    assert ( (NumberOfClass + 1) ==IntConcObjUsed->GetInterfacialVelocityList().size() );
+    
+    lineStream<<CurrentTime<<" >>>>>>>\t \t";
+    
+    
+    
+    
+    for (unsigned int i=0; i<IntConcObjUsed->GetInterfacialVelocityList().size(); ++i )
+    {
+      if (i==0)
+      {
+	//Add The left interface of the first class (class1) 
+	lineStream<< IntConcObjUsed->GetLeftInterfacialVelocityForClass(i+1);
+      }
+      else
+      {
+	//Add right interface value
+	assert(i!=0);
+	lineStream<<"\t"<<IntConcObjUsed->GetRightInterfacialVelocityForClass(i);
+      };
+      
+    }
+    
+    lineStream<<"\n\n";  
+    lineStringVector.push_back(lineStream.str());
+    
+    
+    
+    
+    
+    std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+    std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+    
+  }//ENd If volumicfraction_>0
+  
+  
+  
+  
+  
+}
 
 
 
@@ -285,8 +503,11 @@ Precipitate::AddEmptyClassForCurrentRadiusDistributionWithCondition()
   unsigned int n=currentRadiusDistribution_->GetItemsValues().size();
   double lastValue = currentRadiusDistribution_->GetItemValueForClass(n);
   
-  if (lastValue>0)
+  
+  if ( lastValue>0 )
   {
+    std::cout<<"volumic fraction is"<<volumicFraction_<<"\n";
+    std::cout<<"precipitate typme is "<<this->GetPrecipitateType()<<"\n";
     currentRadiusDistribution_->AddEmptyClass();
   }
   
@@ -407,6 +628,26 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
     std::cout<<"f = : "<<f<<std::endl;
     std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
     std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+    
+    
+     ////////
+     //post assertions
+     /////////
+    
+    //Check precision of solutions X,Y found
+    double epsilon=1e-10;
+    double Eq1precision=std::abs(X*Y-f);
+    double Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
+    std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
+    std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
+	  
+    assert ( (Eq1precision<= epsilon) && "Precision for equation X*Y=f is not satisfied" );
+    assert ( (Eq2precision<= epsilon) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
+    
+    
+    
+    
+    
 }
 
 
@@ -862,6 +1103,18 @@ Precipitate::ReturnDeltaCriticalRadius()
   
   solution=ListOfPotentialSolutions[0];
   
+  ////////	  
+  //post assertions
+  /////////
+  //Check precision of solution X found
+  double epsilon=1e-16;
+  double Eqprecision= a*std::pow(solution,3) +  b*std::pow(solution,2) + c*solution + d ; // compare ax^3 +bx^2 +cx +d  to 0.
+  
+  std::cout<<"Precision for equation : Pi*(alphaP1 + 4/3)*(deltageP1 + deltagvP1)*x^3 - 2*(alphaP1 + 2)*gammaP1*Pi*x^2 + kB*T =0 is "<<Eqprecision<<"\n";	 
+  assert ( (Eqprecision<= epsilon) && "Precision for equation Pi*(alphaP1 + 4/3)*(deltageP1 + deltagvP1)*x^3 - 2*(alphaP1 + 2)*gammaP1*Pi*x^2 + kB*T =0 is NOT SATISFIED" );
+	  
+  
+  
   assert (solution>0);
   return solution;
 }
@@ -1155,6 +1408,8 @@ Precipitate::ConvertMassicToVolumicConcentration()
 {
   
   //TODO assert if CC is in chemicalCompositionList_. If not, abandon 
+  
+  assert(!"Not Needed yet! Not implemented yet ");
    
 }
 
@@ -1162,6 +1417,7 @@ void
 Precipitate::ConvertVolumicToMassicConcentration()
 {
   // TODO assert if CC is in chemicalCompositionList_. If not, abandon
+  assert(!"Not Needed yet! Not implemented yet ");
 }
 
 void
@@ -1186,6 +1442,8 @@ Precipitate::ConvertAtomicToVolumicConcentration()
     
     
     double volumicConc=atomicConc*(elementMolarMass/1000/elementRho)/(molarVolume_/this->GetSumOfStoicCoefs());
+    
+    
     
     assert((volumicConc>0)&&"In ConvertAtomicToVolumicConcentration(): computed value of volumic conc is negative or null");
     it->second->SetVolumicValue(volumicConc);
@@ -1341,20 +1599,47 @@ Precipitate::ComputeAllInterfacialConcentrations()
 const double 
 Precipitate::ReturnCriticalTimeStep()
 {
-  double criticaltimeStepP, criticalV, deltar;// critical time step for Precipitate
+  double criticaltimeStepP;// critical time step for Precipitate
   
   assert ( (currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current Radius Distribution");
   
-  criticalV= currentRadiusDistribution_->ReturnCriticalInterfacialVelocity();
   
-  deltar=currentRadiusDistribution_->GetSpatialStep();
+  
+  unsigned int firstNotEmptyClassId =this->ReturnRDFirstNotEmptyClassIdAfterNucleation();
+  
+  if(firstNotEmptyClassId==0 )
+  {
+    assert (volumicFraction_==0);
+    std::cout<<"In Precipitate::ReturnCriticalTimeStep():  In this  case there is no nucleus radius in the radius distribution and the volumic fraction of precipitate is 0 \n";
+    std::cout<<"Therefore, returned value of precipitate time step will be the computation default time step \n";
+    assert ((materialPointer_!=0)&&"Errot:Precipitate does not belong to any precipitate:");
+    double defaultTimeStep= materialPointer_->GetComputation().GetDefaultTimeStep();
+    criticaltimeStepP=defaultTimeStep;
+  }
+  else
+  {
+    
+    // The smallest unempty class (first unempty class) after nucleation exist,
+    double criticalV, deltar;
+    
+    
+    assert(firstNotEmptyClassId>=1);
+    
+    criticalV=currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed().GetLeftInterfacialVelocityForClass(firstNotEmptyClassId);
+    
+    deltar=currentRadiusDistribution_->GetSpatialStep();
+  
+  
+    criticaltimeStepP= deltar/2/std::abs(criticalV);
+    
+    /*debug*/std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
+    
+  };
   
 
   
-  criticaltimeStepP= deltar/2/std::abs(criticalV);
-  
     /*TODO erase*/ std::cout<<"criticaltimeStepP toto "<<criticaltimeStepP<< "  "<<typeid(*this).name()<<"\n";
-  std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
+
   
   assert  (criticaltimeStepP>0);
   
@@ -1482,6 +1767,19 @@ Precipitate::SolveCineticLinearSytem()
   Vleft1=IConcObjPtr->GetLeftInterfacialVelocityForClass(1);
   Vright1=IConcObjPtr->GetRightInterfacialVelocityForClass(1);
   
+  //debug:begin
+  std::cout<<"CLass Id is <<"<<1<<">>\n";
+	
+  std::cout<<"Vleft :"<<Vleft1<<" ; Vright :"<<Vright1<<"\n";	
+  std::cout<<"Class 1 left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(1)<<"\n";
+  std::cout<<"Class 1 Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(1)<<"\n";
+
+  std::cout<<"Class 1 Radius is :" << currentRadiusDistribution_->GetRadiusForClass(1)<<"\n";
+  std::cout<<"Class 1 Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(1)<<"\n";
+  std::cout<<"Class 1 Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(1)<<"\n";
+  //debug:end
+  
+  
   if ( Vright1>0 && Vleft1>0 )
   {
     A(0,1)=0 ;
@@ -1512,6 +1810,19 @@ Precipitate::SolveCineticLinearSytem()
   double Vleftn,Vrightn;
   Vleftn=IConcObjPtr->GetLeftInterfacialVelocityForClass(n);
   Vrightn=IConcObjPtr->GetRightInterfacialVelocityForClass(n);
+  
+  //debug:begin
+  std::cout<<"CLass Id is <<"<<n<<">>\n";
+	
+  std::cout<<"Vleft :"<<Vleftn<<" ; Vright :"<<Vrightn<<"\n";	
+  std::cout<<"Class n left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(n)<<"\n";
+  std::cout<<"Class n Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(n)<<"\n";
+
+  std::cout<<"Class n Radius is :" << currentRadiusDistribution_->GetRadiusForClass(n)<<"\n";
+  std::cout<<"Class n Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(n)<<"\n";
+  std::cout<<"Class n Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(n)<<"\n";
+  //debug:end
+  
   
   if ( Vrightn>0 && Vleftn>0  )
   {
@@ -1554,6 +1865,19 @@ Precipitate::SolveCineticLinearSytem()
 	A(i,i)=deltar/deltat +Vright;
 	A(i,i+1)=0;
 	A(i,i-1)= -Vleft;
+	
+	//debug:begin
+	std::cout<<"CLass Id is <<"<<classId<<">>\n";
+	
+	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+	
+	
+	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+	//debug:end
       }
       else if( Vright>0 && Vleft<0 )
       {
@@ -1561,6 +1885,20 @@ Precipitate::SolveCineticLinearSytem()
 	A(i,i)= deltar/deltat + Vright - Vleft;
 	A(i,i+1)=0;
 	A(i,i-1)=0;
+	
+	//debug:begin
+	std::cout<<"CLass Id is <<"<<classId<<">>\n";
+	
+	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+	
+	
+	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+	//debug:end
+	
       }
       else if ( Vright<0 && Vleft<0 )
       {	
@@ -1568,11 +1906,37 @@ Precipitate::SolveCineticLinearSytem()
 	A(i,i)= deltar/deltat -Vleft;
 	A(i,i+1)= Vright;
 	A(i,i-1)=0;
+	
+	//debug:begin
+	std::cout<<"CLass Id is <<"<<classId<<">>\n";
+	
+	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+	
+	
+	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+	//debug:end
       }
       else // ( Vright<0 && Vleft>0 ) //impossible case ??? 
       {
 	//Normally this is impossible case ???
 	std::cout<<"case 4"<<std::endl;
+	
+	std::cout<<"CLass Id is <<"<<classId<<">>\n";
+	
+	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+	
+	
+	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+	
+	
 	
 	/*TODO check if not needed or not*/  assert(!"An IMPOSSIBLE case has been found . leftInterfacialVelocity>0 AND rightInterfacialVelocity<0.   " );
 	

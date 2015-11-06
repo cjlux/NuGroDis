@@ -117,6 +117,31 @@ Material::~Material()
 }
 
 
+
+
+bool 
+Material::CheckIfTheVolumicConcentrationsArePositive()
+{
+  
+  std::map<std::string , Concentration*>::iterator it;
+  std::map<std::string , Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
+  bool isAVolumicConcPositive=true;
+  
+  
+    for (it=currentConcMap.begin(); it!=currentConcMap.end(); ++it)
+    {
+      double volumicConc=it->second->GetVolumicValue();
+      
+      if (volumicConc<=0)
+      {
+	isAVolumicConcPositive=false;
+      }
+      
+    }
+  
+  return isAVolumicConcPositive;
+}
+
 void // in TEST run beginning of "boucle temporelle"
 Material::RunProcess()
 {
@@ -126,7 +151,12 @@ Material::RunProcess()
   currentTime=computation_.GetCurrentTime();
   computationDuration=computation_.GetMaxComputationTime();
   std::cout<<"Computation Duration is "<<computationDuration<<"\n"<<std::endl;
-  while ( currentTime<computationDuration)
+  
+  this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
+  
+  
+  
+  while ( (currentTime<computationDuration)&&(this->CheckIfTheVolumicConcentrationsArePositive()==true) )
   {//Begin While
     std::cout<<"Current time is "<<currentTime<<"\n\n\n\n\n"<<std::endl;
     //assert (computation_->GetCurrentTime==0)
@@ -187,7 +217,8 @@ Material::RunProcess()
     
     this->ComputePrecipitatesVolumicFraction();
     
-    this->UpdateVolumicValues(); //Important
+    
+    this->UpdateVolumicValues(); //Important to use method UpdateVolumicValues() here.
     
     this->ComputePrecipitatesNucleationSiteNb();
     
@@ -203,7 +234,7 @@ Material::RunProcess()
     //Update all properties that are dependent to temperature
     
     //TODO Update current Temperature
-    /*Just for debug*/this->GetTemperature().SetCurrentTemp(295.15);
+    /*Just for debug*/this->GetTemperature().SetCurrentTemp(293.15);
     
     
     
@@ -269,6 +300,8 @@ Material::RunProcess()
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
     {
       (*i)->SavePrecipitateAttributes();
+      (*i)->SavePrecipitateInterfacialConcentrations();
+      (*i)->SavePrecipitateInterfacialVelocities();
     }
     
     this->SaveMaterialCurrentChemicalCompo();
@@ -537,6 +570,11 @@ Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
     
     
     double computedAtomicConc= (volumicConc*elementRho*1000./elementMolarMass)/sum;
+    
+    
+    
+    
+    
    
     std::cout<<"===================== VALUE RETURNED FOR ATOMIC CONC OF ELEMENT <"<<it->first<<"> IN MATERIAL IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
   
@@ -587,7 +625,7 @@ Material::ConvertVolumicToInitialMassicConcentration()
     assert ( (it->second->GetInitialMassicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To MassicConcentration\
     because InitialMassicValue has already been set." );
     it->second->SetInitialMassicValue(massicConc);
-    std::cout<<"===================== VALUE COMPUTED FOR MASSIC CONC OF ELEMENT <"<<it->first<<"> SOLID SOLUTION GRAIN IS ============= "<<it->second->GetInitialMassicValue()<<std::endl;
+    std::cout<<"===================== VALUE COMPUTED FOR INITIAL MASSIC CONC OF ELEMENT <"<<it->first<<"> SOLID SOLUTION GRAIN IS ============= "<<it->second->GetInitialMassicValue()<<std::endl;
   }
   
 }
@@ -596,6 +634,7 @@ Material::ConvertVolumicToInitialMassicConcentration()
 void 
 Material::UpdateVolumicValues()
 {
+  // Remember : checkIfUpdatedValuesArePositive default value is true !!!
   
   std::cout<<"Updating material current volumic concentration values\
   taking into account the volumic fraction of precipitates"<<std::endl;
@@ -623,15 +662,17 @@ Material::UpdateVolumicValues()
 	
 	assert ( (VolumicFraction==oldVolumicFraction)&&"Volumic fraction of precipitates must be computed before run method Material::UpdateVolumicValues()");
 	
-	std::map<std::string, Concentration*>::iterator iter;
-	double precipitateFracVol=(*i)->GetVolumicFraction();
-	double elementVolumicConcInPrecipitate=(*i)->GetChemicalComposition().GetConcentrationForElement(it->first).GetVolumicValue();
-	product+= precipitateFracVol*elementVolumicConcInPrecipitate;
-	sumOfFracVol+=precipitateFracVol;
+	double precipitateFracVol=(*i)->GetVolumicFraction(); //fracVolP
+	double elementVolumicConcInPrecipitate=(*i)->GetChemicalComposition().GetConcentrationForElement(it->first).GetVolumicValue(); //Xv_i_P
+	product+= precipitateFracVol*elementVolumicConcInPrecipitate;// Xv_i_P1 * fracVolP1 + Xv_i_P2 * fracVolP2 + ... + Xv_i_Pn * fracVolPn 
+	sumOfFracVol+=precipitateFracVol;  // fracVolP1 + fracVolP2 + ... + fracVolPn 
       }
       
-    double elementInitialVolumicConcInMaterial=it->second->GetVolumicValue();
-    double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1-sumOfFracVol);
+    double elementInitialVolumicConcInMaterial=it->second->GetVolumicValue(); //Xv0_i_SS
+    
+    assert(sumOfFracVol!= 1.);
+    assert( ( sumOfFracVol < 1 ) && " Precipitates total volumic fraction must be less than 1" );
+    double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1.-sumOfFracVol);
     
     
     currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
@@ -716,6 +757,12 @@ Material::SaveMaterialVacancyProperties()
   {
     // file is empty
     line<<"time"<<"\t"<<"Dlac"<<"\t"<<"Xlac"<<"\t"<<"XlacEq"<<"\t"<<"lambda"<<"\t"<<"halSinkDistance"<<"\t";
+    
+    for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
+    {
+      line<<"D_"+(*i)->GetElementName()+"SS"<<"\t";
+    }
+    
     lineStringVector.push_back(line.str());
     assert (lineStringVector.size()==1);
   }
@@ -731,6 +778,15 @@ Material::SaveMaterialVacancyProperties()
   std::stringstream lineStream;
   lineStream<<CurrentTime<<"\t";
   lineStream<<Dlac<<"\t"<<Xlac<<"\t"<<XlacEq<<"\t"<<lambda<<"\t"<<halfSinkD<<"\t";
+  
+  
+  //Getting the atomic diffusion coef (D_i_SS)
+  for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
+  {
+    lineStream<< (*i)->GetDiffusion().GetAtomicDiffusionCoef() <<"\t";
+  }
+  
+  
   
   lineStringVector.push_back(lineStream.str());
   

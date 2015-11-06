@@ -135,6 +135,45 @@ Vacancy::ComputeEquilibriumConcentration()
 
 
 
+//return alpha  where alpha is used to compute equilibrium conc. equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
+const double 
+Vacancy::ReturnAlpha(double Temperature) const
+{
+  double R=ThermoDynamicsConstant::GetR();
+  double sum_alpha_i=0.;
+  for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
+  {
+    std::string elementName = (*i)->GetElementName();
+    double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
+    const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
+    double Evac=0.;
+    
+    /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
+    
+    if (usingEvac==true)
+    {
+      Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+    }
+    else
+    {
+      Evac=0. ;
+      //TODO check what is correct between 1. and 0. .Isnt it 0. ? 0 to make sum_alpha_i=0 and then alpha=1
+    };
+    
+    sum_alpha_i += coordinationNumber_*atomicConc*( -1. + std::exp(Evac/(R*Temperature)) );  // sum of i=1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
+      /*DEBUG*/ std::cout<<" TOPO TOPO atomicConc "<<atomicConc<<std::endl;
+      /*DEBUG*/ std::cout<<" TOPO TOPO Evac "<<Evac<<std::endl;
+      /*DEBUG*/ std::cout<<" TOPO TOPO coordinationNumber_ "<<coordinationNumber_<<std::endl;
+  }
+  /*DEBUG*/ std::cout<<" TOPA sum_alpha_i "<<sum_alpha_i<<std::endl;
+  
+    
+    //TODO alpha
+    double alpha= 1. + sum_alpha_i;
+    
+    return alpha;
+  
+}
 
 
 
@@ -158,35 +197,8 @@ Vacancy::ReturnEquilibriumConcentration() const
   double R=ThermoDynamicsConstant::GetR();
   double T=material_.GetTemperature().GetCurrentTemp();
   
- double sum_alpha_i=0.;
- for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
- {
-   std::string elementName = (*i)->GetElementName();
-   double atomicConc=material_.ReturnAtomicConcFromVolumicForElement(elementName);
-   const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
-   double Evac=0.;
-   
-   /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
-   
-   if (usingEvac==true)
-   {
-    Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
-   }
-   else
-   {
-    Evac=1.;
-   };
-   
-   sum_alpha_i += coordinationNumber_*atomicConc*( -1. + std::exp(Evac/(R*T)) );  // sum of i=1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
-    /*DEBUG*/ std::cout<<" TOPO TOPO atomicConc "<<atomicConc<<std::endl;
-    /*DEBUG*/ std::cout<<" TOPO TOPO Evac "<<Evac<<std::endl;
-    /*DEBUG*/ std::cout<<" TOPO TOPO coordinationNumber_ "<<coordinationNumber_<<std::endl;
- }
- /*DEBUG*/ std::cout<<" TOPA sum_alpha_i "<<sum_alpha_i<<std::endl;
- 
+  const double alpha= this->ReturnAlpha(T);
   
-  //TODO alpha
-  double alpha= 1. + sum_alpha_i;
   double equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
   assert ( (equilibriumConcValue>0)&&"In ReturnEquilibriumConcentration: Returned value is not positive");
   
@@ -210,9 +222,14 @@ Vacancy::ReturnEquilibriumConcentration() const
 double 
 Vacancy::ReturnConcentrationBeforeQuenching()
 {
+  
   double R=ThermoDynamicsConstant::GetR();
   double Xlacavtrempe;
-  Xlacavtrempe = std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*solutionisingTemp_));
+  
+  const double alpha= this->ReturnAlpha(solutionisingTemp_);
+  
+  
+  Xlacavtrempe = alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*solutionisingTemp_));
   
   assert(Xlacavtrempe>0);
   

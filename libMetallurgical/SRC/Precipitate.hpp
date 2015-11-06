@@ -53,6 +53,12 @@ public:
     
     void SavePrecipitateAttributes();
     
+    void SavePrecipitateInterfacialConcentrations();
+    
+    void SavePrecipitateInterfacialVelocities();
+    
+    
+    
     
     
     

@@ -18,7 +18,9 @@
 #include <cmath>
 #include <fstream>
 #include <iterator>
+#include <algorithm>
 #include <Python.h>
+
  
 #include "RadiusDistribution.hpp"
 #include "Precipitate.hpp"
@@ -45,7 +47,8 @@ RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialC
    chemicalElementList_(),
    interfConcentrationObjectMap_(),
    InterfacialConcentrationObjectUsed_(0),
-   InterfacialConcentrationObjectUsedHasBeenChosen_(false)
+   InterfacialConcentrationObjectUsedHasBeenChosen_(false),
+   chemicalElementChosen_(0)
 {
   
   std::cout <<  "Building object <RadiusDistribution> " << std::endl;
@@ -69,7 +72,8 @@ RadiusDistribution::RadiusDistribution(double deltar, double r1, double initialC
    chemicalElementList_(),
    interfConcentrationObjectMap_(),
    InterfacialConcentrationObjectUsed_(0),
-   InterfacialConcentrationObjectUsedHasBeenChosen_(false)
+   InterfacialConcentrationObjectUsedHasBeenChosen_(false),
+   chemicalElementChosen_(0)
 {
   std::cout <<  "Building object <RadiusDistribution> which is not linked to any Precipitate" << std::endl;
   assert (deltar>0);
@@ -97,6 +101,28 @@ RadiusDistribution::AddEmptyClass()
   itemsValues_.push_back(0);
   assert (itemsValues_.size()== n+1. );
   
+  
+  
+  /*
+   
+  ////// 
+  //Method2: IncrementWithEmptyValues() only with InterfacialConcentrationObjectUsed_ instead of //all  InterfObj of interfConcentrationObjectMap_
+  /////
+  
+  assert (InterfacialConcentrationObjectUsed_!=0);
+  std::cout<<"Incrementing with empty value the InterfacialConcentration Object for the used Element "<<InterfacialConcentrationObjectUsed_->GetChemicalElement().GetElementName()<<";InterfacialConcentration Object used Adress is :"<<InterfacialConcentrationObjectUsed_<<std::endl;
+  InterfacialConcentrationObjectUsed_->IncrementWithEmptyValues();
+  */
+  
+  
+  
+  
+  
+  
+  ////// 
+  //Method1: IncrementWithEmptyValues() with all  InterfObj of interfConcentrationObjectMap_
+  /////
+  std::cout<<"Incrementing with empty value All InterfacialConcentration Objects : \n ";
   std::map<std::string , InterfacialConcentration*>::iterator it;
   for (it=interfConcentrationObjectMap_.begin(); it!=interfConcentrationObjectMap_.end(); ++it )
   {
@@ -104,11 +130,34 @@ RadiusDistribution::AddEmptyClass()
     it->second->IncrementWithEmptyValues();
   }
   
+  
+  
 }
 
 void
 RadiusDistribution::SaveDistribution()
 {
+  assert((precipitate_!=0)&&"radiusDistribution is not linked to any precipitate");
+  std::string precipitateType= precipitate_->GetPrecipitateType();
+  
+  std::string relativeSaveFolderPath="RadDisFiles/"+precipitateType;
+  precipitate_->GetMaterial().GetComputation().CreateDirectory(relativeSaveFolderPath);
+  
+  std::string ResultsDirectoryPath= precipitate_->GetMaterial().GetComputation().GetResultsDirectory();
+  
+  double CurrentTime = precipitate_->GetMaterial().GetComputation().GetCurrentTime();
+  
+  std::stringstream timeStrstream;
+  timeStrstream<<CurrentTime;
+  
+  std::string fileName= "RadDis_time_"+timeStrstream.str()+"_.txt";
+  std::string path=ResultsDirectoryPath+"/"+relativeSaveFolderPath+"/"+fileName;
+  std::ofstream output_file;
+  
+  
+  
+  
+  
   std::stringstream line;
   
   line<<"ClassId"<<std::setw(20)<<"R"<<std::setw(20)<<"NP"<<"\n"; 
@@ -130,21 +179,11 @@ RadiusDistribution::SaveDistribution()
   }
   
   
-  std::string precipitateType= precipitate_->GetPrecipitateType();
-  
-  assert((precipitate_!=0)&&"radiusDistribution is not linked to any precipitate");
-  
-  std::string ResultsDirectoryPath= precipitate_->GetMaterial().GetComputation().GetResultsDirectory();
-  
-  double CurrentTime = precipitate_->GetMaterial().GetComputation().GetCurrentTime();
-  
-  std::stringstream timeStrstream;
-  timeStrstream<<CurrentTime;
+
   
   
-  std::string fileName= precipitateType+"_RadDis_"+"time_"+timeStrstream.str()+".txt";
-  std::string path=ResultsDirectoryPath+"/RadDisFiles"+"/"+fileName;
-  std::ofstream output_file;
+  
+
   output_file.open(path.c_str());
   
   
@@ -392,15 +431,16 @@ RadiusDistribution::InitializeInterfConc()
   //Step2: Add ChemicalElements to chemicalElementList and create interfacialConcentrationObjects associated to each chemicalElement 
   for (unsigned int i=0; i<elementList.size(); ++i)
   {
-    chemicalElementList_.push_back(elementList[i]);
-    
       
     if ( elementList[i]->GetElementName()!= mainElementName )
-    { interfConcentrationObjectMap_[elementList[i]->GetElementName()]= new InterfacialConcentration(*this,*elementList[i]) ; };
+    { 
+      chemicalElementList_.push_back(elementList[i]);
+      interfConcentrationObjectMap_[elementList[i]->GetElementName()]= new InterfacialConcentration(*this,*elementList[i]); 
+    };
     
   }
-  assert ( elementList.size()==chemicalElementList_.size() );
-  assert ( interfConcentrationObjectMap_.size()== elementList.size()-1 );
+  assert ( elementList.size()==chemicalElementList_.size() + 1 );
+  assert ( interfConcentrationObjectMap_.size()== elementList.size() - 1 );
   
 }
 
@@ -562,7 +602,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	assert( X != -constantD/constantC );// because denominator of Y must be different from 0
 	//Y = (constantA*X +constantB)/(constantC*X +constantD);  
 	Y=f/X;
-	/*DEBUG*/std::cout<<"DEBUG if Y = (AX+B)/(CX+D) then Y= "<< (constantA*X + constantB)/(constantC*X + constantD)<<"n";
+	/*DEBUG*/std::cout<<"DEBUG if Y = (AX+B)/(CX+D) then Y= "<< (constantA*X + constantB)/(constantC*X + constantD)<<"\n";
 	assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
 	
 	
@@ -594,6 +634,23 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  std::cout<<"f = : "<<f<<std::endl;
 	  std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
 	  std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+	  
+	  
+	  ////////
+	  //post assertions
+	  /////////
+
+	  //Check precision of solutions X,Y found
+	  double epsilon=1e-5;
+	  double Eq1precision=std::abs(X*Y-f);
+	  double Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
+	  
+	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
+	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
+	  
+	  assert ( (Eq1precision<= epsilon) && "Precision for equation X*Y=f is not satisfied" );
+	  assert ( (Eq2precision<= epsilon) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
+	  
 	  return 1; //There is a solution
 	  
 	}
@@ -765,7 +822,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	
 	
 	//Computes All interfacial concentration to the right : Xint_1 to Xint_n .  NOT Xint_0 will be compute separately
-	for ( unsigned int classId=1; classId<=itemsValues_.size(); ++classId )
+	for ( unsigned int classId=itemsValues_.size(); classId>=1; --classId )
 	{
 	  
 	  
@@ -789,7 +846,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 						  XvPj,
 						  solX,
 						  solY);
-	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<"\n"<<std::endl;
+	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<" solution case is "<<solutionCase<<"\n"<<std::endl;
 	  
 	  if (solutionCase==1)
 	  {
@@ -799,11 +856,24 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	  }
 	  else 
 	  {
+	    
 	    assert (solutionCase==-1);
-	    double X = this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId);
-	    double Y = this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).GetRightInterfacialConcValueForClass(classId);
-	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetLeftInterfacialConcValueForClass(X, classId);
-	    this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).SetLeftInterfacialConcValueForClass(Y, classId);
+	    
+	    //In this case, we take right interfacial concentration of class (i+1)
+	    double X = this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1);
+	    double Y = this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1);
+	    /*DEBUG */std::cout<<"X of Class Id + 1 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1)<<"\n"; 
+	    
+	    /*DEBUG */std::cout<<"X of Class Id + 2 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 2)<<"\n"; 
+	    
+	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n";
+	    
+	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n"; 
+	    /*DEBUG */std::cout<<"X is "<<X<<" Y is "<<Y<<"\n"; 
+	    assert (X!=0);
+	    assert(Y!=0);
+	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetRightInterfacialConcValueForClass(X, classId);
+	    this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).SetRightInterfacialConcValueForClass(Y, classId);
 	  };
 	  
 	  
@@ -1052,14 +1122,17 @@ RadiusDistribution::ComputeInterfacialVelocityList()
   {
     assert ((InterfacialConcentrationObjectUsedHasBeenChosen_==false)&&"InterfacialConcentration Object used for Interfacial Velocity has already been chosen");
     
-    std::string elementName;
-  
-    elementName=chemicalElementList_[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+    std::string chosenElementName;
+    
+    chemicalElementChosen_= chemicalElementList_[0];
+    
+    assert (chemicalElementChosen_!=0);
+    chosenElementName=chemicalElementChosen_->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
 							// So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result
-    std::cout<<"Element chosen is : "<<elementName<<"\n";
+    std::cout<<"Element chosen is : "<<chosenElementName<<"\n";
   
   
-   InterfacialConcentrationObjectUsed_= interfConcentrationObjectMap_[elementName];
+   InterfacialConcentrationObjectUsed_= interfConcentrationObjectMap_[chosenElementName];
    InterfacialConcentrationObjectUsedHasBeenChosen_=true;
    
    InterfacialConcentrationObjectUsed_->ComputeInterfacialVelocityList();
@@ -1114,14 +1187,15 @@ RadiusDistribution::ReturnCriticalInterfacialVelocity()
 double
 RadiusDistribution::ReturnInterfacialVelocityListFirstElement()
 {
-  std::string elementName;
+  std::string chosenElementName;
   
-  elementName=chemicalElementList_[0]->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
+  assert ((chemicalElementChosen_!=0)&&"No chemical element has been chosen for interfacial velocity");
+  chosenElementName=chemicalElementChosen_->GetElementName(); //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
 							// So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result
   
   
   
-   std::vector<double>ICList= this->GetInterfConcentrationObjectForElement(elementName).GetInterfacialVelocityList();
+   std::vector<double>ICList= this->GetInterfConcentrationObjectForElement(chosenElementName).GetInterfacialVelocityList();
   
   return ICList[0];
 

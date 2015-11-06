@@ -47,6 +47,8 @@ public:
   
   double GetMaxTimeStep() const { assert(maxTimeStep_>0) ;  return maxTimeStep_;};
   
+  double GetDefaultTimeStep() const { assert(defaulTimeStep_>0) ; return defaulTimeStep_;};
+  
   void UpdateCurrentTime();
   
   //Compute and save maxComputation time : Hardening.duration + ThermalLoading.duration
@@ -60,6 +62,7 @@ public:
   void Run();
   
   void CreateResultsDirectory();
+  void CreateDirectory(std::string relativePathOfTheWantedFolder);
   
   void Info() const;
   

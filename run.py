@@ -7,6 +7,7 @@
 
 from __future__ import division, print_function
 from math import exp
+from collections import OrderedDict
 
 import sys
 sys.path.append("libMetallurgical/PythonB")
@@ -76,7 +77,9 @@ thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
 thermoDynConst.Info();
 
 #Reading initial alloy compo
-exec "AlloyInitialComposition="+material+".AlloyInitialComposition" 
+exec "AlloyInitialComposition="+material+".AlloyInitialComposition"
+#Ordered Composition in ascending order. The first value will be the minimum.
+AlloyInitialComposition=OrderedDict(sorted(AlloyInitialComposition.items(), key=lambda t: t[1][0])) 
 print("  > Alloy composition read is        :", AlloyInitialComposition)
 
 #Find main element of Alloy
@@ -101,6 +104,9 @@ ED = PyChemicalElement.GetElementsDict() #Mendeleiv  Table : a dictionary of che
 ConcernedPyChemicalElements=[] #a list which will contains python objects of type chemicalElements according to chemical elements involved in the computation
 for symbol in AlloyInitialComposition.keys():
     ConcernedPyChemicalElements.append(ED[symbol])
+print("AlloyInitialComposition.keys()",AlloyInitialComposition.keys())
+print("AlloyInitialComposition",AlloyInitialComposition)
+print("Coneerned python chemicalElements obj",ConcernedPyChemicalElements )
 
 #Create C++ objects of type ChemicalElement using Mendeleiv.py
 CppElementsDict={}#a dictionary of chemichal Elements Names as keys with their C++ Objects associated. {"chemichal Element Name": chemicalElementC++Object}
@@ -334,12 +340,16 @@ for computation in ComputationList:
             print("CC Cpp object of precipitate is: ",CppCCP)
             print("Precipitate Chemical Formulation: ",CppCCP.formula)
             PyCC=PyChemicalComposition(pyPrecipitateObj.chemicalComposition[0])
+            print("pyPrecipitateObj.chemicalComposition[0]",pyPrecipitateObj.chemicalComposition[0])
 
             #Add "ALL" Cpp ChemicalElement inCpp ChemicalComposition of Cpp Precipitate
-            for u in PyCC.composition.items():
+            #Ordered by alphabetic order. The First key which is not the main Element will be used when computing interfacial Conc
+            for u in sorted(PyCC.composition.items(), key=lambda t: t[0]): # Previously for u in PyCC.composition.items(): 
                 symbol=u[0]
                 stoichiometry=u[1][0]
                 print("pouet 1")
+                print("Symbol", symbol)
+                print("PyCC.composition.items()", PyCC.composition.items())
                 #Add Cpp ChemicalElement in Cpp ChemicalComposition of Cpp Precipitate
                 CppElementsDict[symbol].EnterInChemicalComposition(CppCCP)
                 print("pouet 2")
@@ -427,23 +437,10 @@ for computation in ComputationList:
 
 
 CppMaterial.Info()
-CppMaterial.GetSSGrain().volNbGP=4
 CppMaterial.Info()
 CppMaterial.GetSSGrain().GetChemicalComposition().Info()
 CppMaterial.GetInitialChemicalComposition().Info()
 
-
-print('##############################################################################5674555555555555555555555555555555555555555')
-toto=ChemicalComposition("Al8Cu4")
-toto2=toto.Clone()
-toto3=CppChemicalCompositionSprime.Clone()
-toto3.GetGrainPointer()
-toto3.GetMaterialPointer()
-toto3.GetConcentrationForElement("Al")
-CppChemicalCompositionSprime.GetGrainPointer()
-CppChemicalCompositionSprime.GetMaterialPointer()
-CppChemicalCompositionSprime.GetConcentrationForElement("Al")
-print('##############################################################################5674555555555555555555555555555555555555555')
 
 
 
@@ -454,7 +451,7 @@ CppMaterial.GetSSGrain().test()
 
 CppMaterial.GetInitialChemicalComposition().test()
 CppMaterial.GetSSGrain().GetChemicalComposition().test()
-CppMaterial.GetCurrentChemicalComposition().test()#if concentration in Material SSGrain is change, it affects concentration of Material
+CppMaterial.GetCurrentChemicalComposition().test()#if concentration in Material SSGrain is modified, it affects concentration of Material
 
 CppPrecipitateDict["Sprime"].ComputeSurfaceEnergy()
 print("Surface energy of <Sprime> value ==============================================",CppPrecipitateDict["Sprime"].surfaceEnergyCurrentValue)
@@ -467,13 +464,14 @@ print("Surface energy of <GP> value ============================================
 
 
 ##############  TEST DE LA BOUCLE TEMPORELLE ########################
-CppMaterial.UpdateVolumicValues()
-print("XvCuSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Cu").volumicValue)
-print("XvMgSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Mg").volumicValue)
-CppVacancy.ComputeDiffusionCoefValue()
-print("Dlac ",CppVacancy.vacancyDiffusionCoef)
-CppVacancy.ComputeEquilibriumConcentration()
-print("Xlaceq ",CppVacancy.equilibriumConc)
+
+##CppMaterial.UpdateVolumicValues()
+##print("XvCuSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Cu").volumicValue)
+##print("XvMgSS ",CppMaterial.GetCurrentChemicalComposition().GetConcentrationForElement("Mg").volumicValue)
+##CppVacancy.ComputeDiffusionCoefValue()
+##print("Dlac ",CppVacancy.vacancyDiffusionCoef)
+##CppVacancy.ComputeEquilibriumConcentration()
+##print("Xlaceq ",CppVacancy.equilibriumConc)
 
 c.maxComputationTime=CppHardening.duration #CppHardening.duration + CppThermalLoading.duration
 CppMaterial.RunProcess()#RunProcess also run ProcessPrecipitatesNucleationRate() which run precipitate method ProcessNucleationRate()

@@ -21,6 +21,8 @@ AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentr
                   "Mg":(2.08/100,"m^3.m^-3")# Magnesium initial concentration, in range [0,1]
     }#Unit can be m^3.m^-3 (volumic) or atom.atom^-1 (atomic) or kg.kg^-1 (massic).
 
+# dictionary sorted by value
+#OrderedDict(sorted(AlloyInitialComposition.items(), key=lambda t: t[1][0]))
 
 
 #INITIAL CONCENTRATION!!!!!!!!!!!!!!!!!!===>    #Question: where to find it in UMl diagram      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -59,8 +61,8 @@ Cu={
              "nature":"DiffusionParam", #Important                  
 "preExpDiffusionCoef": (6.5E-5,"m^2.s^-1"), #Atomic diffusion: initial diffusion value for copper, pre-exponential diffusion coeffcient. Mandatory!               
                   "Q": (135000,"J.mol^-1"), #Atomic diffusion: Activation energy of diffusion for copper.  Mandatory!
-               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!. Optional: If this parameter is not needed, user must write :==> (None,None)   
-
+               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!. Optional: If this parameter is not needed, user must write :==> (None,None)
+             
 #WARNING: all these keys are mandatory. In case of the key "Evac", If  user don't want to use it, he must give value :==> (None,None)
 #WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) .
   

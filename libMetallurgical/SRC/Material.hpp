@@ -45,6 +45,8 @@ public:
   void SaveMaterialCurrentChemicalCompo();
   void SaveMaterialVacancyProperties();
   
+  bool CheckIfTheVolumicConcentrationsArePositive();
+  
   void RunProcess();
   
   void UpdateAtomicDiffusionCoef(); //TODO After , make this function take arguments for dealing with thermalloading

@@ -52,6 +52,7 @@ public:
     void SetInitialMassicValue(const double initialMassicValue);
     //Set value of volumic concentration
     void SetVolumicValue(const double volumicvalue);
+    void SetVolumicValueAndcheckIfSettedValueIsPositive(const double volumicvalue, bool checkIfSettedValueIsPositive = true);
     void SetStoichiometricCoef(const int stoiCoef);
     
     
@@ -127,9 +128,37 @@ Concentration::SetInitialAtomicValue(const double initialAtomicValue)
 inline void
 Concentration::SetVolumicValue(const double volumicValue)
 {
+  
+  // /*DEBUG*/std::cout<<"DEBUG: element name is "<<chemicalElement_.GetElementName()<<"\n";
+
+    std::cout<<" NOTIFICATION:  A Positive value of Setted volumic concentration has been asserted.";
+    assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
+  
+  volumicValue_=volumicValue;
+}
+
+
+
+
+inline void
+Concentration::SetVolumicValueAndcheckIfSettedValueIsPositive(const double volumicValue, bool checkIfSettedValueIsPositive)
+{
+  
+  // Remember : checkIfSettedValueIsPositive default value is true !!!
+  
+  
   // /*DEBUG*/std::cout<<"DEBUG: element name is "<<chemicalElement_.GetElementName()<<"\n";
   
-  assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
+  if (checkIfSettedValueIsPositive==true )
+  {
+    std::cout<<" NOTIFICATION:  A Positive value of Setted volumic concentration is being asserted.";
+    assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
+  }
+  else
+  {
+    std::cout<<" NOTIFICATION:  Positive value of Setted volumic concentration has not been asserted because checkIfSettedValueIsPositive=false";
+  }
+  
   volumicValue_=volumicValue;
 }
 

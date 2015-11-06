@@ -120,7 +120,7 @@ Diffusion::ComputeAtomicDiffusionCoefValue()
   /*DEBUG*/std::cout<<" {{{{***************************preExpDiffusionCoef_***************************}}}} "<< preExpDiffusionCoef_<<std::endl;
   /*DEBUG*/std::cout<<" {{{{***************************activationEnergy_***************************}}}} "<< activationEnergy_<<std::endl;
   /*DEBUG*/std::cout<<" {{{{***************************R***************************}}}} "<< R<<std::endl;
-  /*DEBUG*/std::cout<<" {{{{***************************T***************************}}}} "<< T<<std::endl;
+  /*DEBUG*/std::cout<<" {{{{***************************T*******toto********************}}}} "<< T<<std::endl;
   /*DEBUG*/std::cout<<" {{{{***************************atomicDiffusionCoef***************************}}}} "<< atomicDiffusionCoef_<<std::endl;
   
   std::cout<<"############# END    Diffusion::ComputeAtomicDiffusionCoefValue()   Computing Atomic DiffusionCoefValue"<<std::endl;
