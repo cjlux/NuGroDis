@@ -554,7 +554,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	/*DEBUG:*/std::cout<<"DEBUG: Value Found using discriminant is"<<X<<"\n";
 	/*DEBUG*/std::cout<<" P(X) with discriminant= "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
 	////////////// Use dichotomous ////////////// 
-	/*
+	
 	
 	double leftLimit, rightLimit;
 	
@@ -595,7 +595,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
  	rightLimit=XvPi;
 	double dichoSolution=Util::Util::DichotomousMethodForSecondDegreeEquation(constantA , (constantB-f*constantC), -f*constantD, X, leftLimit, rightLimit ); // epsilon and alpha are optionnal. by default, epsilon=1.e-16 and alpha=0.1;
 	X=dichoSolution;
-	*/
+	
 	//////////// End ofuse dichotomous //////////// 
 	
 	
@@ -641,7 +641,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  /////////
 
 	  //Check precision of solutions X,Y found
-	  double epsilon=1e-5;
+	  double epsilon=1e-7;
 	  double Eq1precision=std::abs(X*Y-f);
 	  double Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
 	  

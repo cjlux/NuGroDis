@@ -1,4 +1,6 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 
 #recurrent bugs Section:
 #extension class wrapper for base class Precipitate has not been created yet: swap the order of the class_ statements, base class before derived class
@@ -8,8 +10,10 @@
 from __future__ import division, print_function
 from math import exp
 from collections import OrderedDict
+import argparse
+from MetalUtils.Utils import CopyAllDicoInNewPyFile, PrintAllDico
 
-import sys
+import sys, os
 sys.path.append("libMetallurgical/PythonB")
 
 #Bindings
@@ -48,14 +52,20 @@ import script
 
 
 
+
+
+
+
 print ("|####################################################################################################|")
 print ("|######################################  RUNNING FILE <run.py> ######################################|")
 print ("|####################################################################################################|")
 
 
 
-
+materialFileName=str(nugrodis.ComputationParam["Material"])
 material = nugrodis.ComputationParam["Material"]
+
+
 
 print("  > importing module                 :",material)
 exec "import "+material #importing module material given by user
@@ -63,12 +73,180 @@ exec 'L = dir('+material+')' #import  L=directory of module material
 print("  > material read is                 :",material)
 
 
+
+##################### PARSE ARGUMENTS 
+parser = argparse.ArgumentParser(description='Run computation with given param GPsurfaceEnergyPolynomial,\
+halfSinkDistance, hardening duration')
+
+parser.add_argument('-g', type=str, help='gammaGP: Surface energy \
+Polynomial Model as a list [a0, a1, ... , aN]  //Unit=[J/m^2]')
+parser.add_argument('-l', type=float, help='half Sink distance  //Unit=[µm]')
+parser.add_argument('-d', type=float, help='Computation duration = hardening\
+duration //Unit=[second]')
+args = parser.parse_args()
+
+gammaParser=args.g
+halfSinkDParser=args.l
+hardeningDurationParser=args.d
+################### END PARSE ARGUMENTS
+
+
+###### pre steps_ Copy old file material.py and nugrodis .py  ( Before update)#####
+### this copy just all the dictionary of "material".py and nugrodis.py and in new files  ***_DicoCopy.py 
+CopyAllDicoInNewPyFile(materialFileName) # create file "material_DicoCopy.py"
+CopyAllDicoInNewPyFile("nugrodis") #create file "nugrodis_DicoCopy.py"
+
+
+
+if ( (gammaParser!=None) & (halfSinkDParser!=None) & (hardeningDurationParser!=None) ):
+    ##### Step 0.1: Saving old values of gamma, halfSinkD, and duration. (in order to replace old values by new ones, after)
+    exec "oldLtuple="+material+".VacanciesParam['halfSinkD']"
+    exec "oldGammaGPtuple="+material+".GP['surfaceEnergyPolynomialModel']"
+    oldHardeningDurationtuple=nugrodis.HardeningParam["duration"]
+    ##### Step 0.1: Changing Parameters with given parsed arguments:   gamma, halfSinkD, and duration
+    ##### exec material+".GP.update({'surfaceEnergyPolynomialModel':(gammaParser,'J.m^-2')})" # unit in [J/m^2]
+    exec material+".GP.update({'surfaceEnergyPolynomialModel':("+gammaParser+",'J.m^-2')})" # unit in [J/m^2]
+    exec material+".VacanciesParam.update({'halfSinkD': (halfSinkDParser*1E-6,'m')})" # unit in micro meter [µm]
+    nugrodis.HardeningParam.update({'duration': (hardeningDurationParser,'s')})# unit in second [s]
+
+    ### Save current values ( values after update)
+    exec "CurrentValueOfSurfaceEnergyPolynomialTuple="+material+".GP['surfaceEnergyPolynomialModel']"
+    exec "CurrentValueOfHalfSinkDTuple="+material+".VacanciesParam['halfSinkD']"
+    CurrentValueOfHardeningDurationTuple=nugrodis.HardeningParam["duration"]
+
+
+
+#Name of Directory as parameters(g,l,d) values which will be used for computation
+exec "lSave= "+material+".VacanciesParam['halfSinkD'][0]"
+lSave=str(lSave)
+exec "gammaGPSave= "+material+".GP['surfaceEnergyPolynomialModel'][0]"
+gammaGPSave= str(gammaGPSave)[1:-1] #to take of "[" and "]"
+durationSave=nugrodis.HardeningParam["duration"][0]
+durationSave=str(durationSave)
+
+#######################################
+##### SETTING RESULT DIRETORY #########
+
+#SavePath=nugrodis.savePath ##Oldversion, M.G.  thinks that this is the way things should be
+
+##Actual version
+SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave
+
+##### SETTING RESULT DIRETORY #########
+#######################################
+
+
+
+#NAME of directory as parameters values
+
+##########################################
 # Create a C++ object of type Computation:
-c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],nugrodis.savePath)
+c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],SavePath)
 c.Info()
 c.type = nugrodis.ComputationParam["Type"]
 
+# Create a C++ object of type Computation:
+##########################################
+
+
+
+
+######## OUTPUT DIRECTORY ###########
 ComputationResultsDirectory=c.resultsDirectory
+#####################################
+
+
+
+
+
+
+
+
+
+    
+###############################################################################################################################################
+#####    Save Parameters used for computation:  save Material.py and nugrodis.py used for the computation as                             ######
+#####                                           Material_save.py and nugrodis_save.py (Write new files in Back_up)                       ######
+
+##### Step I.1: Create Back_Up folder in OutPut Directory
+backUpDir=ComputationResultsDirectory+"/Back_up"
+if not os.path.exists(backUpDir):
+    os.makedirs(backUpDir)
+
+
+##### Step II.2: Create empty files material_save.py and nugrodis_save.py in Back_Up folder   
+newMaterialPyFile=open(backUpDir+'/'+material+'_save.py','w')
+newNugrodisPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+
+
+##### Step II.3 (OLD): Copy the content of Old .py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
+##oldMaterialPyfile=open(material+".py",'r').read()
+##oldNugrodisPyfile=open("nugrodis.py",'r').read()
+##for line in oldMaterialPyfile:
+##   newMaterialPyFile.write(line)
+##newMaterialPyFile.close()
+##for line in oldNugrodisPyfile:
+##    newNugrodisPyfile.write(line)
+##newNugrodisPyfile.close()
+
+
+
+##### Step II.3 (NEW): Copy the content of Old 'pyfile'_DicoCopy.py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
+oldMaterialPyfile=open(material+"_DicoCopy.py",'r').read()
+oldNugrodisPyfile=open("nugrodis_DicoCopy.py",'r').read()
+for line in oldMaterialPyfile:
+   newMaterialPyFile.write(line)
+newMaterialPyFile.close()
+for line in oldNugrodisPyfile:
+    newNugrodisPyfile.write(line)
+newNugrodisPyfile.close()
+
+if ( (gammaParser!=None) & (halfSinkDParser!=None) & (hardeningDurationParser!=None) ):
+    # :::::::   USE PARSED ARGUMENTS FOR THE COMPUTATION AND SAVE CORRECT 'material'.py and nugrodis.py used for Computation  ::::::: #
+    
+    ##### Step III: In Back_Up .py files (material_save.py and nugrodis_save.py) ==>
+    ### replacing old values of params: gamma, halfSinkD, and duration, by the real values used for Computation
+
+
+
+    ##### Check (Assert) single occurence of string to replace: check if Occurence of string to replace is 1. Because, it is not 1,
+    # it means something we DONT WANT to change can be modified.
+    materialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','r+')
+    nugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','r+')  
+
+    assert (oldMaterialPyfile.count(str(oldGammaGPtuple))==1), "old value of argument 'surfaceEnergyPolynomialModel' in dictionary GP can't be set\
+by parsing. It has to be setted manually in file 'material'.py " 
+    assert( oldMaterialPyfile.count( str(oldLtuple))==1   ),"The old tuple of argument 'halfSinkD' in dictionary VacanciesParam APPEARS MORE THAN\
+ONE TIME so it can't be\
+set by parsing. It has to be setted manually in file 'material'.py"
+    assert( oldNugrodisPyfile.count( str(oldHardeningDurationtuple))==1   ),"The old tuple of argument duration in dictionary \
+HardeningParam APPEARS MORE THAN ONE TIME so it can't be set by parsing. It has to be setted manually in file nugrodis.py"
+
+    clearMaterialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','w')
+    clearNugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+
+    for line in oldMaterialPyfile.replace(str(oldGammaGPtuple), str(CurrentValueOfSurfaceEnergyPolynomialTuple)).replace(str(oldLtuple),str(CurrentValueOfHalfSinkDTuple)):
+        clearMaterialBackUpPyFile.write(line)
+    clearMaterialBackUpPyFile.close()
+    for line in oldNugrodisPyfile.replace(str(oldHardeningDurationtuple),str(CurrentValueOfHardeningDurationTuple)):
+       clearNugrodisBackUpPyfile.write(line)
+    clearNugrodisBackUpPyfile.close()
+
+##### END:Save Parameters used for computation:  save Material.py and nugrodis.py used for the computation (Write new files in Back_up)  ######
+###############################################################################################################################################
+
+
+
+
+
+
+#####################################################
+########### SETTINGS FOR POSTPROCESSING #############
+lastSaveTextFile=open('lastResultDirectoryPath.txt', 'w')
+lastSaveTextFile.write(ComputationResultsDirectory)
+lastSaveTextFile.close()
+########### SETTINGS FOR POSTPROCESSING #############
+#####################################################
 
 # Create a C++ object of type ThermoDynamicsConstant:
 thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
@@ -530,8 +708,14 @@ CppMaterial.RunProcess()#RunProcess also run ProcessPrecipitatesNucleationRate()
 
 
 c.Run()
-script.OutputDistributionCurves(ComputationResultsDirectory+"/")
-script.OutputAttributes(ComputationResultsDirectory+"/")
+
+
+######## POSTPROCESSING, old method     #####
+## script.OutputDistributionCurves(ComputationResultsDirectory+"/")
+## script.OutputAttributes(ComputationResultsDirectory+"/")
+## script.OutputMaterialChemicalComposition(ComputationResultsDirectory+"/")
+## script.OutputMaterialVacancyProperties(ComputationResultsDirectory+"/")
+#########################################################
 
 
 

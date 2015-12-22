@@ -505,28 +505,39 @@ Material::ConvertVolumicToInitialAtomicConcentration()
     
   for (it=concMap.begin(); it!=concMap.end(); ++it)
   {
-    double volumicConc=0;
+    double initialVolumicConc=0;
     double elementRho=0;
     double elementMolarMass=0;
     double sum=0;
     for (it2=concMap.begin(); it2!=concMap.end(); ++it2)
     {
-      volumicConc=it2->second->GetVolumicValue();
+      initialVolumicConc=it2->second->GetInitialVolumicValue();
       elementRho=it2->second->GetChemicalElement().GetDensity();
       elementMolarMass=it2->second->GetChemicalElement().GetMolarMass();
-      sum+=volumicConc*elementRho*1000/elementMolarMass;
+      sum+=initialVolumicConc*elementRho*1000/elementMolarMass;
+      
+      /*debug begin*/
+      std::cout<<"Rho"<<it2->first<<"  = "<<elementRho<<"\n";
+      std::cout<<"Mm"<<it2->first<<"  = "<<elementMolarMass<<"\n";
+      std::cout<<"Xv0"<<it2->first<<"SS  = "<<initialVolumicConc<<"\n";
+      std::cout<<"monome (Xv0SS*Rho*1000/Mm) when element i is "<<it2->first<< initialVolumicConc*elementRho*1000/elementMolarMass  <<"\n";
+      std::cout<<" Sum cumulé proressive "<<sum<<"\n";
+      /*debug end*/
       
     }
     
-    volumicConc=it->second->GetVolumicValue();
+    initialVolumicConc=it->second->GetInitialVolumicValue();
     elementRho=it->second->GetChemicalElement().GetDensity();
     elementMolarMass=it->second->GetChemicalElement().GetMolarMass();
     
     
     
+    /*debug begin*/
+    std::cout<<"debug: numerateur = "<<elementRho*1000/elementMolarMass <<"\n";
+    std::cout<<"debug: coef for converting volumicSS to atomicSS for element  <"<<it->first<<"> is --->"<<elementRho*1000/elementMolarMass/sum<<"\n";
+    /*debug end*/
     
-    
-    double atomicConc= (volumicConc*elementRho*1000/elementMolarMass)/sum;
+    double atomicConc= (initialVolumicConc*elementRho*1000/elementMolarMass)/sum;
     //SET INITIAL ATOMIC VALUE!!!
     assert ( (it->second->GetInitialAtomicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To AtomicConcentration\
     because InitialAtomicValue has already been set." );
@@ -602,25 +613,25 @@ Material::ConvertVolumicToInitialMassicConcentration()
     
   for (it=concMap.begin(); it!=concMap.end(); ++it)
   {
-    double volumicConc=0;
+    double initialVolumicConc=0;
     double elementRho=0;
     double sum=0;
     for (it2=concMap.begin(); it2!=concMap.end(); ++it2)
     {
-      volumicConc=it2->second->GetVolumicValue();
+      initialVolumicConc=it2->second->GetInitialVolumicValue();
       elementRho=it2->second->GetChemicalElement().GetDensity();
-      sum+=volumicConc*elementRho;
+      sum+=initialVolumicConc*elementRho;
       
     }
     
-    volumicConc=it->second->GetVolumicValue();
+    initialVolumicConc=it->second->GetInitialVolumicValue();
     elementRho=it->second->GetChemicalElement().GetDensity();
     
     
     
     
     
-    double massicConc= (volumicConc*elementRho)/sum;
+    double massicConc= (initialVolumicConc*elementRho)/sum;
     //SET INITIAL MASSIC VALUE!!!
     assert ( (it->second->GetInitialMassicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To MassicConcentration\
     because InitialMassicValue has already been set." );
@@ -664,15 +675,26 @@ Material::UpdateVolumicValues()
 	
 	double precipitateFracVol=(*i)->GetVolumicFraction(); //fracVolP
 	double elementVolumicConcInPrecipitate=(*i)->GetChemicalComposition().GetConcentrationForElement(it->first).GetVolumicValue(); //Xv_i_P
-	product+= precipitateFracVol*elementVolumicConcInPrecipitate;// Xv_i_P1 * fracVolP1 + Xv_i_P2 * fracVolP2 + ... + Xv_i_Pn * fracVolPn 
-	sumOfFracVol+=precipitateFracVol;  // fracVolP1 + fracVolP2 + ... + fracVolPn 
+	product += (precipitateFracVol*elementVolumicConcInPrecipitate);// Xv_i_P1 * fracVolP1 + Xv_i_P2 * fracVolP2 + ... + Xv_i_Pn * fracVolPn 
+	sumOfFracVol += precipitateFracVol;  // fracVolP1 + fracVolP2 + ... + fracVolPn 
+	
+	//Debug
+	std::cout<<"TARATATA: Precipitate type is "<<(*i)->GetPrecipitateType()<<"\n";
+	std::cout<<"TARATATA1: Precipitate frac vol is "<<precipitateFracVol<<"\n"<<" Xv"<<it->first<<"P : "<<elementVolumicConcInPrecipitate<<"\n"<<" total Xv_i*Vf_i Product is"<<product<<"\n Sum of frac vol is :"<<precipitateFracVol<<"\n";
       }
       
-    double elementInitialVolumicConcInMaterial=it->second->GetVolumicValue(); //Xv0_i_SS
+    double elementInitialVolumicConcInMaterial=it->second->GetInitialVolumicValue(); //Xv0_i_SS
+    
+    //debug
+    std::cout<<"TARATATA2 Initial COncentration OIbd adress is "<<it->second<<"\n";
+    std::cout<<" Xv0"<<it->first<<"SS is:"<<elementInitialVolumicConcInMaterial<<"\n";
     
     assert(sumOfFracVol!= 1.);
     assert( ( sumOfFracVol < 1 ) && " Precipitates total volumic fraction must be less than 1" );
     double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1.-sumOfFracVol);
+    
+    //debug
+    std::cout<<"TARATATA3 Current volumic con is then: "<<currentVolumicConc<<"\n";
     
     
     currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
@@ -756,7 +778,7 @@ Material::SaveMaterialVacancyProperties()
   if ( in.tellg() == 0 /*check if it is empty*/      )
   {
     // file is empty
-    line<<"time"<<"\t"<<"Dlac"<<"\t"<<"Xlac"<<"\t"<<"XlacEq"<<"\t"<<"lambda"<<"\t"<<"halSinkDistance"<<"\t";
+    line<<"time"<<"\t"<<"Dlac"<<"\t"<<"Xlac"<<"\t"<<"XlacEq"<<"\t"<<"LambdaBoostFactor"<<"\t"<<"halSinkDistance"<<"\t";
     
     for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
     {

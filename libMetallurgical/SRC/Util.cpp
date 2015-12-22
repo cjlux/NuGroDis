@@ -106,9 +106,11 @@ namespace Util
       {
         const double sqrtDelta = sqrt(delta);
        
-	/*Debut Modifs par MG*/ 
-	//Pour eviter erreur d'arrondi: sources: https://fr.wikipedia.org/wiki/%C3%89quation_du_second_degr%C3%A9      Michel Pignat et Jean Vignès, Ingénierie du contrôle de la précision des calculs sur ordinateur.
-	/*
+	///////
+	/// *Debut Modifs par MG*/ 
+	///Pour eviter erreur d'arrondi: sources:
+	///https://fr.wikipedia.org/wiki/%C3%89quation_du_second_degr%C3%A9      ///Michel Pignat et Jean Vignès, Ingénierie du contrôle de la ///précision des calculs sur ordinateur.
+	////////
 	if (b>0)
 	{
 	  x1.real() = (-b-sqrtDelta)*oneOver2a;
@@ -123,10 +125,29 @@ namespace Util
 	  x2.real() = c/(a*x1.real());
 	  x2.imag() = 0.;
 	};
-	*/
-	/* Fin Modifs par MG*/
+	////////////////
+	///* Fin Modifs par MG*/
+	/////////////////////
 	
-	/* Debut: Avec method Jenkins-Traub */
+	
+	///////////////////////////
+	///*Debut Ancienne version par JLC*/
+	/// Sans précaution par rapport à l'erreur d'arrondi
+	////////////////
+	/*
+	x1.real() = (-b-sqrtDelta)*oneOver2a;
+        x1.imag() = 0.;
+        x2.real() = (-b+sqrtDelta)*oneOver2a;
+        x2.imag() = 0.;
+	*/
+	///////////////////
+	// Fin Ancienne version JLC
+	//////////////////////////////
+
+	
+	//////////////////////
+	///// Debut: Avec method Jenkins-Traub */
+	///////////////////
 	/*
 	int degree=2;
 	double coefs[degree+1];
@@ -142,76 +163,15 @@ namespace Util
         x2.real() = zeror[1];
         x2.imag() = 0.;
 	*/
-	/* Fin: Avec method Jenkins-Traub */
+	//////////////////
+	///// Fin: Avec method Jenkins-Traub */
+	///////////////////////////////////
 	
 	
-	/*Debut Ancienne version par JLC*/
-	
-	x1.real() = (-b-sqrtDelta)*oneOver2a;
-        x1.imag() = 0.;
-        x2.real() = (-b+sqrtDelta)*oneOver2a;
-        x2.imag() = 0.;
 	
 	
-	/* //debut: dicho
-	double f1left, f1right, f2left, f2right, delta, half1, half2, fhalf1, fhalf2, epsilon;
-	epsilon= 1e-30;
-	delta=0.1;
-	f1left= x1.real()- delta;
-	f1right=x1.real()+ delta;
-	f2left= x2.real()- delta;
-	f2right=x2.real()+ delta;
-	
-	//assert ( (f1left*f1right<0)&& (f2left*f2right<0));
-	
-	while ( (f1left*f1right<0) && ( (f1right-f1left)<=epsilon ) )
-	{
-	  half1= (f1left+f1right)/2.;
-	  half2= (f2left+f2right)/2.;
-	  
-	  fhalf1= a*half1*half1 +b*half1 +c;
-	  fhalf2= a*half2*half2 +b*half2 +c;
-	  
-	  if ( fhalf1*f1right <0)
-	  {
-	    f1left= fhalf1;
-	    fhalf1= (fhalf1+f1right)/2.;
-	    
-	  }
-	  else
-	  {
-	    f1right= fhalf1;
-	    fhalf1= (fhalf1+f1left)/2.;
-	  };
-	  	  
-	}
-	x1.real()= f1left;
 	
 	
-	while ( (f2left*f2right<0) && ( (f2right-f2left)<=epsilon ) )
-	{
-
-	  half2= (f2left+f2right)/2.;
-	  
-	  fhalf2= a*half2*half2 +b*half2 +c;
-	  
-	  if ( fhalf2*f2right <0)
-	  {
-	    f2left= fhalf2;
-	    fhalf2= (fhalf2+f2right)/2.;
-	  }
-	  else
-	  {
-	    f2right= fhalf2;
-	    fhalf2= (fhalf2+f2left)/2.;
-	  };
-	  
-	}
-	x2.real()= f2left;
-	//Fin: dicho
-	*/
-	
-	/*Fin Ancienne version par JLC*/
       }
     else      // 2 conjugate complex roots
       {
@@ -533,53 +493,80 @@ namespace Util
 	
 	assert((alpha>0)&&(alpha<=1));
 	
+	//debug
+	std::cout<<"Solution to imporve by dichotomous method is ------> "<<solutionToImprove<<"\n";
 	
-
-	delta=alpha*(std::abs(rightValue-leftValue));
-	f1left= solutionToImprove - delta;
-	if ( f1left<leftValue )
-	{f1left=leftValue;}
+	double f_solutionToImprove= a*solutionToImprove*solutionToImprove + b*solutionToImprove + c;
 	
-	f1right=solutionToImprove + delta;
-	if (f1right>rightValue)
-	{f1right=rightValue;}
-	
-	/*DEBUG*/ std::cout<<"In Util::DichotomousMethodForSecondDegreeEquation(): \n ";
-	/*DEBUG*/std::cout<<" delta is "<<delta<<"left value is "<<f1left<<" right value is "<< f1right <<"\n";
-
-
-	
-	f_left= a*f1left*f1left + b*f1left + c;
-	f_right= a*f1right*f1right + b*f1right +c;
-	
-	
-	/*debug*/ std::cout<<" fleft*fright= "<<f_left*f_right<<" fleft =  "<<f_left<<" fright = "<<f_right<<"\n";
-	assert ( (f_left*f_right<0)&&"Solution is not in the range compute from given argument leftValue and rightValue");
-	
-	while ( (f_left*f_right<0) && ( std::abs(f1right-f1left)>=epsilon ) )
+	if (f_solutionToImprove == 0)
 	{
-	  /*debug*/ std::cout<<" f1left= "<<f1left<<" f1right ="<<f1right<<"\n";
-	  half= (f1left+f1right)/2.;
-	  
-	  f_half= a*half*half + b*half +c;
-	  
-	  if ( f_half*f_right <0)
-	  {
-	    f1left= half;
-	    half= (half+f1right)/2.;
-	    f_left= a*f1left*f1left + b*f1left + c;
-	  }
-	  else
-	  {
-	    f1right= half;
-	    half= (half+f1left)/2.;
-	    f_right= a*f1right*f1right +b*f1right +c;
-	  };
-   	  
+	  std::cout<<"P(solutionToImprove)=0  . Solution to improve is already accurate \n";
 	}
-	/*debug*/
-	solutionToImprove= f1left; //or f1right, it is the same
-	//Fin: dicho
+	else
+	{
+	  delta=alpha*(std::abs(rightValue-leftValue));
+	  f1left= solutionToImprove - delta;
+	  if ( f1left<leftValue )
+	  {f1left=leftValue;}
+	  
+	  f1right=solutionToImprove + delta;
+	  if (f1right>rightValue)
+	  {f1right=rightValue;}
+	  
+	  /*DEBUG*/ std::cout<<"In Util::DichotomousMethodForSecondDegreeEquation(): \n ";
+	  /*DEBUG*/std::cout<<" delta is "<<delta<<"left value is "<<f1left<<" right value is "<< f1right <<"\n";
+
+
+	  
+	  f_left= a*f1left*f1left + b*f1left + c;
+	  f_right= a*f1right*f1right + b*f1right +c;
+	  
+	  
+	  /*debug*/ //std::cout<<" fleft*fright= "<<f_left*f_right<<" fleft =  "<<f_left<<" fright = "<<f_right<<"\n";
+	  
+	  assert ( (f_left*f_right<0)&&"Solution is not in the range compute from given argument leftValue and rightValue");
+	  
+	  //debug
+	  //std::cout<<"pre assert: f_left*f_right=  "<<f_left*f_right<<" f(leftValue) "<<f_left<<" f(rightValue) "<<f_right<<"\n //leftValue- rightValue= "<<f1left-f1right<<"\n";
+	  
+	  
+	  while ( (f_left*f_right<0) && ( std::abs(f1right-f1left)>=epsilon ) )
+	  {
+	    /*debug*/ //std::cout<<" f1left= "<<f1left<<" f1right ="<<f1right<<"\n";
+	    half= (f1left+f1right)/2.;
+	    
+	    f_half= a*half*half + b*half +c;
+	    
+	    if ( f_half*f_right <0)
+	    {
+	      f1left= half;
+	      f_left= a*f1left*f1left + b*f1left + c;
+	      /*debug*/ //std::cout<<"case1: fleft= "<< f1left<<"\n fright= "<<f1right<<"\n";
+	    }
+	    else
+	    {
+	      f1right= half;
+	      f_right= a*f1right*f1right +b*f1right +c;
+	      /*debug*/ //std::cout<<"Fleft*Fhalf = "<<f_left*f_right<<"\n";
+	      /*debug*/ //std::cout<<"fright "<<f1right<<"\n";
+	      /*debug*/ //std::cout<<"Fhalf = "<<f_right<<"\n";
+	      /*debug*/ //std::cout<<"Fleft = "<<f_left<<"\n";
+	      /*debug*/ //std::cout<<"case2: fleft= "<< f1left<<"\n fright= "<<f1right<<"\n";
+	    };
+	    
+	    
+	  }
+	  /*debug*/ //std::cout<<"Post assert: f_left*f_right=  "<<f_left*f_right<<" f(leftValue) "<<f_left<<" f(rightValue) "<<f_right<<"\n leftValue- rightValue= "<<f1left-f1right<<"\n";
+	  
+	  solutionToImprove= f1left; //or f1right, it is the same
+	  //End: dicho
+	  
+	  //debug
+	  std::cout<<"Dicho. solution is now "<<solutionToImprove<<"\n";
+	  
+	};
+
+
     
     /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
     std::cout<< "P(solutionToImprove)= "<< a*solutionToImprove*solutionToImprove +b*solutionToImprove + c <<"\n";

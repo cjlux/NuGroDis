@@ -87,6 +87,7 @@ std::cout << "Building Object <Computation>" << std::endl;
 
     
     resultsDirectory_= buffer;
+    
   }
   else
   {
@@ -99,7 +100,7 @@ std::cout << "Building Object <Computation>" << std::endl;
     
     std::strftime(buffer, sizeof(buffer), "%a_%b_%d_%Hhr_%Mmin_%Ss_%Y", std::localtime(&now));
     
-    resultsDirectory_=ResultsDirectory+"/"+buffer;
+    resultsDirectory_=ResultsDirectory+"__"+buffer;
   }
 
 this->CreateResultsDirectory();
@@ -193,6 +194,9 @@ Computation::ComputeMaxTimeStep()
     assert ((*it)>0);
     
     maxTimeStep_= *it;
+    
+    
+    
     std::cout<<"crtitical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;
     
     

@@ -13,12 +13,15 @@
 //
 #include <iostream>
 #include <cmath>
+#include <map>
 #include "Vacancy.hpp"
 #include "ChemicalElement.hpp"
 #include "Diffusion.hpp"
 #include "ThermoDynamicsConstant.hpp"
 #include "Material.hpp"
 #include "Temperature.hpp"
+#include "Concentration.hpp"
+#include "ChemicalComposition.hpp"
 
 Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb)
   : vacCreationEnthalpy_(deltaHF), 
@@ -225,6 +228,29 @@ Vacancy::ReturnConcentrationBeforeQuenching()
   
   double R=ThermoDynamicsConstant::GetR();
   double Xlacavtrempe;
+  
+  /////////////////////////////////////////////////////////////////
+  //assert if material current volumic conc is initial volumic conc
+  /////////////////////////////////////////////////////////////////
+  std::map<std::string , Concentration*>::iterator it;
+  
+  std::map<std::string, Concentration*> initialConcMap=material_.GetInitialChemicalComposition().GetConcentrationMap();
+  
+  std::map<std::string, Concentration*> currentConcMap=material_.GetCurrentChemicalComposition().GetConcentrationMap();
+  
+  for (it=initialConcMap.begin(); it!=initialConcMap.end(); ++it)
+  {
+    double initialVolumicConc=initialConcMap[it->first]->GetInitialVolumicValue();
+    
+    double currentVolumicValue= currentConcMap[it->first]->GetVolumicValue();
+    
+    assert (  (initialVolumicConc==currentVolumicValue)&&"Cannot return \
+    concentration before quenching before at this moment, initial volumic concentration is not the current volumic concentration" );
+  }
+  // End assert if material current volumic conc is initial volumic conc
+  //////////////////////////////////////////////////////////////////////
+  
+  
   
   const double alpha= this->ReturnAlpha(solutionisingTemp_);
   

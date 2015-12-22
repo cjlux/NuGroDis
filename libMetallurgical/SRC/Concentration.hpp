@@ -50,6 +50,8 @@ public:
     void SetInitialAtomicValue(const double initialAtomicValue);
     //Set Initial massic value
     void SetInitialMassicValue(const double initialMassicValue);
+    //Set Initial volumic value: especially for initial Chemical Compo
+    void SetInitialVolumicValue(const double initialMassicValue);
     //Set value of volumic concentration
     void SetVolumicValue(const double volumicvalue);
     void SetVolumicValueAndcheckIfSettedValueIsPositive(const double volumicvalue, bool checkIfSettedValueIsPositive = true);
@@ -61,9 +63,13 @@ public:
     double GetVolumicValue() const;
     double GetInitialAtomicValue() const;
     double GetInitialMassicValue() const;
+    double GetInitialVolumicValue() const;
     const int GetStoichiometricCoef() const;
     bool GetInitialAtomicValueHasBeenSet() const {return initialAtomicValueHasBeenSet_;};
     bool GetInitialMassicValueHasBeenSet() const {return initialMassicValueHasBeenSet_;};
+    bool GetInitialVolumicValueHasBeenSet() const {return initialVolumicValueHasBeenSet_;};
+    
+    
     
     
     //RELATIONS
@@ -90,10 +96,15 @@ private:
     //The initial massic concentration of the chemical element. Unit: ratio in the range [0,1]
     double initialMassicValue_;
     
+    
+    
     int stoichiometricCoef_;
     
     bool initialAtomicValueHasBeenSet_;
     bool initialMassicValueHasBeenSet_;
+    
+    double initialVolumicValue_;
+    bool initialVolumicValueHasBeenSet_;
     
     
     
@@ -125,9 +136,25 @@ Concentration::SetInitialAtomicValue(const double initialAtomicValue)
   initialAtomicValueHasBeenSet_=true;
 }
 
+
+inline void
+Concentration::SetInitialVolumicValue(const double initialVolumicValue)
+{
+  assert ( (initialVolumicValueHasBeenSet_==false)&&"Cannot Set Initial Volumic Value because it has already been set " );
+  initialVolumicValue_=initialVolumicValue;
+  initialVolumicValueHasBeenSet_=true;
+ 
+  assert ( (initialVolumicValue_>=0)&&"Value of Initial Volumic Concentration is negative. Cannot set initial volumic value!" );
+}
+
+
 inline void
 Concentration::SetVolumicValue(const double volumicValue)
 {
+  if (initialVolumicValueHasBeenSet_==false)
+  {
+    this->SetInitialVolumicValue(volumicValue);
+  }
   
   // /*DEBUG*/std::cout<<"DEBUG: element name is "<<chemicalElement_.GetElementName()<<"\n";
 
@@ -136,6 +163,10 @@ Concentration::SetVolumicValue(const double volumicValue)
   
   volumicValue_=volumicValue;
 }
+
+
+
+
 
 
 
@@ -183,6 +214,16 @@ Concentration::GetInitialMassicValue() const
   and probably has not been setted!!!"  );
   return initialMassicValue_;
 }
+
+inline double
+Concentration::GetInitialVolumicValue() const
+{
+  assert(  (initialVolumicValue_!=-1)&&"Cannot Get Initial Volumic Value because it is equal to -1 \
+  and probably has not been setted!!!"  );
+  return initialVolumicValue_;
+}
+
+
 
 inline double
 Concentration::GetVolumicValue() const

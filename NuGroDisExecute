@@ -5,4 +5,8 @@ CURRENT_DIR=$PWD
 
 NuGroDis_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-cd $NuGroDis_DIR/libMetallurgical/SRC/ && make &&cd ../.. && python run.py && cd $CURRENT_DIR
+#oldVersion:  
+#cd $NuGroDis_DIR/libMetallurgical/SRC/ && make &&cd ../.. && python run.py && cd $CURRENT_DIR
+
+#NewVersion
+cd $NuGroDis_DIR/libMetallurgical/SRC/ && make &&cd ../.. && python run.py; python -c "import script; print script.PostProcessing()" && cd $CURRENT_DIR

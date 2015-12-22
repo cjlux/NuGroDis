@@ -26,7 +26,9 @@ Concentration::Concentration(const ChemicalElement& elem,const ChemicalCompositi
    initialMassicValue_(-1),
    stoichiometricCoef_(0),
    initialAtomicValueHasBeenSet_(false),
-   initialMassicValueHasBeenSet_(false)
+   initialMassicValueHasBeenSet_(false),
+   initialVolumicValue_(-1),
+   initialVolumicValueHasBeenSet_(false)
 {
 }
 
@@ -87,6 +89,7 @@ Concentration::Info() const
   std::cout <<  "                                   volumicValue: " << volumicValue_  << " SI unit" << std::endl;
   std::cout <<  "                             initialAtomicValue: " << initialAtomicValue_ << " SI unit" << std::endl;
   std::cout <<  "                             initialMassicValue: " << initialMassicValue_ << " SI unit" << std::endl;
+  std::cout <<  "                             initialVolumicValue: " << initialVolumicValue_ << " SI unit" << std::endl;
   //std::cout <<  "                            chemicalComposition: " << chemicalComposition_ << " SI unit" << std::endl;
   //std::cout <<  "                                chemicalElement: " << chemicalElement_ << " SI unit" << std::endl;
   std::cout <<  std::endl;

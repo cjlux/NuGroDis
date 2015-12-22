@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #for x in ChemicalElements.keys():
 #    print(x)
 #    print(ChemicalElements[x]["density"][0])
@@ -5,6 +6,7 @@
 from __future__ import division, print_function
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict
 from MetalUtils.ElementsData import Dict as ElementsDataDict
+
 
 NuGroDisVersion="1.0"
 
@@ -30,7 +32,7 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (77636,"s"), # hardening duration
+"duration": (1000,"s"), # hardening duration
 "initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
 #"initialClassNumber" : (117, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }

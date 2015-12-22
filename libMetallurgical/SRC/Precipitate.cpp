@@ -80,7 +80,8 @@ Precipitate::Precipitate(Material& mat,ChemicalComposition &CC, RadiusDistributi
    SumOfStoiCoefsHasBeenComputed_(false),
    solubilityProduct_(-1),
    equilibriumConcMap_(),
-   criticalInterfacialConcentrationRadiusFactor_(0.1)
+   criticalInterfacialConcentrationRadiusFactor_(0.1) 
+   /*debug*/,FirstNotEmptyClassIdAfterNucleation(-1)
 {
   std::cout<<"Build a C++ Precipitate object"<<std::endl;
   
@@ -126,6 +127,8 @@ Precipitate::InitializeEquilibriumConcentrationMap()
   
 }
 
+
+//Return firstNotEmptyClassIdAfterNucleation
 unsigned int
 Precipitate::ReturnRDFirstNotEmptyClassIdAfterNucleation()
 {
@@ -183,7 +186,6 @@ Precipitate::ReturnRDFirstNotEmptyClassIdAfterNucleation()
   };
 
   
- 
   
  return firstNotEmptyClassIdAfterNucleation;
 }
@@ -207,6 +209,8 @@ Precipitate::SavePrecipitateAttributes()
   std::string path=ResultsDirectoryPath+"/"+relativeSaveFolderPath+"/"+fileName;
   std::ofstream output_file;
   output_file.open(path.c_str(), std::ios_base::app);
+  
+  
   
   
   //Check if file is empty
@@ -239,6 +243,9 @@ Precipitate::SavePrecipitateAttributes()
       
     }
     
+    /*debug*/ line<<"\t"<<"FistNotEmptyClassAfterNucleation";
+    
+    
     line<<"\n";
     
     lineStringVector.push_back(line.str());
@@ -257,6 +264,8 @@ Precipitate::SavePrecipitateAttributes()
      lineStream<<"\t"<<it->second; 
     };
   }
+  
+  /*debug*/ lineStream<<"\t"<<FirstNotEmptyClassIdAfterNucleation;
   
   lineStream<<"\n";
     
@@ -1606,6 +1615,8 @@ Precipitate::ReturnCriticalTimeStep()
   
   
   unsigned int firstNotEmptyClassId =this->ReturnRDFirstNotEmptyClassIdAfterNucleation();
+  
+  /*debug*/ FirstNotEmptyClassIdAfterNucleation=firstNotEmptyClassId;
   
   if(firstNotEmptyClassId==0 )
   {

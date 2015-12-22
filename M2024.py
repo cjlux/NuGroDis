@@ -12,8 +12,10 @@ from __future__ import division, print_function
 from MetalUtils.ElementsData import Dict as ElementsDataDict
 from MetalUtils.ElementsData import ComputeMolarVolume
 from MetalUtils.Mendeleiev import PyChemicalComposition
-import Utils
 import math
+#from MetalUtils.Utils import SumOfCoefficients
+
+
 #ALL CONCENTRATIONS MUST BE THOSE AFTER SOLUTIONIZING
 
 AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentration, in range [0,1]
@@ -88,14 +90,14 @@ GP={
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,
 "solvusActivationEnergy":(36000,"J.mol^-1"), # DeltaHP1
-"surfaceEnergyPolynomialModel":([0.044],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
+"surfaceEnergyPolynomialModel":([0.040],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(0,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP
 "deltaCell":(1/100,"m.m^-1") , # difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate)
 #REMEMBER: At the moment, molar volume of GuinierPreston precipitates must be define by the user. But, subsequently, it can be computed automatically taking into account the structure of the precipitate.  
 }
 
 
-##################################################    Sprime DATA     ##########################################################
+################################################    Sprime DATA     ##########################################################
 Sprime={
 "nature":"Sprime", #important nature can be:  "GuinierPreston" or "Sprime" . Key words can be found in MetalUtils/Grain.py PrecipitateNatureList
 "chemicalComposition": ("Al2CuMg","")  , #Chemical composition, will be used to find stoichiometric coefs and then compute volumic concentration of elements
@@ -110,5 +112,10 @@ Sprime={
 "shapeFactor":(20,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP2
 "deltaCell":(1/100,"m.m^-1") , #difference between precipitate and solid solution cell size , was deltamailleP2
 "wettingAngle":(30*math.pi/180,"rad") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
-} 
+}
+
+
+
+
+
 

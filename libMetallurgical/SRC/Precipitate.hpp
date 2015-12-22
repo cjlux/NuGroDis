@@ -303,6 +303,9 @@ protected:
     
    
     //ChemicalComposition & chemicalComposition_;  //A Grain has 1(one and only one) chemical composition.FOR precipitate it is constant and for SSGrain it can varies with time
+    
+    
+    /*debug: just for debug */int FirstNotEmptyClassIdAfterNucleation;
 
 private:
   
