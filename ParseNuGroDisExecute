@@ -1,0 +1,16 @@
+#!/bin/bash
+#make SRC/ and run python file run.py for Nugrodis.
+
+CURRENT_DIR=$PWD 
+
+NuGroDis_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+
+
+#Version 1.0
+#cd $NuGroDis_DIR/libMetallurgical/SRC/ && make &&cd ../.. && python run.py -g $1 -l $2 -d $3; python -c "import script; print script.PostProcessing()" && cd $CURRENT_DIR
+
+#version 1.1
+cd $NuGroDis_DIR/libMetallurgical/SRC/ && make &&cd ../.. && python run.py $1 $2 $3 $4 $5 $6; python -c "import script; print script.PostProcessing()" && cd $CURRENT_DIR
+
+# for example,    run.py -g [0.044] -l 30 -d50000 ,  command will be:  ParseNuGroDisExecute -g [0.044] -l 30 -d50000
