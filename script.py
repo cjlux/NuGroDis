@@ -11,9 +11,6 @@ SpecificValues=["-222.222","-111.111","111.111","222.222"] #DO NOT DELETE THIS L
 
 
 
-
-
-
 def PostProcessing():
     f=open("lastResultDirectoryPath.txt","r")
     ComputationResultsDirectory=f.readlines(1)[0] #the first and only line of file "lastResultDirectoryPath.txt"
@@ -128,13 +125,17 @@ def OutputDistributionCurves(path,Retoile=True):
                     plt.close()
 
 
-def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",Xcolor="green",Ycolor="red", returnFig=False):
+def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="green",Ycolor="red", returnFig=False):
     "Plot a curve and save it to the given path"
     #rc('text', usetex=True)
     rc('font', family='serif')
-    
+
+    # marker can be 
+            # un-filled markers  ',' , '.', '1' , '2' , '4' , '_' , 'x' , '|' , '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '+'
+            # filled markers 'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd'
+
     fig, ax = plt.subplots()
-    ax.plot(X,Y,'r-o')
+    ax.plot(X,Y,marker)
     ax.grid(True)
     plt.title(u""+figTitle)
     ax.set_xlabel(u""+Xlabel,color=Xcolor)
@@ -193,7 +194,7 @@ def OpenFileAndRead(path):
     
 
 
-def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabel=None,Ylabel=None, figTitle="" ):
+def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabel=None,Ylabel=None, figTitle="", marker="r-o" ):
     """Plot from a data given in argument (ReadFile)"""
     ###########
     #SAVE PATH#
@@ -317,7 +318,7 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
 
 
     savePath=saveDirPath+"/"+saveFigName+".pdf"
-    PlotCurve(xData,attributeToPlotData,savePath,Xlabel=Xlabel,Ylabel=Ylabel,figTitle=figTitle)
+    PlotCurve(xData,attributeToPlotData,savePath,Xlabel=Xlabel,Ylabel=Ylabel,figTitle=figTitle,marker=marker)
 
  
 
@@ -779,15 +780,31 @@ def makeRadiusListForDistribution(r1,deltaR,n):
     RR=[]
     assert (r1>=0), "given minimum radius for makeRadiusListForDistribution() is negative"    
     assert (deltaR>0), "given spatial step for makeRadiusListForDistribution() is not strictly positive"    
-    assert(n>=1) ,"given number of class for makeRadiusListForDistribution() is not superior or equal to 1. Cannot make Radius List! "    
+    assert(n>=1) ,"given number of class for makeRadiusListForDistribution() is not superior or equal to 1. Cannot make Radius List! "        
     
-    range(1,n+1,1)    
-    
-    for u in range(1,n+1,1):
+    for u in range(1,n,1):
         rr=r1 + (u-1)*deltaR
         RR.append(rr)
 
     return RR
+
+
+def makeInterfacialRadiusListForDistribution(r1,deltaR,n):
+    """generate and return an interfacial radius list for a distribution"""    
+    interfacialRR=[]
+    assert (r1>=0), "given minimum radius for makeInterfacialRadiusListForDistribution() is negative"    
+    assert (deltaR>0), "given spatial step for makeInterfacialRadiusListForDistribution() is not strictly positive"    
+    assert(n>=1) ,"given number of class for makeInterfacialRadiusListForDistribution() is not superior or equal to 1. Cannot make Radius List! "    
+
+    #add interface radius 0 (r0Left)
+    r0Left=r1-deltaR/2
+    assert( r0Left >0), "The left radius of first class (r0Left) is not strictly positive: given minimum radius and spatialStep are incompatible "   
+    
+    for u in range(1,n+1,1):
+        rr=r0Left + (u-1)*deltaR
+        interfacialRR.append(rr)
+
+    return interfacialRR
 
 
 
@@ -841,7 +858,7 @@ def OutputInterfacialDistributionCurves(path):
                         currentTime= lineData[0]
                         InterfacialValuesList= lineData[1:]
                         n=len(InterfacialValuesList)
-                        RList = makeRadiusListForDistribution(minRadius,spatialStep,n )    
+                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
                         assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
                         
                         
@@ -881,7 +898,7 @@ def OutputInterfacialDistributionCurves(path):
                         currentTime= lineData[0]
                         InterfacialValuesList= lineData[1:]
                         n=len(InterfacialValuesList)
-                        RList = makeRadiusListForDistribution(minRadius,spatialStep,n )    
+                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
                         assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
                         
                         
