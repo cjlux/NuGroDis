@@ -48,7 +48,7 @@
 
 #include "Util.hpp"
 
-#include "PolynomialRootFinder.hpp"
+//#include "PolynomialRootFinder.hpp"
 
 namespace Util
   {
