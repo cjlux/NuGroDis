@@ -14,7 +14,7 @@ OBJ_FILE_LIST = $(SRC_FILE_LIST:%.cpp=$(OBJ_DIR)/%.o)
 
     PYTHON_VERSION = 2.7
     PYTHON_INC_DIR = /usr/include/python$(PYTHON_VERSION)
-    PYTHON-BINDING = ../PythonB
+    PYTHON-BINDING = ../PythonB/$(MODE)
 
 	  TOP_DIR = ../..
           LIB_DIR = $(TOP_DIR)/lib$(NAME)
@@ -35,36 +35,26 @@ endif
 
 # default MODE is now RELEASE:
 ifeq ($(MODE), )
-	mode = RELEASE
-else 
-   ifeq ($(MODE), RELEASE)
-	mode = RELEASE
-   endif
-   ifeq ($(MODE), PROFILE)
-	mode = PROFILE
-   endif
-   ifeq ($(MODE), DEBUG)
-	mode = DEBUG
-   endif	
+	MODE = RELEASE
 endif
 
-ifeq ($(mode), RELEASE)
+ifeq ($(MODE), RELEASE)
        OBJ_DIR := $(OBJ_DIR)/RELEASE
 endif
-ifeq ($(mode), DEBUG)
+ifeq ($(MODE), DEBUG)
        OBJ_DIR := $(OBJ_DIR)/DEBUG
 endif
-ifeq ($(mode), PROFILE)
+ifeq ($(MODE), PROFILE)
        OBJ_DIR := $(OBJ_DIR)/PROFILE
 endif
 
-ifeq ($(mode), RELEASE) 
+ifeq ($(MODE), RELEASE) 
         CXXFLAGS  = -c -O2 -Wall -MMD -frounding-math -fPIC
 endif
-ifeq ($(mode), DEBUG) 
+ifeq ($(MODE), DEBUG) 
         CXXFLAGS  = -c -g -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
 endif
-ifeq ($(mode), PROFILE) 
+ifeq ($(MODE), PROFILE) 
         CXXFLAGS  = -c -O2 -pg -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
 endif
 
@@ -106,7 +96,6 @@ purge:
 info:
 	-@echo "NAME		: \"$(NAME)\"" 
 	-@echo "MODE		: \"$(MODE)\"" 
-	-@echo "mode		: \"$(mode)\"" 
 	-@echo "TOP_DIR 	: \"$(TOP_DIR)\""
 	-@echo "LIB_DIR 	: \"$(LIB_DIR)\""
 	-@echo "SRC_DIR 	: \"$(SRC_DIR)\""
@@ -119,7 +108,7 @@ help:
 	@echo "Usage : make [MODE=RELEASE|DEBUG|PROFILE] target"
 	@echo "  MODE default : RELEASE" 
 	@echo "  ==> ARCHI  : $(ARCHI)"
-	@echo "  ==> MODE   : $(mode)"
+	@echo "  ==> MODE   : $(MODE)"
 	@echo "  ==> CXX    : $(CXX)"
 	@echo " Possible targets are :"
 	@echo '       all   : compiles all what is needed.'

@@ -14,7 +14,28 @@ import argparse
 from MetalUtils.Utils import CopyAllDicoInNewPyFile, PrintAllDico
 
 import sys, os
-sys.path.append("libMetallurgical/PythonB")
+##################### PARSE ARGUMENTS 
+parser = argparse.ArgumentParser(description='Run computation with given param GPsurfaceEnergyPolynomial,\
+halfSinkDistance, hardening duration')
+
+parser.add_argument('-g', type=str, help='gammaGP: Surface energy \
+Polynomial Model as a list [a0, a1, ... , aN]  //Unit=[J/m^2]')
+parser.add_argument('-l', type=float, help='half Sink distance  //Unit=[µm]')
+parser.add_argument('-d', type=float, help='Computation duration = hardening\
+duration //Unit=[second]')
+parser.add_argument('-D', action = 'store_true', help='Run in debug mode for C++')
+args = parser.parse_args()
+
+gammaParser=args.g
+halfSinkDParser=args.l
+hardeningDurationParser=args.d
+debug=args.D
+################### END PARSE ARGUMENTS
+
+if not debug:
+    sys.path.append("libMetallurgical/PythonB/RELEASE")
+else:
+    sys.path.append("libMetallurgical/PythonB/DEBUG")
 
 #Bindings
 from Metallurgical import ChemicalComposition, \
@@ -72,23 +93,6 @@ exec "import "+material #importing module material given by user
 exec 'L = dir('+material+')' #import  L=directory of module material
 print("  > material read is                 :",material)
 
-
-
-##################### PARSE ARGUMENTS 
-parser = argparse.ArgumentParser(description='Run computation with given param GPsurfaceEnergyPolynomial,\
-halfSinkDistance, hardening duration')
-
-parser.add_argument('-g', type=str, help='gammaGP: Surface energy \
-Polynomial Model as a list [a0, a1, ... , aN]  //Unit=[J/m^2]')
-parser.add_argument('-l', type=float, help='half Sink distance  //Unit=[µm]')
-parser.add_argument('-d', type=float, help='Computation duration = hardening\
-duration //Unit=[second]')
-args = parser.parse_args()
-
-gammaParser=args.g
-halfSinkDParser=args.l
-hardeningDurationParser=args.d
-################### END PARSE ARGUMENTS
 
 
 ###### pre steps_ Copy old file material.py and nugrodis .py  ( Before update)#####
