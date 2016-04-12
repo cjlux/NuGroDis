@@ -25,11 +25,8 @@
 			PythonBindings.cpp\
 			Util.cpp\
 			PolynomialRootFinder.cpp
-			
 
 #			PythonBindings.cpp \ Diffusion.cpp\ InterfacialConcentration.cpp\
-			
-
 
 .SUFFIXES:
 
