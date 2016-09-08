@@ -186,14 +186,47 @@ const double  //TODO
 Vacancy::ReturnEquilibriumConcentration() const
 {  
   
-    int tempCurrentSize = material_.GetTemperature().GetTemperatureList().size();
-  
 
   
-  if( (tempCurrentSize ==1 ) ||
-    (  (tempCurrentSize!=1)&&(material_.GetTemperature().GetTemperatureList()[tempCurrentSize-1] !=  material_.GetTemperature().GetCurrentTemp()) ) 
-  )
-  {
+
+
+/* old: 8/Sep/2016  here, here we assume that if the temperature is constant, the equlibrium concentration must be constant, 
+ * thus equal to the previous one coming from the previous time step */   
+//   int tempCurrentSize = material_.GetTemperature().GetTemperatureList().size();
+//   if( (tempCurrentSize ==1 ) ||
+//     (  (tempCurrentSize!=1)&&(material_.GetTemperature().GetTemperatureList()[tempCurrentSize-1] !=  material_.GetTemperature().GetCurrentTemp()) ) 
+//   )
+//   {
+//   
+//   
+//   std::cout<<"################## Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
+//   double R=ThermoDynamicsConstant::GetR();
+//   double T=material_.GetTemperature().GetCurrentTemp();
+//   
+//   const double alpha= this->ReturnAlpha(T);
+//   
+//   double equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
+//   assert ( (equilibriumConcValue>0)&&"In ReturnEquilibriumConcentration: Returned value is not positive");
+//   
+//   /*DEBUG*/ std::cout<<" TOPO TOPO std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T)) "<<std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T))<<std::endl;
+//   /*DEBUG*/ std::cout<<" TOPO TOPO vacCreationEntropy_   "<<vacCreationEntropy_<<"R "<<R<<"T "<<T<<" vacCreationEnthalpy_ "<<vacCreationEnthalpy_<<  std::endl;
+//   std::cout<<"############ equilibriumConcValue = "<<equilibriumConcValue<<std::endl;
+//   std::cout<<"################## END  Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
+// 
+//   return equilibriumConcValue;
+//   
+//   }
+//   else
+//   {
+//     std::cout<<"debug 200"<<" material_.GetTemperature().GetTemperatureList().size()  "<<material_.GetTemperature().GetTemperatureList().size()<<std::endl;
+//     return equilibriumConc_;
+//   }
+    
+    
+    
+    
+    
+
   
   
   std::cout<<"################## Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
@@ -210,13 +243,8 @@ Vacancy::ReturnEquilibriumConcentration() const
   std::cout<<"############ equilibriumConcValue = "<<equilibriumConcValue<<std::endl;
   std::cout<<"################## END  Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
 
-  return equilibriumConcValue;
-  
-  }
-  else
-  {
-    return equilibriumConc_;
-  }
+  return equilibriumConcValue;  
+
 }
 
 

@@ -34,12 +34,12 @@
 void 
 Material::test()
 {
-  std::cout<<"Size = "<<precipitateList_.size()<<std::endl;
-  std::cout<<"Adresse of precipitate vector is "<<&precipitateList_<<std::endl;
-  std::cout <<"Adresse of precipitate object are: ";
+  std::cout << "Size = " << precipitateList_.size() << std::endl;
+  std::cout << "Adresse of precipitate vector is " << &precipitateList_ << std::endl;
+  std::cout << "Adresse of precipitate object are: ";
   for( std::vector<Precipitate*>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {std::cout << *i << '|';}
-  std::cout <<""<<std::endl;
+  std::cout << "" << std::endl;
 }
 
 
@@ -64,60 +64,54 @@ Material::Material(Temperature& temp,
   temperature_.SetMaterial(*this);
   computation_.SetMaterial(*this);
   
-  std::cout<<" >Building a C++ object Material"<<std::endl;
+  std::cout << " >Building a C++ object Material" << std::endl;
   InitialCompo.SetMaterial(*this);
   
   /*
   //debug
-  std::cout<<"		material Young modulus "<<YoungModulus_<<std::endl;
-  std::cout<<"		material Poisson coef "<<PoissonCoeff_<<std::endl;
-  std::cout<<"		material lattice param "<<latticeParameter_<<std::endl;
+  std::cout << "		material Young modulus " << YoungModulus_ << std::endl;
+  std::cout << "		material Poisson coef " << PoissonCoeff_ << std::endl;
+  std::cout << "		material lattice param " << latticeParameter_ << std::endl;
   
 
     
   // make the SSGrain:
   SSGrain *ssgrain= new SSGrain(*this);
-  std::cout<<"Adress of ssgrain  Object ="<<ssgrain<<std::endl;
-  std::cout<<"		SSgrain Young modulus (from YoungModulus_) = "<<ssgrain->GetYoungModulus()<<std::endl;
+  std::cout << "Adress of ssgrain  Object =" << ssgrain << std::endl;
+  std::cout << "		SSgrain Young modulus (from YoungModulus_) = " << ssgrain->GetYoungModulus() << std::endl;
   
   //debug
   ssgrain->Info();
   
   //debug
-  std::cout<<"		SSgrain Young modulus (from YoungModulus_) = "<<ssgrain->GetYoungModulus()<<std::endl;
+  std::cout << "		SSgrain Young modulus (from YoungModulus_) = " << ssgrain->GetYoungModulus() << std::endl;
   
   //debug
-  std::cout<<"		material Young modulus "<<YoungModulus_<<std::endl;
-  std::cout<<"		material Poisson coef "<<PoissonCoeff_<<std::endl;
-  std::cout<<"		material lattice param "<<latticeParameter_<<std::endl;
-  std::cout<<"		ssgrain->Info() ";
+  std::cout << "		material Young modulus " << YoungModulus_ << std::endl;
+  std::cout << "		material Poisson coef " << PoissonCoeff_ << std::endl;
+  std::cout << "		material lattice param " << latticeParameter_ << std::endl;
+  std::cout << "		ssgrain->Info() ";
   //debug
   ssgrain->Info();
-  std::cout<<"		SSgrain Young modulus (from YoungModulus_) = "<<ssgrain->GetYoungModulus()<<std::endl;
+  std::cout << "		SSgrain Young modulus (from YoungModulus_) = " << ssgrain->GetYoungModulus() << std::endl;
 
   
   //Debug
-  std::cout<<" 		>>Poisson coeff of material's SSGrain ="<<ssgrain->GetPoissonCoeff()<<std::endl;
+  std::cout << " 		>>Poisson coeff of material's SSGrain =" << ssgrain->GetPoissonCoeff() << std::endl;
   
   ssgrainList_.push_back(ssgrain);
   
   //debug
-  std::cout<<" 		>>Poisson coeff of material's this->GetSSGrainList()[0] ="<<this->GetSSGrainList()[0]->GetPoissonCoeff()<<std::endl;
-  std::cout<<" 		>>Poisson coeff of material's SSGrainList_[0] ="<<ssgrainList_[0]->GetPoissonCoeff()<<std::endl;
+  std::cout << " 		>>Poisson coeff of material's this->GetSSGrainList()[0] =" << this->GetSSGrainList()[0]->GetPoissonCoeff() << std::endl;
+  std::cout << " 		>>Poisson coeff of material's SSGrainList_[0] =" << ssgrainList_[0]->GetPoissonCoeff() << std::endl;
   
   */
-  std::cout<<"Exit constructor of Material"<<std::endl;
-
-  
-  
+  std::cout << "Exit constructor of Material" << std::endl;
 } 
 
 Material::~Material()
 {
 }
-
-
-
 
 bool 
 Material::CheckIfTheVolumicConcentrationsArePositive()
@@ -126,8 +120,7 @@ Material::CheckIfTheVolumicConcentrationsArePositive()
   std::map<std::string , Concentration*>::iterator it;
   std::map<std::string , Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
   bool isAVolumicConcPositive=true;
-  
-  
+    
     for (it=currentConcMap.begin(); it!=currentConcMap.end(); ++it)
     {
       double volumicConc=it->second->GetVolumicValue();
@@ -138,19 +131,22 @@ Material::CheckIfTheVolumicConcentrationsArePositive()
       }
       
     }
-  
   return isAVolumicConcPositive;
 }
 
 void // in TEST run beginning of "boucle temporelle"
 Material::RunProcess()
 {
-  std::cout<<"Material::RunProcess() ===>  Running Process "<<std::endl;
+#ifdef DEBUG
+  std::string rep;
+  std::cin >> rep;
+#endif
+  std::cout << "Material::RunProcess() ===>  Running Process " << std::endl;
   double currentTime, computationDuration;
   
   currentTime=computation_.GetCurrentTime();
   computationDuration=computation_.GetMaxComputationTime();
-  std::cout<<"Computation Duration is "<<computationDuration<<"\n"<<std::endl;
+  std::cout << "Computation Duration is " << computationDuration << "\n" << std::endl;
   
   this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
   
@@ -158,7 +154,7 @@ Material::RunProcess()
   
   while ( (currentTime<computationDuration)&&(this->CheckIfTheVolumicConcentrationsArePositive()==true) )
   {//Begin While
-    std::cout<<"Current time is "<<currentTime<<"\n\n\n\n\n"<<std::endl;
+    std::cout << "Current time is " << currentTime << "\n\n\n\n\n" << std::endl;
     //assert (computation_->GetCurrentTime==0)
     
     this->UpdateVolumicValues();
@@ -228,7 +224,7 @@ Material::RunProcess()
     currentTime=computation_.GetCurrentTime();
     if (currentTime>= computationDuration)
     {
-      std::cout<<"Current time is equal or superior to Computation Duration. Current time just after update is "<<currentTime<<"\n\n\n\n\n"<<std::endl;
+      std::cout << "Current time is equal or superior to Computation Duration. Current time just after update is " << currentTime << "\n\n\n\n\n" << std::endl;
     }
     
     //Update all properties that are dependent to temperature
@@ -323,9 +319,9 @@ Material::RunProcess()
 
    
    
-  std::cout<<"\n\n\n\n"<<std::endl;
-  std::cout<<"++--++--++--++ ################# END OF Material::RunProcess()"<<std::endl;
-  std::cout<<std::endl;
+  std::cout << "\n\n\n\n" << std::endl;
+  std::cout << "++--++--++--++ ################# END OF Material::RunProcess()" << std::endl;
+  std::cout << std::endl;
 }
 
 
@@ -337,11 +333,11 @@ void Material::UpdateAtomicDiffusionCoef()
   vacancy_->ComputeEquilibriumConcentration();
   if (computation_.GetCurrentTime()==0)
   {
-    std::cout<<"Computing Concentration before quenching\n"<<std::endl;
+    std::cout << "Computing Concentration before quenching\n" << std::endl;
     vacancy_->ComputeConcentrationBeforeQuenching();
   }
   
-  std::cout<<"MaterialGetConcentrationBeforeQuenching()  "<<vacancy_->GetConcentrationBeforeQuenching()<<std::endl;
+  std::cout << "MaterialGetConcentrationBeforeQuenching()  " << vacancy_->GetConcentrationBeforeQuenching() << std::endl;
   vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
   
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
@@ -354,7 +350,7 @@ void Material::UpdateAtomicDiffusionCoef()
 void
 Material::ProcessPrecipitatesNucleationRate()
 {
-  std::cout<<"Material::ProcessPrecipitatesNucleationRate() : process Nucleation rate from C++, and for material"<<std::endl;
+  std::cout << "Material::ProcessPrecipitatesNucleationRate() : process Nucleation rate from C++, and for material" << std::endl;
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->ProcessNucleationRate();
@@ -364,7 +360,7 @@ Material::ProcessPrecipitatesNucleationRate()
 void
 Material::ComputePrecipitatesAllInterfacialConcentrations()
 {
-  std::cout<<"Material::ComputePrecipitatesAllInterfacialConcentrations() : Compute precipitates All interfacial concentration from C++, and for material"<<std::endl;
+  std::cout << "Material::ComputePrecipitatesAllInterfacialConcentrations() : Compute precipitates All interfacial concentration from C++, and for material" << std::endl;
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->ComputeAllInterfacialConcentrations();
@@ -374,29 +370,29 @@ Material::ComputePrecipitatesAllInterfacialConcentrations()
 void
 Material::ComputePrecipitatesInterfacialVelocityList()
 {
-  std::cout<<"Material::ComputePrecipitatesInterfacialVelocityList() : Compute precipitates All interfacial velocities ( interfacialVelocityList) "<<std::endl;
+  std::cout << "Material::ComputePrecipitatesInterfacialVelocityList() : Compute precipitates All interfacial velocities ( interfacialVelocityList) " << std::endl;
   
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->GetCurrentRadiusDistribution().ComputeInterfacialVelocityList();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesInterfacialVelocityList() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::ComputePrecipitatesInterfacialVelocityList() +-+-+-+-" << std::endl;
 }
 
 
 void
 Material::ComputeCriticalInterfacialConcentration()
 {
-  std::cout<<"Material::ComputeCriticalInterfacialConcentration() : Compute precipitates critical interfacial concentration  (XvIntcritique for each solute \
-  element of the precipitate) "<<std::endl;
+  std::cout << "Material::ComputeCriticalInterfacialConcentration() : Compute precipitates critical interfacial concentration  (XvIntcritique for each solute \
+  element of the precipitate) " << std::endl;
   
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->GetCurrentRadiusDistribution().ComputeCriticalInterfacialConcentration();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::ComputeCriticalInterfacialConcentration() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::ComputeCriticalInterfacialConcentration() +-+-+-+-" << std::endl;
   
 }
 
@@ -404,16 +400,16 @@ Material::ComputeCriticalInterfacialConcentration()
 void
 Material::ProcessComputationMaxTimeStep()
 {
-  std::cout<<"Material::ProcessComputationMaxTimeStep() : compute the maximum time step allowed for the Computation"<<std::endl; 
+  std::cout << "Material::ProcessComputationMaxTimeStep() : compute the maximum time step allowed for the Computation" << std::endl; 
   computation_.ComputeMaxTimeStep();
-  std::cout<<"+-+-+-+-   END: Running Material::ProcessComputationMaxTimeStep() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::ProcessComputationMaxTimeStep() +-+-+-+-" << std::endl;
 }
 
 
 void
 Material::AddNucleatedPrecipitates()
 {
-  std::cout<<"Material::AddNucleatedPrecipitates() : Adding nucleated Precipites For all precipiates in the material "<<std::endl; 
+  std::cout << "Material::AddNucleatedPrecipitates() : Adding nucleated Precipites For all precipiates in the material " << std::endl; 
   
   
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
@@ -421,7 +417,7 @@ Material::AddNucleatedPrecipitates()
     (*i)->AddNucleatedPrecipitates();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::AddNucleatedPrecipitates() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::AddNucleatedPrecipitates() +-+-+-+-" << std::endl;
   
 }
 
@@ -429,51 +425,51 @@ Material::AddNucleatedPrecipitates()
 void
 Material::SolveCineticLinearSytem()
 {
-  std::cout<<"Material::SolveCineticLinearSytem() : Solving cinetic liear system For all precipiates in the material "<<std::endl; 
+  std::cout << "Material::SolveCineticLinearSytem() : Solving cinetic liear system For all precipiates in the material " << std::endl; 
   
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->SolveCineticLinearSytem();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::SolveCineticLinearSytem() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::SolveCineticLinearSytem() +-+-+-+-" << std::endl;
   
 }
 
 void
 Material::ComputePrecipitatesVolumicFraction()
 {
-  std::cout<<"Material::ComputePrecipitatesVolumicFraction() : Computing volumic fraction for all precipitates in the material "<<std::endl; 
+  std::cout << "Material::ComputePrecipitatesVolumicFraction() : Computing volumic fraction for all precipitates in the material " << std::endl; 
   
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->ComputeVolumicFraction();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesVolumicFraction() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::ComputePrecipitatesVolumicFraction() +-+-+-+-" << std::endl;
   
 }
 
 void
 Material::ComputePrecipitatesNucleationSiteNb()
 {
-  std::cout<<"Material::ComputePrecipitatesNucleationSiteNb() : Computing nucleation sites number for all precipitates in the material "<<std::endl; 
+  std::cout << "Material::ComputePrecipitatesNucleationSiteNb() : Computing nucleation sites number for all precipitates in the material " << std::endl; 
   
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
   {
     (*i)->ComputeNucleationSiteNb();
   }
   
-  std::cout<<"+-+-+-+-   END: Running Material::ComputePrecipitatesNucleationSiteNb() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::ComputePrecipitatesNucleationSiteNb() +-+-+-+-" << std::endl;
   
 }
 
 void
 Material::UpdateComputationCurrentTime()
 {
-  std::cout<<"Material::UpdateTimeStep() : Updating the current time step of the Computation"<<std::endl; 
+  std::cout << "Material::UpdateTimeStep() : Updating the current time step of the Computation" << std::endl; 
   computation_.UpdateCurrentTime();
-  std::cout<<"+-+-+-+-   END: Running Material::UpdateTimeStep() +-+-+-+-"<<std::endl;
+  std::cout << "+-+-+-+-   END: Running Material::UpdateTimeStep() +-+-+-+-" << std::endl;
 }
 
 void
@@ -517,11 +513,11 @@ Material::ConvertVolumicToInitialAtomicConcentration()
       sum+=initialVolumicConc*elementRho*1000/elementMolarMass;
       
       /*debug begin*/
-      std::cout<<"Rho"<<it2->first<<"  = "<<elementRho<<"\n";
-      std::cout<<"Mm"<<it2->first<<"  = "<<elementMolarMass<<"\n";
-      std::cout<<"Xv0"<<it2->first<<"SS  = "<<initialVolumicConc<<"\n";
-      std::cout<<"monome (Xv0SS*Rho*1000/Mm) when element i is "<<it2->first<< initialVolumicConc*elementRho*1000/elementMolarMass  <<"\n";
-      std::cout<<" Sum cumulé proressive "<<sum<<"\n";
+      std::cout << "Rho" << it2->first << "  = " << elementRho << "\n";
+      std::cout << "Mm" << it2->first << "  = " << elementMolarMass << "\n";
+      std::cout << "Xv0" << it2->first << "SS  = " << initialVolumicConc << "\n";
+      std::cout << "monome (Xv0SS*Rho*1000/Mm) when element i is " << it2->first <<  initialVolumicConc*elementRho*1000/elementMolarMass  << "\n";
+      std::cout << " Sum cumulé proressive " << sum << "\n";
       /*debug end*/
       
     }
@@ -533,8 +529,8 @@ Material::ConvertVolumicToInitialAtomicConcentration()
     
     
     /*debug begin*/
-    std::cout<<"debug: numerateur = "<<elementRho*1000/elementMolarMass <<"\n";
-    std::cout<<"debug: coef for converting volumicSS to atomicSS for element  <"<<it->first<<"> is --->"<<elementRho*1000/elementMolarMass/sum<<"\n";
+    std::cout << "debug: numerateur = " << elementRho*1000/elementMolarMass << "\n";
+    std::cout << "debug: coef for converting volumicSS to atomicSS for element  <" << it->first << "> is --->" << elementRho*1000/elementMolarMass/sum << "\n";
     /*debug end*/
     
     double atomicConc= (initialVolumicConc*elementRho*1000/elementMolarMass)/sum;
@@ -542,7 +538,7 @@ Material::ConvertVolumicToInitialAtomicConcentration()
     assert ( (it->second->GetInitialAtomicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To AtomicConcentration\
     because InitialAtomicValue has already been set." );
     it->second->SetInitialAtomicValue(atomicConc);
-    std::cout<<"===================== VALUE COMPUTED FOR INITIAL ATOMIC CONC OF ELEMENT <"<<it->first<<"> MATERIAL GRAIN IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
+    std::cout << "===================== VALUE COMPUTED FOR INITIAL ATOMIC CONC OF ELEMENT <" << it->first << "> MATERIAL GRAIN IS ============= " << it->second->GetInitialAtomicValue() << std::endl;
   }
   
 }
@@ -587,11 +583,11 @@ Material::ReturnAtomicConcFromVolumicForElement(std::string elementName) const
     
     
    
-    std::cout<<"===================== VALUE RETURNED FOR ATOMIC CONC OF ELEMENT <"<<it->first<<"> IN MATERIAL IS ============= "<<it->second->GetInitialAtomicValue()<<std::endl;
+    std::cout << "===================== VALUE RETURNED FOR ATOMIC CONC OF ELEMENT <" << it->first << "> IN MATERIAL IS ============= " << it->second->GetInitialAtomicValue() << std::endl;
   
   
   //Post conditions
-  /*DEBUG*/ std::cout<<" computedAtomicConc is "<<computedAtomicConc<<"volumic conc is"<<volumicConc<<"Element name is "<<elementName<< "\n";
+  /*DEBUG*/ std::cout << " computedAtomicConc is " << computedAtomicConc << "volumic conc is" << volumicConc << "Element name is " << elementName <<  "\n";
   assert( (computedAtomicConc>0)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must be positive" );
   assert( (computedAtomicConc<=1)&&"In ReturnAtomicConcentrationFromVolumic: result of conversion must inferior to 1" );
   
@@ -636,7 +632,7 @@ Material::ConvertVolumicToInitialMassicConcentration()
     assert ( (it->second->GetInitialMassicValueHasBeenSet()==false)&&"Material Cannot Convert Volumic To MassicConcentration\
     because InitialMassicValue has already been set." );
     it->second->SetInitialMassicValue(massicConc);
-    std::cout<<"===================== VALUE COMPUTED FOR INITIAL MASSIC CONC OF ELEMENT <"<<it->first<<"> SOLID SOLUTION GRAIN IS ============= "<<it->second->GetInitialMassicValue()<<std::endl;
+    std::cout << "===================== VALUE COMPUTED FOR INITIAL MASSIC CONC OF ELEMENT <" << it->first << "> SOLID SOLUTION GRAIN IS ============= " << it->second->GetInitialMassicValue() << std::endl;
   }
   
 }
@@ -647,8 +643,8 @@ Material::UpdateVolumicValues()
 {
   // Remember : checkIfUpdatedValuesArePositive default value is true !!!
   
-  std::cout<<"Updating material current volumic concentration values\
-  taking into account the volumic fraction of precipitates"<<std::endl;
+  std::cout << "Updating material current volumic concentration values\
+  taking into account the volumic fraction of precipitates" << std::endl;
   // XvCuSS
   //TODO 
   std::map<std::string, Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
@@ -679,22 +675,22 @@ Material::UpdateVolumicValues()
 	sumOfFracVol += precipitateFracVol;  // fracVolP1 + fracVolP2 + ... + fracVolPn 
 	
 	//Debug
-	std::cout<<"TARATATA: Precipitate type is "<<(*i)->GetPrecipitateType()<<"\n";
-	std::cout<<"TARATATA1: Precipitate frac vol is "<<precipitateFracVol<<"\n"<<" Xv"<<it->first<<"P : "<<elementVolumicConcInPrecipitate<<"\n"<<" total Xv_i*Vf_i Product is"<<product<<"\n Sum of frac vol is :"<<precipitateFracVol<<"\n";
+	std::cout << "TARATATA: Precipitate type is " << (*i)->GetPrecipitateType() << "\n";
+	std::cout << "TARATATA1: Precipitate frac vol is " << precipitateFracVol << "\n" << " Xv" << it->first << "P : " << elementVolumicConcInPrecipitate << "\n" << " total Xv_i*Vf_i Product is" << product << "\n Sum of frac vol is :" << precipitateFracVol << "\n";
       }
       
     double elementInitialVolumicConcInMaterial=it->second->GetInitialVolumicValue(); //Xv0_i_SS
     
     //debug
-    std::cout<<"TARATATA2 Initial COncentration OIbd adress is "<<it->second<<"\n";
-    std::cout<<" Xv0"<<it->first<<"SS is:"<<elementInitialVolumicConcInMaterial<<"\n";
+    std::cout << "TARATATA2 Initial COncentration OIbd adress is " << it->second << "\n";
+    std::cout << " Xv0" << it->first << "SS is:" << elementInitialVolumicConcInMaterial << "\n";
     
     assert(sumOfFracVol!= 1.);
     assert( ( sumOfFracVol < 1 ) && " Precipitates total volumic fraction must be less than 1" );
     double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1.-sumOfFracVol);
     
     //debug
-    std::cout<<"TARATATA3 Current volumic con is then: "<<currentVolumicConc<<"\n";
+    std::cout << "TARATATA3 Current volumic con is then: " << currentVolumicConc << "\n";
     
     
     currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
@@ -778,11 +774,11 @@ Material::SaveMaterialVacancyProperties()
   if ( in.tellg() == 0 /*check if it is empty*/      )
   {
     // file is empty
-    line<<"time"<<"\t"<<"Dlac"<<"\t"<<"Xlac"<<"\t"<<"XlacEq"<<"\t"<<"LambdaBoostFactor"<<"\t"<<"halSinkDistance"<<"\t";
+    line << "time" << "\t" << "Dlac" << "\t" << "Xlac" << "\t" << "XlacEq" << "\t" << "LambdaBoostFactor" << "\t" << "halSinkDistance" << "\t";
     
     for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
     {
-      line<<"D_"+(*i)->GetElementName()+"SS"<<"\t";
+      line << "D_"+(*i)->GetElementName()+"SS" << "\t";
     }
     
     lineStringVector.push_back(line.str());
@@ -798,14 +794,14 @@ Material::SaveMaterialVacancyProperties()
   Dlac= this->GetVacancy().GetVacancyDiffusionCoef();
   
   std::stringstream lineStream;
-  lineStream<<CurrentTime<<"\t";
-  lineStream<<Dlac<<"\t"<<Xlac<<"\t"<<XlacEq<<"\t"<<lambda<<"\t"<<halfSinkD<<"\t";
+  lineStream << CurrentTime << "\t";
+  lineStream << Dlac << "\t" << Xlac << "\t" << XlacEq << "\t" << lambda << "\t" << halfSinkD << "\t";
   
   
   //Getting the atomic diffusion coef (D_i_SS)
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
   {
-    lineStream<< (*i)->GetDiffusion().GetAtomicDiffusionCoef() <<"\t";
+    lineStream <<  (*i)->GetDiffusion().GetAtomicDiffusionCoef() << "\t";
   }
   
   
@@ -857,10 +853,10 @@ Material::SaveMaterialCurrentChemicalCompo()
   if ( in.tellg() == 0 /*check if it is empty*/      )
   {
     // file is empty
-    line<<"time"<<"\t";
+    line << "time" << "\t";
     for (unsigned int i=0; i<ElementsName.size(); ++i)
     {
-      line<<"Xv"+ElementsName[i]<<"\t";
+      line << "Xv"+ElementsName[i] << "\t";
     } 
     
     lineStringVector.push_back(line.str());
@@ -868,10 +864,10 @@ Material::SaveMaterialCurrentChemicalCompo()
   }
     
   std::stringstream lineStream;
-  lineStream<<CurrentTime<<"\t";
+  lineStream << CurrentTime << "\t";
   for (unsigned int i=0; i<ElementsName.size(); ++i)
   {
-    lineStream<<ElementVolumicConc[i]<<"\t";
+    lineStream << ElementVolumicConc[i] << "\t";
   } 
   
   lineStringVector.push_back(lineStream.str());
@@ -887,40 +883,40 @@ Material::SaveMaterialCurrentChemicalCompo()
 void
 Material::Info() const
 {
-  std::cout <<  "################################# Material::Info #################################" 	<< std::endl;
-  std::cout <<  "                               temperature: -------------------- BEGIN Material's temperature Info ---------------------------------"<< std::endl;
+  std::cout <<   "################################# Material::Info #################################" 	 <<  std::endl;
+  std::cout <<   "                               temperature: -------------------- BEGIN Material's temperature Info ---------------------------------" <<  std::endl;
   temperature_.Info(); 
-  std::cout <<"                        -------------------------------------------- END Material's temperature Info ---------------------------------"<<std::endl;
+  std::cout << "                        -------------------------------------------- END Material's temperature Info ---------------------------------" << std::endl;
 
   if (vacancy_!=0)
   {
-  std::cout <<  "                                   vacancy: -------------------- BEGIN Material's Vacancy Info --------------------------------"<< std::endl;
+  std::cout <<   "                                   vacancy: -------------------- BEGIN Material's Vacancy Info --------------------------------" <<  std::endl;
   vacancy_->Info();
-  std::cout <<"                        -------------------------------------------- END material's Vacancy Info ---------------------------------"<<std::endl;
+  std::cout << "                        -------------------------------------------- END material's Vacancy Info ---------------------------------" << std::endl;
   }
   else
   {
-    std::cout<<"The material does not have any Vacancy yet"<<std::endl ;
+    std::cout << "The material does not have any Vacancy yet" << std::endl ;
   };
   
-  std::cout <<  "                                   ssgrain: " ;
+  std::cout <<   "                                   ssgrain: " ;
   if  (ssgrainPointer_!=0) 
-  {std::cout<<"Adress of the ssgrain is "<<ssgrainPointer_<<std::endl;
+  {std::cout << "Adress of the ssgrain is " << ssgrainPointer_ << std::endl;
     ssgrainPointer_->Info();
   }
   else
   {
-    std::cout<<"The material does not have any solid solution grain"<<std::endl ;
+    std::cout << "The material does not have any solid solution grain" << std::endl ;
     
   };
   
  
-  std::cout <<  "                       mainChemicalElement: -------------------- BEGIN Material's mainChemicalElement Info ---------------------------------"<<std::endl;
+  std::cout <<   "                       mainChemicalElement: -------------------- BEGIN Material's mainChemicalElement Info ---------------------------------" << std::endl;
   mainChemicalElement_.Info();
-  std::cout <<"                      ---------------------------------------------- END Material's mainChemicalElement Info ---------------------------------"<<std::endl;
-  //std::cout <<  "                InitialChemicalComposition: " << InitialChemicalComposition_ << " SI unit" << std::endl;
+  std::cout << "                      ---------------------------------------------- END Material's mainChemicalElement Info ---------------------------------" << std::endl;
+  //std::cout <<   "                InitialChemicalComposition: " <<  InitialChemicalComposition_ <<  " SI unit" <<  std::endl;
    // currentChemicalComposition_
-  //std::cout <<  "                          precipitateList: " << precipitateList_ << " SI unit" << std::endl;
+  //std::cout <<   "                          precipitateList: " <<  precipitateList_ << " SI unit" << std::endl;
   std::cout <<  "                              YoungModulus: " << YoungModulus_ << " SI unit" << std::endl;
   std::cout <<  "                              PoissonCoeff: " << PoissonCoeff_ << " SI unit" << std::endl;
   std::cout <<  "                          LatticeParameter: " << latticeParameter_ << " SI unit" << std::endl;

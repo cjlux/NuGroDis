@@ -52,10 +52,10 @@ ifeq ($(MODE), RELEASE)
         CXXFLAGS  = -c -O2 -Wall -MMD -frounding-math -fPIC
 endif
 ifeq ($(MODE), DEBUG) 
-        CXXFLAGS  = -c -g -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
+        CXXFLAGS  = -c -g -Wall -DDEBUG -MMD -frounding-math -fPIC
 endif
 ifeq ($(MODE), PROFILE) 
-        CXXFLAGS  = -c -O2 -pg -Wall -DVERIF_ASSERT -MMD -frounding-math -fPIC
+        CXXFLAGS  = -c -O2 -pg -Wall -MMD -frounding-math -fPIC
 endif
 
 CXXFLAGS := $(CXXFLAGS) $(ARCHI_FLAG) -pipe
