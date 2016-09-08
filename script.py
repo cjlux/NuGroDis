@@ -386,6 +386,7 @@ def OutputMaterialVacancyProperties(path):
 
     fileDir=path+"/MaterialCurrentCompo/"
 
+    
     filename="MaterialVacancyProperties.txt"
 
     
