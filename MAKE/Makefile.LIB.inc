@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.LIB.inc 523 2012-06-15 08:53:19Z dada $
+# $Id$
 #
 
             SHELL = /bin/sh
