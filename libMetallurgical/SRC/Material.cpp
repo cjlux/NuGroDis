@@ -151,6 +151,7 @@ Material::RunProcess()
   this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
   
   
+  this->SaveInitialData();//uncomment or delete, depending on the older method of saving
   
   while ( (currentTime<computationDuration)&&(this->CheckIfTheVolumicConcentrationsArePositive()==true) )
   {//Begin While
@@ -169,7 +170,7 @@ Material::RunProcess()
     
     this->UpdateAtomicDiffusionCoef();// Important! : Update of AtomicDiffusion coef
     
-    this->SaveMaterialVacancyProperties();
+    this->SaveMaterialVacancyProperties(); //important to save MaterialVacancyProperties here
     
     this->ProcessPrecipitatesNucleationRate(); 
     ///*DEBUG*/assert (!("Tpooet"));
@@ -285,7 +286,12 @@ Material::RunProcess()
     
     
     
+    this->SaveData();//uncomment or delete, depending on the older method of saving
     
+    ///////////////////////// old way of saving
+    //Uncomment or delete, depending on SaveMaterial()
+    ///////////////////:
+    /*
     //Save RadiusDistribution of all precipitates
     for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
     {
@@ -301,6 +307,10 @@ Material::RunProcess()
     }
     
     this->SaveMaterialCurrentChemicalCompo();
+    */
+    /////////////////////////
+    //Uncomment or delete, depending on SaveMaterial()
+    ///////////////////:
     
     
     
@@ -877,6 +887,51 @@ Material::SaveMaterialCurrentChemicalCompo()
   
 }
 
+
+void
+Material::SaveData()
+{
+  std::cout <<   "################################# Material::InitialSave #################################" 	 <<  std::endl;
+  
+  //Save RadiusDistribution of all precipitates
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->GetCurrentRadiusDistribution().SaveDistribution();  
+  }
+  
+  //Save Attributes values of all precipitates
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->SavePrecipitateAttributes();
+    (*i)->SavePrecipitateInterfacialConcentrations();
+    (*i)->SavePrecipitateInterfacialVelocities();
+  }
+  
+  this->SaveMaterialCurrentChemicalCompo();  
+  
+}
+
+void
+Material::SaveInitialData()
+{
+  std::cout <<   "################################# Material::InitialSave #################################" 	 <<  std::endl;
+  
+  
+  //Save RadiusDistribution of all precipitates
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->GetCurrentRadiusDistribution().SaveDistribution();  
+  }
+  
+  //Save Attributes values of all precipitates
+  for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
+  {
+    (*i)->SavePrecipitateAttributes();
+  }
+  
+  this->SaveMaterialCurrentChemicalCompo();  
+  
+}
 
 
 

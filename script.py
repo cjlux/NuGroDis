@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os, sys
 import matplotlib.pyplot as plt
-from numpy import array
+from numpy import array, arange
 from matplotlib import rc
 import M2024
 
@@ -11,17 +11,60 @@ SpecificValues=["-222.222","-111.111","111.111","222.222"] #DO NOT DELETE THIS L
 
 
 
+def GetInitialHalfSinkD(resultPath):
+    """ Return initialHalfSinkD """
+    ##Read file material vacancy properties and get information
+    vacancyPropertiesFile=resultPath+"MaterialCurrentCompo/MaterialVacancyProperties.txt" 
+    ReadVacancyPropertiesFile=OpenFileAndRead(vacancyPropertiesFile)
+    initialHalfSinkD=float(ReadVacancyPropertiesFile[1][5])  # first save data is at line 2 so index 1. And "half sink distance" or "L" is the column 6, so index 5     
+    return initialHalfSinkD
+
+def GetInitialGamma(precipitateAttributesFile):
+    """ Return initialGamma """
+    
+    ##Read file Precipitate attribute and get information
+    ReadFilePrecipitateAttribute=OpenFileAndRead(precipitateAttributesFile)
+    PrecipitateAttributeData=ReadFilePrecipitateAttribute[1:] 
+    initialGamma=float(PrecipitateAttributeData[0][5]) # "surface energy" or "gamma" is the column 6, so index 5
+    
+    
+    return initialGamma
+
+
+
+
+def ValeurlaPlusProche(valeur,ColonneData):
+    """Donne la liste de valeurs et la liste de leur index les plus proches possibles d'une liste de valeurs dans une colonne de données """
+        
+    valeur=list(valeur)
+    ColonneData=list(ColonneData)
+    INDEX=[]
+    VPROCHE=[]
+    for t in valeur:
+        valeurproche=min(ColonneData, key=lambda x:abs(x-t))
+        VPROCHE.append(valeurproche)
+    VPROCHE=list(set(VPROCHE))
+    VPROCHE=sorted(VPROCHE)
+           
+    
+    for x in VPROCHE:
+        indexvaleurproche=ColonneData.index(x)
+        INDEX.append(indexvaleurproche)
+    
+    return VPROCHE,INDEX
+
+
 def PostProcessing():
     f=open("lastResultDirectoryPath.txt","r")
     ComputationResultsDirectory=f.readlines(1)[0] #the first and only line of file "lastResultDirectoryPath.txt"
     f.close()
     path=ComputationResultsDirectory+"/"
 
-    OutputDistributionCurves(path)
+    OutputDistributionCurves(path, timeStep=3600) # by default timeStep is 3600 (see function)
     OutputAttributes(path)
     OutputMaterialChemicalComposition(path)
     OutputMaterialVacancyProperties(path)
-    OutputInterfacialDistributionCurves(path)
+    OutputInterfacialDistributionCurves(path, timeStep=3600) # by default timeStep is 3600 (see function)
 
 
 def CheckIfASpecificValueIsInData(data):
@@ -38,10 +81,14 @@ def CheckIfASpecificValueIsInData(data):
 
 
 
-def OutputDistributionCurves(path,Retoile=True):
+def OutputDistributionCurves(path,Retoile=True, timeStep=3600):
     """Save distribution Curves"""
+    
+    print("******* POSTPROCESSING DISTRIBUTION CURVES *******")
 
-    RadDisDir=path+"RadDisFiles/"    
+    RadDisDir=path+"RadDisFiles/"  
+    
+    
 
     
 ##    for root, subdirs, files in os.walk(RadDisDir):
@@ -74,58 +121,75 @@ def OutputDistributionCurves(path,Retoile=True):
 
             attributeFileName=subdirName+"_Attributes_.txt"
             AttributesFileDir=path+"PrecipitatesAttributes/"+subdirName+"/"
+            
+            ##Read file Precipitate atrtribute and get information
+            ReadFilePrecipitateAttribute=OpenFileAndRead(AttributesFileDir+attributeFileName)
+            PrecipitateAttributeData=ReadFilePrecipitateAttribute[1:]
+            timeList=map(float,list(PrecipitateAttributeData[:,0]))
+            
+            
+            initialGamma=PrecipitateAttributeData[0][5]
+            initialHalfSinkD=GetInitialHalfSinkD(path)
+            
+            
+            closeTimeList=list( arange(timeStep,float(timeList[-1]),timeStep)  )  # Time per steps of 'timeStep' secondes 
+            
+            if float(timeList[-1]) not in closeTimeList:closeTimeList.append(timeList[-1])
+            
             if Retoile==True:
-                ##Read file Precipitate atrtribute and get information on real critical radius (r* + dr* )
-                ReadFilePrecipitateAttribute=OpenFileAndRead(AttributesFileDir+attributeFileName)
+                ##From file Precipitate atrtribute, get information on real critical radius (r* + dr* )>>> >>> >>> 
+
                 realCriticalRadiusList=[]
-                PrecipitateAttributeData=ReadFilePrecipitateAttribute[1:]
-                timeList=list(PrecipitateAttributeData[:,0])
                 realCriticalRadiusList=list(PrecipitateAttributeData[:,8])
                 ##
             
+            closestTimeList,closestTimeindexList=  ValeurlaPlusProche(closeTimeList,timeList)
             
 
             print("RadDisFilesDir", RadDisFilesDir)
             for filename in os.listdir(RadDisFilesDir):
-                if filename.endswith(".txt"):
-                    #print ("PostProcessing file: <",filename, ">")
-                    saveName=ResultsDir+filename[:-4]+".pdf"
-                    ReadFile=OpenFileAndRead(RadDisFilesDir+filename)
-                    radDisCurrentTime=filename[12:-5]
+                radDisCurrentTime=float(filename[12:-5])
+                if radDisCurrentTime in closestTimeList:
+                    if filename.endswith(".txt"):
+                        #print ("PostProcessing file: <",filename, ">")
+                        saveName=ResultsDir+filename[:-4]+".pdf"
+                        ReadFile=OpenFileAndRead(RadDisFilesDir+filename)
+                                
+                        Data=ReadFile[1:]
+                        RR=[]
+                        NP=[]
+                        for data in Data:
+                            RR.append(data[1])
+                            NP.append(data[2])
+    
+                        rc('font', family='serif')
+                        fig, ax = plt.subplots()
+                        ax.plot(RR,NP,'r-o')
+                        ax.grid(True)
+                        ax.set_xlabel(u'Rayon [m]',color='green')
+                        ax.set_ylabel(u'Nombre de particules par unité de volume [N/m^3] ',color='red')
+                        # draw a vertical line x=retoile
+                        if Retoile==True:
+                            currentTimeIndex=timeList.index(radDisCurrentTime)
+                            criticalRadius=realCriticalRadiusList[currentTimeIndex]
+                            #print("critical radius is",criticalRadius, "current time", radDisCurrentTime ,"index", currentTimeIndex)
                             
-                    Data=ReadFile[1:]
-                    RR=[]
-                    NP=[]
-                    for data in Data:
-                        RR.append(data[1])
-                        NP.append(data[2])
-
-                    rc('font', family='serif')
-                    fig, ax = plt.subplots()
-                    ax.plot(RR,NP,'r-o')
-                    ax.grid(True)
-                    ax.set_xlabel(u'Rayon [m]',color='green')
-                    ax.set_ylabel(u'Nombre de particules par unité de volume [N/m^3] ',color='red')
-                    # draw a vertical line x=retoile
-                    if Retoile==True:
-                        currentTimeIndex=timeList.index(radDisCurrentTime)
-                        criticalRadius=realCriticalRadiusList[currentTimeIndex]
-                        #print("critical radius is",criticalRadius, "current time", radDisCurrentTime ,"index", currentTimeIndex)
-                        
-                        if criticalRadius!="-222.222": # retoile existe
-                            ax.axvline(x=criticalRadius,linestyle='--', linewidth=1, color='blue',label=u"Position")
-                            ax.legend([subdirName+' distribution', 'Critical radius'],\
-                                      fancybox=True, shadow=True )
-                        else: #criticalRadius=="-222.222" , retoile n'existe pas
-                            ax.legend([subdirName+' distribution;\n(CriticalRadius does not exist)'],\
-                                      fancybox=True, shadow=True )
-
-                    plt.title(subdirName+u" precipitates distribution at time:\n"+str(float(radDisCurrentTime)/3600.)+" [h] (or "+radDisCurrentTime+" [s])" )
-                    plt.savefig(saveName)
-                    plt.close()
+                            if criticalRadius!="-222.222": # retoile existe
+                                ax.axvline(x=criticalRadius,linestyle='--', linewidth=1, color='blue',label=u"Position")
+                                ax.legend([subdirName+' distribution', 'Critical radius'],\
+                                          fancybox=True, shadow=True )
+                            else: #criticalRadius=="-222.222" , retoile n'existe pas
+                                ax.legend([subdirName+' distribution;\n(CriticalRadius does not exist)'],\
+                                          fancybox=True, shadow=True )
+    
+                        plt.title(subdirName+u" precipitates distribution at time:\n"+\
+                        str(float(radDisCurrentTime)/3600.)+" [h] (or "+str(radDisCurrentTime)+" [s])"+\
+                        ' with gamma='+str(initialGamma)+'; L='+str(initialHalfSinkD))
+                        plt.savefig(saveName)
+                        plt.close()
 
 
-def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="green",Ycolor="red", returnFig=False):
+def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="green",Ycolor="red", returnFig=False, labelCurve=' '):
     "Plot a curve and save it to the given path"
     #rc('text', usetex=True)
     rc('font', family='serif')
@@ -135,11 +199,12 @@ def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="
             # filled markers 'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd'
 
     fig, ax = plt.subplots()
-    ax.plot(X,Y,marker)
+    ax.plot(X,Y,marker, label=labelCurve)
     ax.grid(True)
     plt.title(u""+figTitle)
     ax.set_xlabel(u""+Xlabel,color=Xcolor)
     ax.set_ylabel(u""+Ylabel,color=Ycolor)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., shadow=True, fancybox=True)
 
     if returnFig==False:
         plt.savefig(saveName, bbox_inches='tight') #saveName or Absolute complete path to saveFile
@@ -147,7 +212,7 @@ def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="
     if returnFig==True:
         return fig,ax
         
-def PlotIntercacialDistributionCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",Xcolor="green",Ycolor="red", returnFig=False):
+def PlotInterfacialDistributionCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",Xcolor="green",Ycolor="red", returnFig=False):
     "Plot a curve and save it to the given path"
     #rc('text', usetex=True)
     import matplotlib.pyplot as plt
@@ -352,6 +417,9 @@ def ReadFileAndPlot(fileName,fileDirPath,saveDirPath,Yindex,Xindex=0, Xlabel=Non
 
 
 def OutputMaterialChemicalComposition(path):
+    
+    print("******* POSTPROCESSING MATERIAL CHEMICAL COMPOSITION CURVES *******")    
+    
     ###########
     #SAVE PATH#
     ###########
@@ -373,6 +441,8 @@ def OutputMaterialChemicalComposition(path):
 
 
 def OutputMaterialVacancyProperties(path):
+        
+    print("******* POSTPROCESSING MATERIAL VACANCIES PROPERTIES CURVES *******")    
     
     ###########
     #SAVE PATH#
@@ -427,6 +497,8 @@ def OutputMaterialSaveFile(path):
             
 def OutputAttributes(path):
     """Save Precipitates attributes Curves"""
+    
+    print("******* POSTPROCESSING PRECIPITATE ATTRIBUTES CURVES *******")
 
     AttributesDir=path+"PrecipitatesAttributes/"
 
@@ -452,8 +524,10 @@ def OutputAttributes(path):
                     ReadFile=OpenFileAndRead(AttibutesFilesDir+filename)
 
                     Data=ReadFile[1:]
-
-                    #print("toto",len(ReadFile[0]))
+                    
+                    initialGamma=Data[0][5]
+                    initialHalfSinkD=GetInitialHalfSinkD(path)
+                    
 
                     ListOfAttributeName=[]
                     for label in ReadFile[0]:
@@ -572,7 +646,7 @@ def OutputAttributes(path):
                                       fancybox=True, shadow=True,loc='upper center')
                                 # pour avoir legend à droite: bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,
 
-                                plt.title(figtitle)
+                                plt.title(figtitle+'\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD))
                                 plt.savefig(saveName,bbox_inches='tight')
                                 plt.close()
 
@@ -584,7 +658,7 @@ def OutputAttributes(path):
 
                                  fig, ax = PlotCurve(timeData[:firstOccurenceWhereSpecificValueFound],\
                                                     attributeToPlotData[:firstOccurenceWhereSpecificValueFound],saveName,\
-                                                    Xlabel='Time [s]',Ylabel=ylabel,figTitle=figtitle, returnFig=True)
+                                                    Xlabel='Time [s]',Ylabel=ylabel,figTitle=figtitle, returnFig=True )
                                  xmin,xmax= plt.xlim()
                                  ax.axvspan(timeWhereSpecificValueFound,xmax,hatch='\\\\\\', label=attributeToPlot+" does not exist",\
                                            linestyle='dashed', fill=False,edgecolor="grey")
@@ -592,13 +666,14 @@ def OutputAttributes(path):
                                       fancybox=True, shadow=True,loc='upper center')
                                  #pour avoir legend à droite: bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,
 
-                                 plt.title(figtitle)
+                                 plt.title(figtitle+'\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD))
                                  plt.savefig(saveName,bbox_inches='tight')
                                  plt.close()
                                  
                                                                 
                             else:
-                                PlotCurve(timeData,attributeToPlotData,saveName,Xlabel='Time [s]',Ylabel=ylabel,figTitle=figtitle)
+                                PlotCurve(timeData,attributeToPlotData,saveName,Xlabel='Time [s]',Ylabel=ylabel,figTitle=figtitle+\
+                                '\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD))
 
 
 def ReadFileAndPlotOldVersion(fileName,fileDirPath,saveDirPath,Yindex,Xindex=0):
@@ -809,8 +884,10 @@ def makeInterfacialRadiusListForDistribution(r1,deltaR,n):
 
 
 
-def OutputInterfacialDistributionCurves(path):
+def OutputInterfacialDistributionCurves(path, timeStep=3600):
     """Save Precipitates Interfacial Distribution Curves"""
+    
+    print("******* POSTPROCESSING PRECIPITATES INTERFACIAL DISTRIBUTION CURVES *******")
     
     PrecipitatesInterfPropertiesDir=path+"PrecipitatesInterfacialProperties/"
     RadDisDir=path+"RadDisFiles/" 
@@ -855,22 +932,48 @@ def OutputInterfacialDistributionCurves(path):
                     print (pathToTheFileRadiusDistribution)
                     minRadius, spatialStep= FindMinRadiusAndSpatialStepOfDistribution(pathToTheFileRadiusDistribution)
                     
+                    timeList=[]
                     for lineData in Data:
-                        currentTime= lineData[0]
-                        InterfacialValuesList= lineData[1:]
+                        timeList.append(lineData[0])
+                    timeList=map(float, timeList)
+                    
+                    closeTimeList=list( arange(timeStep,float(timeList[-1]),timeStep)  )  # Time per steps of 'timeStep' secondes
+                    if float(timeList[-1]) not in closeTimeList:closeTimeList.append(timeList[-1])
+                    closestTimeList,closestTimeindexList=  ValeurlaPlusProche(closeTimeList,timeList)  
+                    
+                    for i in closestTimeindexList:
+                        data=Data[i]
+                        currentTime=data[0]
+                        InterfacialValuesList=data[1:]
                         n=len(InterfacialValuesList)
-                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
-                        assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
-                        
-                        
+                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )
+                        assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial values list do not have the same dimensions"                    
                         
                         saveFigName="ICDistribution_"+currentTime+".pdf"
                         savePath=InterfacialCocentrationResultsDir+"/"+saveFigName
-                        PlotIntercacialDistributionCurve(RList,InterfacialValuesList,
+                        PlotInterfacialDistributionCurve(RList,InterfacialValuesList,
                                   saveName=savePath, 
                                   Xlabel="Radius [m]",\
                                   Ylabel="InterfacialConcentration", 
-                                  figTitle="Interfacial concentration distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")
+                                  figTitle="Interfacial concentration distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")                   
+                    
+                    
+#                    for lineData in Data:
+#                        currentTime= lineData[0]
+#                        InterfacialValuesList= lineData[1:]
+#                        n=len(InterfacialValuesList)
+#                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
+#                        assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
+#                        
+#                        
+#                        
+#                        saveFigName="ICDistribution_"+currentTime+".pdf"
+#                        savePath=InterfacialCocentrationResultsDir+"/"+saveFigName
+#                        PlotInterfacialDistributionCurve(RList,InterfacialValuesList,
+#                                  saveName=savePath, 
+#                                  Xlabel="Radius [m]",\
+#                                  Ylabel="InterfacialConcentration", 
+#                                  figTitle="Interfacial concentration distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")
                     
                 if filename.endswith("InterfacialVelocities_.txt"):
                     print ("PostProcessing Interfacial Velocities File: <",filename, ">")
@@ -895,22 +998,50 @@ def OutputInterfacialDistributionCurves(path):
                     print (pathToTheFileRadiusDistribution)
                     minRadius, spatialStep= FindMinRadiusAndSpatialStepOfDistribution(pathToTheFileRadiusDistribution)
                     
+                    timeList=[]
                     for lineData in Data:
-                        currentTime= lineData[0]
-                        InterfacialValuesList= lineData[1:]
+                        timeList.append(lineData[0])
+                    timeList=map(float, timeList)
+                    
+                    closeTimeList=list( arange(timeStep,float(timeList[-1]),timeStep)  )  # Time per steps of 'timeStep' secondes
+                    if float(timeList[-1]) not in closeTimeList:closeTimeList.append(timeList[-1])
+                    closestTimeList,closestTimeindexList=  ValeurlaPlusProche(closeTimeList,timeList)  
+                    
+                    
+                    for i in closestTimeindexList:
+                        data=Data[i]
+                        currentTime=data[0]
+                        InterfacialValuesList=data[1:]
                         n=len(InterfacialValuesList)
-                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
+                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )
                         assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
-                        
                         
                         
                         saveFigName="IVDistribution_"+currentTime+".pdf"
                         savePath=InterfacialVelocityResultsDir+"/"+saveFigName
-                        PlotIntercacialDistributionCurve(RList,InterfacialValuesList,
+                        PlotInterfacialDistributionCurve(RList,InterfacialValuesList,
                                   saveName=savePath, 
                                   Xlabel="Radius [m]",\
                                   Ylabel="InterfacialConcentration", 
-                                  figTitle="Interfacial Velocities distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")
+                                  figTitle="Interfacial Velocities distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")                    
+                    
+                    
+#                    for lineData in Data:
+#                        currentTime= lineData[0]
+#                        InterfacialValuesList= lineData[1:]
+#                        n=len(InterfacialValuesList)
+#                        RList = makeInterfacialRadiusListForDistribution(minRadius,spatialStep,n )    
+#                        assert( len(RList)==len(InterfacialValuesList) ), "Radius List and Interfacial valist list do not have the same dimensions"
+#                        
+#                        
+#                        
+#                        saveFigName="IVDistribution_"+currentTime+".pdf"
+#                        savePath=InterfacialVelocityResultsDir+"/"+saveFigName
+#                        PlotInterfacialDistributionCurve(RList,InterfacialValuesList,
+#                                  saveName=savePath, 
+#                                  Xlabel="Radius [m]",\
+#                                  Ylabel="InterfacialConcentration", 
+#                                  figTitle="Interfacial Velocities distribution at time:\n"+str(float(currentTime)/3600.)+" [h] (or "+currentTime+" [s]")
                     
 #D=OpenAndReadFilePrecInterf("/home/mgado/work/Git/NuGroDis/gamma_0.0415_L_1.2e-05_t_150000.0__Wed_Dec_02_16hr_50min_37s_2015/PrecipitatesInterfacialProperties/GuinierPreston/GuinierPreston_InterfacialConcentrations_.txt")
 #/home/mgado/work/Git/NuGroDis/gamma_0.044_L_3e-05_t_1000.0__Tue_Dec_01_17hr_01min_14s_2015/RadDisFiles/GuinierPreston/RadDis_time_1_.txt               

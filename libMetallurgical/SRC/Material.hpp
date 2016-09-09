@@ -44,6 +44,8 @@ public:
   
   void SaveMaterialCurrentChemicalCompo();
   void SaveMaterialVacancyProperties();
+  void SaveData();
+  void SaveInitialData();
   
   bool CheckIfTheVolumicConcentrationsArePositive();
   
@@ -70,7 +72,8 @@ public:
   void ComputePrecipitatesNucleationSiteNb();
   
   void UpdateComputationCurrentTime(); //En cours
-
+  
+  
   void Info() const;
   void ReadData(std::string dataFileName);
   void InitializeGrains(); //Initialize material SSgrains AND/OR precipitates

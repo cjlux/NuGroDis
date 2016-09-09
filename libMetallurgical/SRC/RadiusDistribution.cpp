@@ -593,7 +593,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  
 	leftLimit=0;
  	rightLimit=XvPi;
-	double dichoSolution=Util::Util::DichotomousMethodForSecondDegreeEquation(constantA , (constantB-f*constantC), -f*constantD, X, leftLimit, rightLimit ); // epsilon and alpha are optionnal. by default, epsilon=1.e-16 and alpha=0.1;
+	double dichoSolution=Util::Util::DichotomousMethodForSecondDegreeEquation(constantA , (constantB-f*constantC), -f*constantD, X, leftLimit, rightLimit, 1.e-16, 1. ); // epsilon and alpha are optionnal. by default, epsilon=1.e-16 and alpha=0.1;
 	X=dichoSolution;
 	
 	//////////// End ofuse dichotomous //////////// 
