@@ -525,6 +525,10 @@ def OutputAttributes(path):
 
                     Data=ReadFile[1:]
                     
+                    if float(Data[0][0])==0: #Data[0][0] should be the first value of the time column
+                        #skip line time=0. Dont use data where time = 0
+                        Data=ReadFile[2:]
+                    
                     initialGamma=Data[0][5]
                     initialHalfSinkD=GetInitialHalfSinkD(path)
                     
