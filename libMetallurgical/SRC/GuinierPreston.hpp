@@ -16,6 +16,7 @@
 #define __GuinierPreston__hpp__
 
 #include <cassert>
+#include <vector>
 
 #include "Precipitate.hpp"
 

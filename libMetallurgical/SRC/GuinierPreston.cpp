@@ -14,12 +14,15 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm> 
+#include <numeric>
 
 #include "GuinierPreston.hpp"
 #include "Polynomial.hpp"
 #include "Material.hpp"
 #include "RadiusDistribution.hpp"
 #include "ChemicalElement.hpp"
+#include "Util.hpp"
 
 
 
@@ -129,6 +132,10 @@ GuinierPreston::ReturnVolumicFraction()
   
   assert (n>0);
   
+  
+  std::vector<double> volumicFractionOfClassVector;
+  double sumWithMethod;
+  
   double Sum=0;
   for (unsigned int i=1; i<=n; ++i)
   {
@@ -137,12 +144,20 @@ GuinierPreston::ReturnVolumicFraction()
     double Ni=currentRadiusDistribution_->GetItemValueForClass(i);
     sum_i= (4/3 + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
     assert (sum_i >= 0);
+    volumicFractionOfClassVector.push_back(sum_i);
     Sum +=sum_i;
   }
   
-  assert(Sum>=0);
+  std::sort(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end());
   
-  return Sum;
+  //sumWithMethod = Util::Util::modified_deflation(volumicFractionOfClassVector);
+  
+  sumWithMethod = std::accumulate(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end(), 0.0);
+  
+  assert(Sum>=0);
+  assert (sumWithMethod>=0);
+  //return Sum; //TODO delete or leave it, old method of summing
+  return sumWithMethod;
 }
 
 void

@@ -90,6 +90,33 @@ namespace Util
       
       static double DichotomousMethodForSecondDegreeEquation(double a, double b, double c,
 					   double solutionToImprove,double leftValue, double rightValue, double epsilon=1.e-16, double alpha=0.1);
+      
+      
+      //========================================================================
+      // The condensed summation algorithm of Kahan.  Avoids common round-off
+      // errors in computing the sum of a sequence of numbers.  It works well
+      // for most cases, but can fail badly when there is cancellation.  The
+      // slower modified_deflation algorithm below does better in those cases.
+
+      template <class T>
+      T condensed_summation(const std::vector<T>& v);
+      
+      
+      
+      
+      //========================================================================
+      // The modified deflation algorithm of Anderson.  It is reasonably fast,
+      // and should give the correct result as it is difficult if not impossible
+      // to do better without increasing the precision of the variables.  The
+      // portion of the algorithm that handles potentially infinite loops has
+      // been modified as the original version did not always work in my tests.
+      // I believe the failures were due to errors in g++ optimizations and
+      // also believe that my code still has an error.
+
+      template <class T>
+      T modified_deflation(const std::vector<T>& v);
+      
+      
     };
 
 }

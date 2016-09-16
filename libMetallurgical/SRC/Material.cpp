@@ -148,10 +148,10 @@ Material::RunProcess()
   computationDuration=computation_.GetMaxComputationTime();
   std::cout << "Computation Duration is " << computationDuration << "\n" << std::endl;
   
-  this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
+  //TODO check later ==> this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
   
   
-  this->SaveInitialData();//uncomment or delete, depending on the older method of saving
+  //TODO check later  ==> this->SaveInitialData();//uncomment or delete, depending on the older method of saving
   
   while ( (currentTime<computationDuration)&&(this->CheckIfTheVolumicConcentrationsArePositive()==true) )
   {//Begin While
@@ -184,6 +184,8 @@ Material::RunProcess()
       
     this->ProcessComputationMaxTimeStep();
     
+    this->SaveData();
+    
     
     this->AddNucleatedPrecipitates();
     
@@ -211,9 +213,11 @@ Material::RunProcess()
       (*i)->GetCurrentRadiusDistribution().PlotPythonHistogram();
     }*/
     
+    this->UpdateComputationCurrentTime();
+    currentTime=computation_.GetCurrentTime();
+    
     
     this->ComputePrecipitatesVolumicFraction();
-    
     
     this->UpdateVolumicValues(); //Important to use method UpdateVolumicValues() here.
     
@@ -221,8 +225,7 @@ Material::RunProcess()
     
     
     
-    this->UpdateComputationCurrentTime();
-    currentTime=computation_.GetCurrentTime();
+    
     if (currentTime>= computationDuration)
     {
       std::cout << "Current time is equal or superior to Computation Duration. Current time just after update is " << currentTime << "\n\n\n\n\n" << std::endl;
@@ -286,7 +289,7 @@ Material::RunProcess()
     
     
     
-    this->SaveData();//uncomment or delete, depending on the older method of saving
+    
     
     ///////////////////////// old way of saving
     //Uncomment or delete, depending on SaveMaterial()
@@ -317,6 +320,11 @@ Material::RunProcess()
   //End WHILE
   }
   
+  /////////////
+  // Save values at the end of the last increment
+  /////
+  this->SaveData(); 
+  ////////
   
     /*TODO uncomment if you want to plot the last distribution
     //plot histogram
@@ -891,7 +899,7 @@ Material::SaveMaterialCurrentChemicalCompo()
 void
 Material::SaveData()
 {
-  std::cout <<   "################################# Material::InitialSave #################################" 	 <<  std::endl;
+  std::cout <<   "################################# Material::Save / current time = " << computation_.GetCurrentTime()<< " s  #################################" 	 <<  std::endl;
   
   //Save RadiusDistribution of all precipitates
   for (std::vector<Precipitate *>::const_iterator i = precipitateList_.begin(); i != precipitateList_.end(); ++i)
