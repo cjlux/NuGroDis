@@ -43,7 +43,6 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-#include <vector>
 
 
 
@@ -582,8 +581,9 @@ namespace Util
   // for most cases, but can fail badly when there is cancellation.  The
   // slower modified_deflation algorithm below does better in those cases.
 
+  /*
   template <class T>
-  T condensed_summation(const std::vector<T>& v)
+  T Util::condensed_summation(const std::vector<T>& v)
   {
     T a, b, sum = 0.0, error = 0.0;
     for (typename std::vector<T>::const_iterator i = v.begin(); i != v.end(); ++i)
@@ -608,7 +608,7 @@ namespace Util
   // also believe that my code still has an error.
 
   template <class T>
-  T modified_deflation(const std::vector<T>& v)
+  T Util::modified_deflation(const std::vector<T>& v)
   {
     if (v.size() < 3)
       return condensed_summation(v);
@@ -679,7 +679,94 @@ namespace Util
 
   } // modified_deflation
 
+  */
   
+  
+  double Util::condensed_summation(const std::vector<double>& v)
+  {
+    double a, b, sum = 0.0, error = 0.0;
+    for (typename std::vector<double>::const_iterator i = v.begin(); i != v.end(); ++i)
+    {
+      a = sum;
+      b = *i + error;
+      sum = a + b;
+      error = (a - sum) + b;
+    }
+    return sum;
+
+  } // condensed_summation
+  
+  
+  double Util::modified_deflation(const std::vector<double>& v)
+  {
+    if (v.size() < 3)
+      return condensed_summation(v);
+
+    // Set up several std::vectors with reasonable capacities
+    std::vector<double> vp, vn, e;
+    vp.reserve(v.size());
+    vn.reserve(v.size());
+    e.reserve(v.size());
+
+    // Initialize std::vectors of negative and positive elements of v
+    for (typename std::vector<double>::const_iterator i = v.begin(); i != v.end(); ++i)
+      if (*i < 0.0)
+	vn.push_back(*i);
+      else if (*i > 0.0)
+	vp.push_back(*i);
+
+    double a, b, sum, error, sp, sn;
+    bool well_conditioned = false;
+    while (!well_conditioned) {
+      // Deflate the last elements of vp and vn.
+      while (!vp.empty() && !vn.empty()) {
+	a = vp.back(); vp.pop_back();
+	b = vn.back(); vn.pop_back();
+	sum = a + b;
+	error = (a - sum) + b;
+	if (sum == a) { // |a| >> |b|
+	  double tmp1 = a / 2.0;
+	  double tmp2 = a - tmp1;
+	  vp.push_back(tmp2);
+	  vp.push_back(tmp1);
+	  vn.push_back(b);
+	} else if (sum == b) { // |b| >> |a|
+	  double tmp1 = b / 2.0;
+	  double tmp2 = b - tmp1;
+	  vp.push_back(a);
+	  vn.push_back(tmp2);
+	  vn.push_back(tmp1);
+	} else {
+	  if (sum < 0.0)
+	    vn.push_back(sum);
+	  else if (sum > 0.0)
+	    vp.push_back(sum);
+	  if (error != 0.0)
+	    e.push_back(error);
+	}
+      }
+
+      // Put the error terms back in the vp and vn arrays.
+      for (typename std::vector<double>::iterator i = e.begin(); i != e.end(); ++i)
+	if (*i < 0.0)
+	  vn.push_back(*i);
+	else if (*i > 0.0)
+	  vp.push_back(*i);
+      e.clear();
+
+      // Check that the sums in vp and vn are well-condtioned.
+      sp = condensed_summation(vp);
+      sn = condensed_summation(vn);
+      well_conditioned = (fabs((sp + sn) / (sp - sn)) == 1.0);
+    }
+
+    std::vector<double> vnew;
+    vnew.reserve(vp.size() + vn.size());
+    vnew.insert(vnew.end(), vp.begin(), vp.end());
+    vnew.insert(vnew.end(), vn.begin(), vn.end());
+    return condensed_summation(vnew);
+
+  } // modified_deflation
   
   
 }

@@ -14,8 +14,7 @@
 
 #include <iostream>
 #include <cmath>
-#include <algorithm> 
-#include <numeric>
+
 
 #include "GuinierPreston.hpp"
 #include "Polynomial.hpp"
@@ -136,28 +135,47 @@ GuinierPreston::ReturnVolumicFraction()
   std::vector<double> volumicFractionOfClassVector;
   double sumWithMethod;
   
+  
+  //Normal sum
   double Sum=0;
   for (unsigned int i=1; i<=n; ++i)
   {
     double sum_i;
     double Ri=currentRadiusDistribution_->GetRadiusForClass(i);
     double Ni=currentRadiusDistribution_->GetItemValueForClass(i);
-    sum_i= (4/3 + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
+    sum_i= (4./3. + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
     assert (sum_i >= 0);
     volumicFractionOfClassVector.push_back(sum_i);
     Sum +=sum_i;
   }
   
+  
+  //Method 3, sort, and making my own sum
+  /*
   std::sort(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end());
+  double vectorSum=0;
+  for (unsigned int i=0; i<volumicFractionOfClassVector.size(); ++i )
+  {
+    vectorSum += volumicFractionOfClassVector[i];
+  }
+  sumWithMethod=vectorSum;
+  */
   
+  //Method 4, using a special algotithm for the sum : modified_deflation
+  /*
   //sumWithMethod = Util::Util::modified_deflation(volumicFractionOfClassVector);
+  */
   
+  //Method 2, sort, and using accumalate for the sum
+  /*
+  std::sort(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end());
   sumWithMethod = std::accumulate(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end(), 0.0);
+  */
   
   assert(Sum>=0);
-  assert (sumWithMethod>=0);
-  //return Sum; //TODO delete or leave it, old method of summing
-  return sumWithMethod;
+  //assert (sumWithMethod>=0);
+  return Sum; //TODO delete or leave it, old method of summing
+  //return sumWithMethod;
 }
 
 void

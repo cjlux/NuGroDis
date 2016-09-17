@@ -40,6 +40,7 @@
 #include <cassert>
 #include <string>
 #include <complex>
+#include <vector>
 
 namespace Util
   {
@@ -98,9 +99,12 @@ namespace Util
       // for most cases, but can fail badly when there is cancellation.  The
       // slower modified_deflation algorithm below does better in those cases.
 
+      /*
       template <class T>
-      T condensed_summation(const std::vector<T>& v);
+      static T condensed_summation(const std::vector<T>& v);
+      */
       
+      static double condensed_summation(const std::vector<double>& v);
       
       
       
@@ -113,9 +117,12 @@ namespace Util
       // I believe the failures were due to errors in g++ optimizations and
       // also believe that my code still has an error.
 
+      /*
       template <class T>
-      T modified_deflation(const std::vector<T>& v);
+      static T modified_deflation(const std::vector<T>& v);
+      */
       
+      static double modified_deflation(const std::vector<double>& v);
       
     };
 
