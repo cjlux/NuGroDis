@@ -243,8 +243,19 @@ Precipitate::SavePrecipitateAttributes()
       
     }
     
-    /*debug*/ line<<"\t"<<"FistNotEmptyClassAfterNucleation";
+    line<<"\t"<<"FistNotEmptyClassAfterNucleation";
     
+    /////////////////////////////////////////////
+    /////// Add new attribute label here ////////
+    /////////////////////////////////////////////
+    
+    // by doing  ===>   line<<"\t"<<"NewAttributeLabelName";
+  
+    line<<"\t"<<"AverageRadius";
+    
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
+
     
     line<<"\n";
     
@@ -265,11 +276,22 @@ Precipitate::SavePrecipitateAttributes()
     };
   }
   
-  /*debug*/ lineStream<<"\t"<<FirstNotEmptyClassIdAfterNucleation;
+  lineStream<<"\t"<<FirstNotEmptyClassIdAfterNucleation;
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////// ADD NEW ATTRIBUTES HERE ////// do not forget to add the label before (see few line above)///////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  // by doing  ===>  lineStream<<"\t"<<NewAttributeVariable;
+  
+  lineStream<<"\t"<<currentRadiusDistribution_->ReturnAverageRadius();
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////  
+  
+  
   
   lineStream<<"\n";
-    
-    
     
   lineStringVector.push_back(lineStream.str());
   
@@ -1042,7 +1064,7 @@ Precipitate::ReturnCriticalRadius()
   
   
   
-  double criticalRadius= -4/3*surfaceEnergyCurrentValue_/(distorsionEnergy_+phaseChangeVolumiqueEnergy_)*(shapeFactor_+2)/(shapeFactor_+4/3);
+  double criticalRadius= -4./3.*surfaceEnergyCurrentValue_/(distorsionEnergy_+phaseChangeVolumiqueEnergy_)*(shapeFactor_+2.)/(shapeFactor_+4./3.);
   
   assert ((criticalRadius>0)&&"In ReturnCriticalRadius: computed value of criticalRadius is not strictly positive");
  
@@ -1152,7 +1174,7 @@ Precipitate::ReturnZeldovichFactor()
 
   
   
-  double Z=molarVolume_/(2*M_PI*std::pow(criticalRadius_ + deltaCriticalRadius_, 2))*std::pow(surfaceEnergyCurrentValue_/(Na*R*T), 0.5 );
+  double Z=molarVolume_/(2.*M_PI*std::pow(criticalRadius_ + deltaCriticalRadius_, 2))*std::pow(surfaceEnergyCurrentValue_/(Na*R*T), 0.5 );
  
   //TODO post assertions!!!
   assert( (Z>0)&&"Computed Zeldovich factor is not strictly positive" );
@@ -1636,12 +1658,37 @@ Precipitate::ReturnCriticalTimeStep()
     
     assert(firstNotEmptyClassId>=1);
     
-    criticalV=currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed().GetLeftInterfacialVelocityForClass(firstNotEmptyClassId);
+    
+    std::vector<double> relevantAbsoluteValueOfVelocityList;
+    
+    unsigned int n=currentRadiusDistribution_->GetItemsValues().size();
+    
+    assert (firstNotEmptyClassId<=n);
+    
+    // All left interfaces velocities
+    for (unsigned int i=firstNotEmptyClassId; i<=n; ++i )
+    {
+      // left interfaces
+      double leftV = currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed().GetLeftInterfacialVelocityForClass(i);
+      relevantAbsoluteValueOfVelocityList.push_back(std::abs(leftV));
+    }
+    
+    //right interface of last class
+    double rightV_OflastClass=currentRadiusDistribution_->GetInterfacialConcentrationObjectUsed().GetRightInterfacialVelocityForClass(n);
+    relevantAbsoluteValueOfVelocityList.push_back(std::abs(rightV_OflastClass));
+    
+    assert (relevantAbsoluteValueOfVelocityList.size()== (n-firstNotEmptyClassId+2));
+    
+    
+    std::vector<double>::const_iterator it;
+    it = std::max_element(relevantAbsoluteValueOfVelocityList.begin(), relevantAbsoluteValueOfVelocityList.end());
+    
+    criticalV= *it;
     
     deltar=currentRadiusDistribution_->GetSpatialStep();
   
   
-    criticaltimeStepP= deltar/2/std::abs(criticalV);
+    criticaltimeStepP= deltar/2/criticalV;
     
     /*debug*/std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
     
@@ -1702,21 +1749,16 @@ Precipitate::AddNucleatedPrecipitates()
        
        
        /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
-       if ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius) )
-       {
-	  assert ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is not in the range of the current RadiusDistribution");
-	  
-	  double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
-	  unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
-	  double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
-	  
-	  assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
-	  
-	  std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
-	  currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
-	  /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;  
-	 
-       }
+       assert ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is not in the range of the current RadiusDistribution");
+       double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
+       unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
+       double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
+	
+       assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
+	
+       std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
+       currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
+       /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;
 	 
        
        

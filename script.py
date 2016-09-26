@@ -1,13 +1,98 @@
 # -*- coding: utf-8 -*-
 import os, sys
 import matplotlib.pyplot as plt
-from numpy import array, arange
+from numpy import array, arange, sqrt
 from matplotlib import rc
 import M2024
 
 
 
 SpecificValues=["-222.222","-111.111","111.111","222.222"] #DO NOT DELETE THIS LINE!!!
+
+def Hardness(path):
+    """Comparaison courbe de dureté obtenu par simulation numerique et celle obtenue expértimentalement"""
+    
+
+    print("******* POSTPROCESSING HARDNESS CURVES *******")    
+    ###########
+    #SAVE PATH#
+    ###########
+    ResultDir=path+"Results/Material/Hardness"
+    if not os.path.exists(ResultDir):
+        os.makedirs(ResultDir)
+    ###########
+    #SAVE PATH#
+    ###########
+
+    materialCurrentCompoFile=path+"/MaterialCurrentCompo/MaterialChemicalCompo.txt"
+    materialCurrentCompoData=OpenFileAndRead(materialCurrentCompoFile)[1:]
+
+    
+    
+    GuinierPrestonAttributeFile=path+"PrecipitatesAttributes/GuinierPreston/GuinierPreston_Attributes_.txt" 
+    GuinierPrestonAttributeData=OpenFileAndRead(GuinierPrestonAttributeFile)[1:]
+    
+    
+    initialGamma=GuinierPrestonAttributeData[0][5]
+    initialHalfSinkD=GetInitialHalfSinkD(path)
+    
+    
+    K=40.437    
+    XvCu=array(map(float,materialCurrentCompoData[:,2]))*100
+    XvMg=array(map(float,materialCurrentCompoData[:,3]))*100
+    XatCu=XvCu*1.406
+    XatMg=XvMg*0.714
+    FvGP=map(float,GuinierPrestonAttributeData[:,1])
+    Css=XatCu+XatMg
+    SigmaGrain=54 #composante dûe au durcissement par taille de grain en MPa    
+    SigmaSS=K*Css**(2/3) #composante dûe au durcissement par solution solide, Sigma= KCss^(2/3), avec Css concentration atomique des solutés
+    SigmaGP=791.453*sqrt(FvGP) #composante dûe au durcissement par précipatation des GP
+    SigmaTotal=SigmaGrain+SigmaSS+SigmaGP
+    a=SigmaGrain+SigmaSS
+    H=(SigmaTotal+183)/3.67 # Dureté par la loi H=3.67*H-183, cf. thèse Genevois, relation calculée dans un domaine de dureté compris entre 110 et 160 HV
+    
+    print(H)
+    
+
+    Hexperimentale=[89,91,92,92.5,95,107,114,118,125,126,128,131,134,134,134]
+    texperimentale=[0.05,0.17,0.33,0.5,1,2,3,4,6,8,24,48,72,80,90] #en heure
+    t=array(map(float,materialCurrentCompoData[:,0]))/3600    # temps en heure
+    print(t)
+    import matplotlib.pyplot as plt
+    fig1,ax = plt.subplots()
+    ax.plot(t,H,'r-o')
+    ax.plot(texperimentale,Hexperimentale,'b-o')    
+    ax.set_title(u'Numerical simulation and Experimental Hardness Curve\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD)) 
+    ax.grid(True)    
+    ax.set_xlabel(u"Time [h] ")
+    ax.set_ylabel(u"Hardness [HV]",color='green')
+    # abaisser la hauteur de l'axe de 10% on the bottom
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+    ax.legend(['Numerical simulation', 'Experimental Curve'],loc='upper center', bbox_to_anchor=(0.5, -0.1),fancybox=True, shadow=True, ncol=5)
+    plt.savefig(ResultDir+'/Hardness.pdf')
+   
+    #courbe sur echelle semi logarithmique
+    fig2,ax = plt.subplots()
+    ax.semilogx(t,H,'r-o')
+    ax.plot(texperimentale,Hexperimentale,'b-o')    
+    ax.set_title(u'Numerical simulation and Experimental Hardness Curve, H=f(fvGP)\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD)) 
+    ax.grid(True)    
+    ax.set_xlabel(u"Time [h] ")
+    ax.set_ylabel(u"Hardness [HV]",color='green')
+    # abaisser la hauteur de l'axe de 10% on the bottom
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+    ax.legend(['Numerical simulation', 'Experimental Curve'],loc='upper center', bbox_to_anchor=(0.5, -0.1),fancybox=True, shadow=True, ncol=5)
+    plt.savefig(ResultDir+'/Hardness_log.pdf')
+    
+    plt.close("all")
+      
+    
+    return 
+
+
+
 
 
 
@@ -65,6 +150,8 @@ def PostProcessing():
     OutputMaterialChemicalComposition(path)
     OutputMaterialVacancyProperties(path)
     OutputInterfacialDistributionCurves(path, timeStep=3600) # by default timeStep is 3600 (see function)
+    
+    Hardness(path)
 
 
 def CheckIfASpecificValueIsInData(data):

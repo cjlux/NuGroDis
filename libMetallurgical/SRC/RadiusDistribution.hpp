@@ -129,6 +129,8 @@ public:
  std::vector<double> ReturnRadiusList();
  double ReturnInterfacialVelocityListFirstElement(); 
  
+ double ReturnAverageRadius();
+ 
  
  //RELATIONS
  //getter
@@ -350,6 +352,63 @@ inline void
 RadiusDistribution::SetAllItemsValues(std::vector<double> NP1)//TO DO   /*comment by MG: SetAllItemsNumbers can also be called SetItemsValues*/
 {
   // itemsValues_=...
+}
+
+inline double
+RadiusDistribution::ReturnAverageRadius()
+{
+  
+  double averageRadius;
+  double sumNi=this->ReturnTotNbOfItems();
+  
+  if (sumNi == 0.)
+  {
+    // no distribution is empty
+    averageRadius=0;
+  }
+  else
+  {
+    unsigned int n=itemsValues_.size();
+    
+    std::vector<double> NiRiVector;
+    
+    
+    for (unsigned int i=1; i<=n; ++i)
+    {   
+      double Ri=this->GetRadiusForClass(i);
+      double Ni=this->GetItemValueForClass(i);
+      
+      double NiRi= Ri*Ni;
+      
+      assert (NiRi>=0);
+      
+      NiRiVector.push_back(NiRi);
+    }
+    
+    double sumNiRiWithMethod=0;
+    
+    ///////////////////////////
+    /// Simple sum method /////
+    ///////////////////////////
+    for (unsigned int i=0; i<n; ++i)
+    {
+      sumNiRiWithMethod += NiRiVector[i];
+    }
+    //////////////////////////
+    
+    assert( sumNiRiWithMethod >= 0 );
+    
+    averageRadius = sumNiRiWithMethod/sumNi;
+    
+    assert (averageRadius >= 0);
+  
+  };
+  
+
+  
+  
+  return averageRadius;
+  
 }
 
 

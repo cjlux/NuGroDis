@@ -127,16 +127,16 @@ GuinierPreston::ComputeNucleationSiteNb()
 double 
 GuinierPreston::ReturnVolumicFraction()
 {
-  double n=currentRadiusDistribution_->GetItemsValues().size();
+  unsigned int n=currentRadiusDistribution_->GetItemsValues().size();
   
   assert (n>0);
   
   
   std::vector<double> volumicFractionOfClassVector;
-  double sumWithMethod;
+  double sumWithMethod=0;
   
-  
-  //Normal sum
+  /////////////////////////////////
+  ///////// Normal sum //////////
   double Sum=0;
   for (unsigned int i=1; i<=n; ++i)
   {
@@ -148,6 +148,8 @@ GuinierPreston::ReturnVolumicFraction()
     volumicFractionOfClassVector.push_back(sum_i);
     Sum +=sum_i;
   }
+  sumWithMethod=Sum;
+  //////////////////////////
   
   
   //Method 3, sort, and making my own sum
@@ -172,10 +174,8 @@ GuinierPreston::ReturnVolumicFraction()
   sumWithMethod = std::accumulate(volumicFractionOfClassVector.begin(),volumicFractionOfClassVector.end(), 0.0);
   */
   
-  assert(Sum>=0);
-  //assert (sumWithMethod>=0);
-  return Sum; //TODO delete or leave it, old method of summing
-  //return sumWithMethod;
+  assert (sumWithMethod>=0);
+  return sumWithMethod;
 }
 
 void
