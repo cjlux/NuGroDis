@@ -51,13 +51,13 @@ def Hardness(path):
     a=SigmaGrain+SigmaSS
     H=(SigmaTotal+183)/3.67 # Dureté par la loi H=3.67*H-183, cf. thèse Genevois, relation calculée dans un domaine de dureté compris entre 110 et 160 HV
     
-    print(H)
+    #print(H)
     
 
     Hexperimentale=[89,91,92,92.5,95,107,114,118,125,126,128,131,134,134,134]
     texperimentale=[0.05,0.17,0.33,0.5,1,2,3,4,6,8,24,48,72,80,90] #en heure
     t=array(map(float,materialCurrentCompoData[:,0]))/3600    # temps en heure
-    print(t)
+    #print(t)
     import matplotlib.pyplot as plt
     fig1,ax = plt.subplots()
     ax.plot(t,H,'r-o')
