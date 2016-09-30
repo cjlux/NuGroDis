@@ -41,6 +41,7 @@
 #include <string>
 #include <complex>
 #include <vector>
+#include <boost/python.hpp>
 
 namespace Util
   {
@@ -124,7 +125,50 @@ namespace Util
       
       static double modified_deflation(const std::vector<double>& v);
       
+      /*
+      template <class T>
+      static std::vector<T> ConvertPythonListToVector(boost::python::list& pythonList);
+      */
+      
+      static std::vector<double> ConvertPythonListToVector(boost::python::list& pythonList);
     };
+    
+    /*
+    template <class T>
+    inline std::vector<T> 
+    Util::ConvertPythonListToVector(boost::python::list& pythonList)
+    {
+      std::vector<T> vector;
+      
+      //step 2: set new values given in argument
+      for (int i = 0; i <= len(pythonList)-1; ++i)
+      {
+	vector.push_back(boost::python::extract<T>(pythonList[i]));
+      }
+      
+      assert ( ( int(vector.size()) == int(len(pythonList)) ) && "Error when converting python list to C++ vector" );
+      
+      return vector;
+      
+    }
+    */
+    
+    inline std::vector<double> 
+    Util::ConvertPythonListToVector(boost::python::list& pythonList)
+    {
+      std::vector<double> vector;
+      
+      //step 2: set new values given in argument
+      for (int i = 0; i <= len(pythonList)-1; ++i)
+      {
+	vector.push_back(boost::python::extract<double>(pythonList[i]));
+      }
+      
+      assert ( ( int(vector.size()) == int(len(pythonList)) ) && "Error when converting python list to C++ vector" );
+      
+      return vector;
+      
+    }
 
 }
 

@@ -321,6 +321,7 @@ Precipitate::GetCurrentRadiusDistribution() const
 { 
   assert((currentRadiusDistribution_!=0)&&"Precipitate do not have any current radiusDistribution");  
   return *currentRadiusDistribution_;
+
 }
 
 

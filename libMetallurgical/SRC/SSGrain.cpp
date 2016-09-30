@@ -25,6 +25,7 @@
 void 
 SSGrain::test()
 {
+  std::cout<<"SSGrain::test()"<<std::endl;
   std::cout<<"Size = "<<precipitateList_.size()<<std::endl;
   std::cout<<"Adresse of precipitate vector is "<<&precipitateList_<<std::endl;
   std::cout <<"Adresse of precipitate object are: ";

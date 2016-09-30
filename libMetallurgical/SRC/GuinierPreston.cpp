@@ -83,6 +83,8 @@ GuinierPreston::ComputeNucleationSiteNb()
   //TODO  
   std::vector<Precipitate *> GPList;//List of GuinierPreston
   
+  
+  
   for ( unsigned int i=0; i<precipitateList.size(); ++i  )
   {
     std::string type= precipitateList[i]->GetPrecipitateType();
@@ -92,6 +94,7 @@ GuinierPreston::ComputeNucleationSiteNb()
     } 
   }
   
+  
   double SumOfFracOfAllGP=0;
   double am = materialPointer_->GetMainChemicalElement().GetLatticeParameter();
   
@@ -100,7 +103,7 @@ GuinierPreston::ComputeNucleationSiteNb()
     
     double fracVol= GPList[i]->ReturnVolumicFraction();
     
-    double NOccupiedSiteGP_i= (4/std::pow(am,3))*fracVol;
+    double NOccupiedSiteGP_i= (4./std::pow(am,3.))*fracVol;
     
     assert (NOccupiedSiteGP_i>=0);
     
@@ -111,16 +114,18 @@ GuinierPreston::ComputeNucleationSiteNb()
   
   nucleationSitesNumber_= initialNucleationSitesNumber_ - SumOfFracOfAllGP ;
   
+  
   if( nucleationSitesNumber_<0)
   {
     std::cout<<"Nuclueation site Number for precipitate type <GuinierPreston> at adress <"<<this<<"> is negative => IT WILL BE SETTED TO ZERO";
     nucleationSitesNumber_=0;
   }
   
+
+  
   assert (nucleationSitesNumber_>=0);
   
-  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç initialNucleationSitesNumber_ : "<<initialNucleationSitesNumber_<<std::endl;
-  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç Nucleation sites number: "<<nucleationSitesNumber_<<std::endl;
+  /*DEBUG*/ std::cout<<"Computed Nucleation sites number for Guinier Preston is : "<<nucleationSitesNumber_<<std::endl;
   
 }
 
@@ -195,7 +200,9 @@ GuinierPreston::ReadDataValue(std::string fileName)
 void
 GuinierPreston::Info() const
 {
+  std::cout <<  "=====================================================================================" 	<< std::endl;
   std::cout <<  "#############################  GuinierPreston::Info #################################" 	<< std::endl;
+  std::cout <<  "=====================================================================================" 	<< std::endl;
   std::cout <<  "                                    deltaCell: " << deltaCell_ << " SI unit" << std::endl;
   std::cout <<  "                       solvusActivationEnergy: " << solvusActivationEnergy_ << " SI unit" << std::endl;
   if (distorsionEnergy_==-1)
@@ -232,6 +239,12 @@ GuinierPreston::Info() const
   };
   
   std::cout  << "                         precipitate adress: " <<this<<std::endl;
+  
+  std::cout <<  "                  currentRadiusDistribution: ==>"<< std::endl;
+  currentRadiusDistribution_->Info();
+  std::cout <<  "=====================================================================================" 	<< std::endl;
+  std::cout <<  "#############################  GuinierPreston::Info #################################" 	<< std::endl;
+  std::cout <<  "=====================================================================================" 	<< std::endl;
   
 
   

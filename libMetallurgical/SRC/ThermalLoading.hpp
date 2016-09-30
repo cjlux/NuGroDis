@@ -17,6 +17,8 @@
 
 #include <string>
 #include <vector>
+#include <boost/python.hpp>
+
 class Computation; 
 class Temperature;
 
@@ -37,14 +39,18 @@ public:
     //(equivalent to read TK1 and set time and temperature attributes)
     void ReadTemperatureLoading(std::string);
     
+    //Read From python lists the values for temperature loading : the time and temperature
+    //(equivalent to read TK1 and set time, temperature, and duration attributes)
+    void ReadTemperatureLoadingFromPythonList(boost::python::list& timePyList, boost::python::list& temperaturePyList);
+    
     //Read Vacancies concentration after hardening (maturation or tempering)
     void ReadVCAH(std::string);
     
     //Getter
     double GetDuration() const {return duration_;};
+    std::vector<double> GetTime() const {return time_;};
+    std::vector<double> Gettemperature() const {return temperature_;};
     
-    //Setter
-    void SetDuration(const double &duration);
     
     void ComputeMaxTimeStep();//TODO only declaration have been made //TODO ERASE, unusefull ?
     
@@ -57,7 +63,7 @@ protected:
 private:
 
     //Thermal loading duration (was tmax - tmat). Unit: s
-    double duration_;
+    double duration_; //TODO Set duration when reading File TK1
     
     //Time vector of temperature loading. Unit: s
     std::vector<double>  time_;
@@ -71,11 +77,5 @@ private:
     Computation& computation_;
 
 };
-
-inline void
-ThermalLoading::SetDuration(const double &duration)
-{
-  duration_=duration;
-}
 
 #endif

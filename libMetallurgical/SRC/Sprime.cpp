@@ -84,6 +84,9 @@ Sprime::ComputeNucleationSiteNb()
   std::vector<Precipitate *> SprimeList;//List of Sprime
   std::vector<Precipitate *> GPList;//List of GuinierPreston
   
+  
+
+  
   for ( unsigned int i=0; i<precipitateList.size(); ++i  )
   {
     std::string type= precipitateList[i]->GetPrecipitateType();
@@ -97,36 +100,39 @@ Sprime::ComputeNucleationSiteNb()
     }
   }
   
-  double SumOfFracOfAllGP=0;
-  double SumOfFracOfAllSprime=0;
-  double am = materialPointer_->GetMainChemicalElement().GetLatticeParameter();
+   
+
+  
+  double numberOfPrecipitateGP=0;
+  double numerOfPrecipitateSprime=0;
   
   for (unsigned int i=0; i<GPList.size(); ++i )
   {
+
+    double numberOfPrecipitateGP_i= GPList[i]->GetCurrentRadiusDistribution().ReturnTotNbOfItems();
+
+
     
-    double fracVol= GPList[i]->ReturnVolumicFraction();
+    assert (numberOfPrecipitateGP_i>=0);
     
-    double NsGP_i=  (4/std::pow(am,3))*fracVol;
-    
-    assert (NsGP_i>=0);
-    
-    SumOfFracOfAllGP += NsGP_i;
+    numberOfPrecipitateGP += numberOfPrecipitateGP_i;
 
   }
   
+
+  
   for (unsigned int i=0; i<SprimeList.size(); ++i )
   {
+    double numberOfPrecipitateSprime_i=SprimeList[i]->GetCurrentRadiusDistribution().ReturnTotNbOfItems();
     
-    double fracVol= SprimeList[i]->ReturnVolumicFraction();
+    assert (numberOfPrecipitateSprime_i>=0);
     
-    double NsSprime_i=  (4/std::pow(am,3))*fracVol;
-    
-    assert (NsSprime_i>=0);
-    
-    SumOfFracOfAllSprime += NsSprime_i;
+    numerOfPrecipitateSprime += numberOfPrecipitateSprime_i;
   }
   
-  nucleationSitesNumber_=SumOfFracOfAllGP-SumOfFracOfAllSprime;
+
+  
+  nucleationSitesNumber_=numberOfPrecipitateGP-numerOfPrecipitateSprime;
   
   if( nucleationSitesNumber_<0)
   {
@@ -134,8 +140,9 @@ Sprime::ComputeNucleationSiteNb()
     nucleationSitesNumber_=0;
   }
   
+  
   assert(nucleationSitesNumber_>=0);
-  /*DEBUG*/ std::cout<<"ççççççççççççççççççççççççççççççççççççççççççççç Nucleation sites number: "<<nucleationSitesNumber_<<std::endl;
+  /*DEBUG*/ std::cout<<"Computed Nucleation sites number For Sprime is : "<<nucleationSitesNumber_<<std::endl;
 
 }
 
@@ -178,7 +185,9 @@ Sprime::ReadDataValue(std::string dataFile)
 void
 Sprime::Info() const
 {
+  std::cout <<  "===================================================================================" 	<< std::endl;
   std::cout <<  "###################################  Sprime::Info #################################" 	<< std::endl;
+  std::cout <<  "===================================================================================" 	<< std::endl;
   std::cout <<  "                                molarVolume: " << molarVolume_  << " SI unit" << std::endl;
   
   
@@ -233,6 +242,11 @@ Sprime::Info() const
   {std::cout << "                      nucleationSitesNumber: " << nucleationSitesNumber_ << " SI unit" << std::endl;};
   
   std::cout  << "                         precipitate adress: " <<this<<std::endl;
+  std::cout <<  "                  currentRadiusDistribution: ==>"<< std::endl;
+  currentRadiusDistribution_->Info();
+  std::cout <<  "===================================================================================" 	<< std::endl;
+  std::cout <<  "###################################  Sprime::Info #################################" 	<< std::endl;
+  std::cout <<  "===================================================================================" 	<< std::endl;
   std::cout <<  std::endl;
   
 }

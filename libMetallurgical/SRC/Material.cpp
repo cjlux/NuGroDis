@@ -34,6 +34,7 @@
 void 
 Material::test()
 {
+  std::cout<<"Material::test()"<<std::endl;
   std::cout << "Size = " << precipitateList_.size() << std::endl;
   std::cout << "Adresse of precipitate vector is " << &precipitateList_ << std::endl;
   std::cout << "Adresse of precipitate object are: ";
@@ -661,8 +662,9 @@ Material::UpdateVolumicValues()
 {
   // Remember : checkIfUpdatedValuesArePositive default value is true !!!
   
-  std::cout << "Updating material current volumic concentration values\
-  taking into account the volumic fraction of precipitates" << std::endl;
+  std::cout<<  "=================================================================================================================="<< std::endl;
+  std::cout<<  " Updating material current volumic concentration values taking into account the volumic fraction of precipitates " << std::endl;
+  std::cout<<  "=================================================================================================================="<< std::endl;
   // XvCuSS
   //TODO 
   std::map<std::string, Concentration*> currentConcMap=currentChemicalComposition_.GetConcentrationMap();
@@ -685,6 +687,11 @@ Material::UpdateVolumicValues()
 	oldVolumicFraction=(*i)->GetVolumicFraction();
 	VolumicFraction=(*i)->ReturnVolumicFraction();
 	
+	
+	if (VolumicFraction!=oldVolumicFraction)
+	{
+	  std::cout<<"Precipitate's type = "<< (*i)->GetPrecipitateType() <<" | VolumicFraction = "<<VolumicFraction<< " | oldVolumicFraction = "<<oldVolumicFraction<<std::endl;
+	};
 	assert ( (VolumicFraction==oldVolumicFraction)&&"Volumic fraction of precipitates must be computed before run method Material::UpdateVolumicValues()");
 	
 	double precipitateFracVol=(*i)->GetVolumicFraction(); //fracVolP
@@ -714,6 +721,10 @@ Material::UpdateVolumicValues()
     currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
     
     }
+    
+  std::cout<<  "=================================================================================================================="<< std::endl;
+  std::cout<<  " Updating material current volumic concentration values taking into account the volumic fraction of precipitates " << std::endl;
+  std::cout<<  "=================================================================================================================="<< std::endl;
     
  
 }

@@ -38,11 +38,14 @@ public:
   ~Computation();
   
 
+  
+  void ProcessMaxComputationTime();
 
   // Setters:
   void SetType(const std::string &);
-  std::string GetType() const;
-  void SetMaxComputationTime(const double ); 
+  
+  std::string GetType() const; 
+  
   double GetMaxComputationTime() const;
   
   double GetMaxTimeStep() const { assert(maxTimeStep_>0) ;  return maxTimeStep_;};
@@ -136,13 +139,6 @@ Computation::GetType() const
 }
 
 
-
-
-inline void
-Computation::SetMaxComputationTime(const double maxCompTime) 
-{
-  maxComputationTime_= maxCompTime;
-}
 
 inline double
 Computation::GetMaxComputationTime() const

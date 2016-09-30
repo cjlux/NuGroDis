@@ -92,10 +92,11 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
   boost::python::class_<Computation>("Computation", boost::python::init<double, boost::python::optional<std::string> >() )
     .add_property("type", &Computation::GetType, &Computation::SetType)
-    .add_property("maxComputationTime", &Computation::GetMaxComputationTime, &Computation::SetMaxComputationTime)
+    .add_property("maxComputationTime", &Computation::GetMaxComputationTime)
     .add_property("resultsDirectory", &Computation::GetResultsDirectory)
     .def("Run", &Computation::Run) 
     .def("Info", &Computation::Info)
+    .def("ProcessMaxComputationTime", &Computation::ProcessMaxComputationTime)
     ;
     
     
@@ -302,6 +303,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("spatialStep", &RadiusDistribution::GetSpatialStep)
     .add_property("minRadius", &RadiusDistribution::GetMinRadius)
     .add_property("initialClassNumber", &RadiusDistribution::GetInitialClassNumber)
+    .def("SetItemValueForClass", &RadiusDistribution::SetItemValueForClass)
     //.add_property("itemsValues", &RadiusDistribution::GetItemsValues, &RadiusDistribution::SetAllItemsValues) // itemsValues is a pointer PROBLEM
     .def("Info", &RadiusDistribution::Info)
     ;
@@ -317,9 +319,10 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
     //TODO some stuff
   boost::python::class_<ThermalLoading>("ThermalLoading", boost::python::init< Computation& >() )
-    .add_property("duration", &ThermalLoading::GetDuration, &ThermalLoading::SetDuration)
+    .add_property("duration", &ThermalLoading::GetDuration)
     //.add_property("time_", &ThermalLoading::GetElementName)
     //.add_property("temperature_", &ThermalLoading::GetElementName)
+    .def("ReadTemperatureLoadingFromPythonList", &ThermalLoading::ReadTemperatureLoadingFromPythonList)
     .def("Info", &ThermalLoading::Info)
     ;
       

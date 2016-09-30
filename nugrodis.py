@@ -32,8 +32,8 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (1000,"s"), # hardening duration
-"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
+"duration": (1000,"s") # hardening duration
+#"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
 #"initialClassNumber" : (117, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
 
@@ -46,10 +46,17 @@ HardeningParam={
 
 
 ThermalLoadingParam={
-"loadProfile": ("TK1.xls","xls"), # unit can be xls,txt,csv means read File. else, it received data from socket and user must write --> (None,None) 
-"loadGPDistribution": ("NP1.xls","xls"),# unit can be xls,txt,csv means read File. else, it received data from a previous hardening processing and user must write --> (None,None)
-"loadSprimeDistribution": ("NP2.xls","xls") # unit can be xls,txt,csv means read File. else, it received data from a previous hardening processing and user must write --> (None,None)
+#==============================================================================
+# "loadProfile": ("TK1","xls"), # unit can be xls,txt,csv means read File. else, it received data from socket and user must write --> (None,None) 
+# "loadGuinierPrestonDistribution": ("NP1","xls"),# unit can be xls,txt,csv means read File. else, it received data from a previous hardening processing and user must write --> (None,None)
+# "loadSprimeDistribution": ("NP2","xls") # unit can be xls,txt,csv means read File. else, it received data from a previous hardening processing and user must write --> (None,None)
+#==============================================================================
 #Do not forget to compute lenght,duration, ... after reading file NP1,NP2, TK1
+
+##### Just For example #########
+"loadProfile": ("/home/users/mgado/phd/biblio/Git/NuGroDis/ExampleTK1_CSV","csv"),
+"loadGuinierPrestonDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_GP_RadDis_time_1_","txt"),
+"loadSprimeDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_Sprime_RadDis_time_6425.07_","txt")
 }
 
 #initialRadiusDistribution={
@@ -74,7 +81,7 @@ InitialGlobalData={
 CellParam ={
 "spatialStep"  : (1E-10,"m") , #Spatial discretisation step
 #"spatialStep"  : (1E-11,"m") , #n=122
-"initialClassNumber" : (20, ""), # Initial number for radiusDistribution Class, unitless. This is the default value use when an radiusDistribution object is instanciate
+"initialClassNumber" : (20, "")# Initial number for radiusDistribution Class, unitless. This is the default value use when an radiusDistribution object is instanciate
 }  #avant : (4* CellParam["spatialStep"],"m")
 CellParam["minimumRadius"] = (4*CellParam["spatialStep"][0],CellParam["spatialStep"][1]) #not useful in cellParam ???? argument for object RadiusDiustribution contructor or not????
 #CellParam["minimumRadius"] = (1E-10,CellParam["spatialStep"][1])

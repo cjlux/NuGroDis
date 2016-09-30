@@ -114,7 +114,7 @@ public:
  
  void AddEmptyClass();
  
- void CoutRadiusDistribution();
+ void CoutRadiusDistribution() const;
  void PlotPythonHistogram();
  void PlotRadiusDistribution();
  

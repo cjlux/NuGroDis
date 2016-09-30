@@ -1,3 +1,7 @@
+from __future__ import division
+import numpy
+
+
 def SumOfCoefficients(chemicalComposition):
     # some stuff...
     return 0.
@@ -112,3 +116,89 @@ def PrintAllDico(material):
             exec "E =module."+e
             if type(E)==dict :
                 print ("Dictionary Name <"+str(e)+">; Dico ==>",E)
+                
+def ReadFileWithExtension(path, extension,delimiter=";"):
+    """Read a file with a given extension """
+    completePath=path+"."+extension    
+    
+    readFile=[]
+    f=open(completePath, "r")
+    
+    
+    if extension == "txt":
+        ## special treatment ?
+        pass
+        
+        
+    if extension == "csv":
+        ## special treatment ?
+        pass        
+        #import csv
+        #f= csv.reader(f, delimiter=",")
+        
+    for u in f:
+        try:
+            if u not in ["\n","\r","\r\n"]:
+                #print(u)
+                u=u.replace(delimiter," ")
+                #print(u)
+                u=u.split()
+                #print(u)
+                readFile.append(u)    
+        except:
+            print(u"Error when reading line :",u)        
+
+    f.close()
+    
+    return readFile
+    
+    
+def ProcessRadiusDistributionData(radiusDistributionData):
+    """ return spatialStep, minimumRadius, numberOfClass and dataArray[classId, RR, NP]\
+    for a given radiusDistribution Data"""
+    assert ( (radiusDistributionData[0][0]=="ClassId")and(radiusDistributionData[0][1]=="R")and(radiusDistributionData[0][2]=="NP") ),\
+    "Error: data is not a correct radius distribution data"
+    
+    radiusDistributionDataWithoutLabel=radiusDistributionData[1:]
+    assert (  int(radiusDistributionData[-1][0])==len(radiusDistributionDataWithoutLabel))
+    
+    
+    
+    dataArray=[]
+    for row in radiusDistributionDataWithoutLabel :
+        try:
+            dataArray.append(map(float,row))
+        except:
+            print(u"Error when converting data to float :",row)  
+            
+    dataArray=numpy.array(dataArray)
+    
+    
+    #classIdList=map(int,dataArray[:,0])
+    #radiusList= dataArray[:,1]
+    #itemsValuesList= dataArray[:,2]     
+    
+    numberOfClass= len(radiusDistributionDataWithoutLabel)
+    
+    minimumRadius= dataArray[0,1] # first valuie or radius
+    
+    spatiaStep=dataArray[1,1]-dataArray[0,1]
+    for i in range(0,numberOfClass-1):
+        spatiaStep_i=  dataArray[i+1,1] - dataArray[i,1]         
+        #float(spatiaStep_i)==float(spatiaStep)
+        assert (numpy.isclose(spatiaStep_i,spatiaStep) ), "the spatial Step of radius distribution is not constant"
+    
+    
+    return spatiaStep,minimumRadius,numberOfClass,dataArray
+
+
+
+def ReadAndProcessRadiusDistributionFile(path, extension,delimiter=";"):
+    """ Read a file with a given extension and then\
+    return spatialStep, minimumRadius, numberOfClass and dataArray[classId, RR, NP] """
+    
+    radDisData= ReadFileWithExtension(path, extension, delimiter)
+    
+    spatiaStep,minimumRadius,numberOfClass,dataArray=ProcessRadiusDistributionData(radDisData)
+    
+    return spatiaStep,minimumRadius,numberOfClass,dataArray

@@ -326,12 +326,21 @@ RadiusDistribution::PlotRadiusDistribution()
    
    
 void
-RadiusDistribution::CoutRadiusDistribution()
+RadiusDistribution::CoutRadiusDistribution() const
 {
+  std::cout <<  "============================================" 	<< std::endl;
+  std::cout <<  "         Printing Radius Distribution       " 	<< std::endl;
+  std::cout <<  "============================================" 	<< std::endl;
+  
+  
   for (unsigned int i=0; i<itemsValues_.size(); ++i)
   {
     std::cout<<"| Class <"<<i+1<<"> ;  N = << "<<itemsValues_[i]<<" >> |\n";
   }
+  
+  std::cout <<  "============================================" 	<< std::endl;
+  std::cout <<  "         Printing Radius Distribution       " 	<< std::endl;
+  std::cout <<  "============================================" 	<< std::endl;
 }
 
 void 
@@ -354,14 +363,19 @@ RadiusDistribution::ReturnTotNbOfItems()
 {
   assert ( (itemsValues_.size()>0)&&"RadiusDistribution have not been initialize");
   
-  double Sum=0;
-  
+
+  double Sum=0.;
   for ( unsigned int i=0; i<itemsValues_.size(); ++i )
   {
+
     Sum += itemsValues_[i];
   }
   
+
+  
   assert (Sum>=0);
+  
+
   
   return Sum;
 }
@@ -1213,6 +1227,9 @@ RadiusDistribution::Info() const
   std::cout <<  "                         initialClassNumber: " << initialClassNumber_<< " SI unit" << std::endl;
   std::cout <<  "                                  minRadius: " << minRadius_<< " SI unit" << std::endl;
   std::cout <<  "                                spatialStep: " << spatialStep_<< " SI unit" << std::endl;
+  std::cout <<  "                                     adress: " << &(*this)<< " SI unit" << std::endl;
+  std::cout <<  "                                                                 " 	<< std::endl;
+  this->CoutRadiusDistribution();
   std::cout <<  "                                                                 " 	<< std::endl;
 }
 

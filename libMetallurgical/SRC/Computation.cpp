@@ -130,6 +130,25 @@ Computation::ReadDataFile(std::string fileName)
 }
 
 
+//The total "Precipitation" computation duration in second [s] = Maturation.duration + ThermalLoading.duration (was tmax)
+void   
+Computation::ProcessMaxComputationTime() 
+{
+  double maxCompTime=0;
+  
+  if (hardening_ != 0)
+  {
+    maxCompTime += hardening_->GetDuration();
+  };
+  
+  if (thermalLoading_ != 0)
+  {
+    maxCompTime += thermalLoading_->GetDuration();
+  };
+  
+  maxComputationTime_= maxCompTime;
+}
+
 
 
 

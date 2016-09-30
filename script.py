@@ -9,6 +9,23 @@ import M2024
 
 SpecificValues=["-222.222","-111.111","111.111","222.222"] #DO NOT DELETE THIS LINE!!!
 
+
+def ConvertDataInNumpyArrayFloat(Data):
+    """ Convert a given Data into a numpy array """
+    
+    dataArray=[]
+    for row in Data :
+        try:
+            dataArray.append(map(float,row))
+        except:
+            print(u"Error when converting to data to float:",row)  
+            
+    dataArray=array(dataArray)
+    
+    return dataArray
+
+
+
 def Hardness(path):
     """Comparaison courbe de dureté obtenu par simulation numerique et celle obtenue expértimentalement"""
     
