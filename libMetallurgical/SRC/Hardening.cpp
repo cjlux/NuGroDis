@@ -18,10 +18,10 @@
 
 Hardening::Hardening(double hardeningDuration, Computation& computation)
   :duration_(hardeningDuration),
-   maxTimeStep_(1),//By defaut it is 1 second //TODO ERASE, unusefull ?
    computation_(computation)
 {
   std::cout <<  "Building object <Hardening> " << std::endl;
+  
   computation_.SetHardening(*this);
 }
 
@@ -42,6 +42,5 @@ Hardening::Info() const
 {
   std::cout <<  "################################# Hardening::Info ###################################" << std::endl;
   std::cout <<  "                                   duration: " << duration_ << " SI unit" << std::endl;
-  //std::cout <<  "                                maxTimeStep: " << maxTimeStep_<< " SI unit" << std::endl;
-  std::cout << std::endl;
+  std::cout <<  "\n"<<std::endl;
 }

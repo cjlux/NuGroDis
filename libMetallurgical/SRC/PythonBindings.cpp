@@ -90,7 +90,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
   
     
-  boost::python::class_<Computation>("Computation", boost::python::init<double, boost::python::optional<std::string> >() )
+  boost::python::class_<Computation>("Computation", boost::python::init<double, boost::python::optional<std::string, bool, double> >() )
     .add_property("type", &Computation::GetType, &Computation::SetType)
     .add_property("maxComputationTime", &Computation::GetMaxComputationTime)
     .add_property("resultsDirectory", &Computation::GetResultsDirectory)
@@ -241,7 +241,6 @@ BOOST_PYTHON_MODULE(Metallurgical)
     
   
   boost::python::class_<Hardening>("Hardening", boost::python::init<double, Computation& >() )
-    .add_property("maxTimeStep", &Hardening::GetMaxTimeStep, &Hardening::SetMaxTimeStep)
     .add_property("duration", &Hardening::GetDuration)
     .def("Info", &Hardening::Info)
     ;
@@ -318,11 +317,12 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
     
     //TODO some stuff
-  boost::python::class_<ThermalLoading>("ThermalLoading", boost::python::init< Computation& >() )
+  boost::python::class_<ThermalLoading>("ThermalLoading", boost::python::init< Computation&, double >() )
     .add_property("duration", &ThermalLoading::GetDuration)
     //.add_property("time_", &ThermalLoading::GetElementName)
     //.add_property("temperature_", &ThermalLoading::GetElementName)
     .def("ReadTemperatureLoadingFromPythonList", &ThermalLoading::ReadTemperatureLoadingFromPythonList)
+    .def("ReturnTemperatureAtTime", &ThermalLoading::ReturnTemperatureAtTime)
     .def("Info", &ThermalLoading::Info)
     ;
       

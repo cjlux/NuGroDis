@@ -151,15 +151,15 @@ Concentration::SetInitialVolumicValue(const double initialVolumicValue)
 inline void
 Concentration::SetVolumicValue(const double volumicValue)
 {
+  //std::cout<<"Setting volumic value of chemical Element "<<chemicalElement_.GetElementName()<<"\n";
+  
   if (initialVolumicValueHasBeenSet_==false)
   {
     this->SetInitialVolumicValue(volumicValue);
   }
   
-  // /*DEBUG*/std::cout<<"DEBUG: element name is "<<chemicalElement_.GetElementName()<<"\n";
-
-    std::cout<<" NOTIFICATION:  A Positive value of Setted volumic concentration has been asserted.";
-    assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
+  
+  assert ( (volumicValue>=0)&&"Value of Volumic Concentration is negative. Cannot set volumic value!" );
   
   volumicValue_=volumicValue;
 }

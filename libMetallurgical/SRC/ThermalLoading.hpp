@@ -26,7 +26,7 @@ class ThermalLoading
 {
 public:
     
-    ThermalLoading(Computation& computation);
+    ThermalLoading(Computation& computation, double maximumTimeStepAllowedDuringThermalLoading=1.);
 
     ~ThermalLoading();
     
@@ -34,6 +34,8 @@ public:
     
     //Read the File giving the radius distribution of precipitates (NP1, NP2, ...
     void ReadDistributionFile(std::string);
+    
+    // ReadDistributionFile can also been made fully in python: ReadAndProcessRadiusDistributionFile(...)
     
     //Read the values for the temperature loading 
     //(equivalent to read TK1 and set time and temperature attributes)
@@ -52,7 +54,12 @@ public:
     std::vector<double> Gettemperature() const {return temperature_;};
     
     
-    void ComputeMaxTimeStep();//TODO only declaration have been made //TODO ERASE, unusefull ?
+    double ReturnTemperatureAtTime(double time);
+    
+    double GetMaximumTimeStep() const { assert ((maxTimeStep_>0)&&"Thermal loading Maximum time step is not > 0 ") ; return maxTimeStep_;};
+    
+    
+    //void ComputeMaxTimeStep(); // only declaration have been made, TODO ERASE, unusefull ?
     
     //Relations
     Computation& GetComputation() const {return computation_;};
@@ -71,7 +78,8 @@ private:
     //Temperature vector of ThermalLoading. Unit: K
     std::vector<double>  temperature_;
     
-    double maxTimeStep_; //TODO ERASE, unusefull ?
+    //The maximum value allowed for any computed Time step during ThermalLoading. Unit: s
+    double const maxTimeStep_;
     
     //Relations
     Computation& computation_;

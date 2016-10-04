@@ -152,6 +152,10 @@ Material::RunProcess()
   //TODO check later ==> this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
   
   
+  // Process the initial volumic fraction of precipitates
+  this->ComputePrecipitatesVolumicFraction();
+  
+  
   //TODO check later  ==> this->SaveInitialData();//uncomment or delete, depending on the older method of saving
   
   while ( (currentTime<computationDuration)&&(this->CheckIfTheVolumicConcentrationsArePositive()==true) )
@@ -348,6 +352,11 @@ Material::RunProcess()
 
 void Material::UpdateAtomicDiffusionCoef()
 {
+  std::cout<<"\n";
+  std::cout<<  "================================================="<< std::endl;
+  std::cout<<  " Updating material atomic diffusion coefficients " << std::endl;
+  std::cout<<  "================================================="<< std::endl; 
+  
   vacancy_->ComputeDiffusionCoefValue();
   vacancy_->ComputeEquilibriumConcentration();
   if (computation_.GetCurrentTime()==0)
@@ -363,6 +372,12 @@ void Material::UpdateAtomicDiffusionCoef()
   {
     (*i)->ComputeAtomicDiffusionCoefValue();
   }
+  
+  
+  std::cout<<  "================================================="<< std::endl;
+  std::cout<<  " Updating material atomic diffusion coefficients " << std::endl;
+  std::cout<<  "================================================="<< std::endl; 
+  std::cout<<"\n";
 }
 
 //in TEST 
@@ -676,7 +691,9 @@ Material::UpdateVolumicValues()
     
     for (it=initialConcMap.begin(); it!=initialConcMap.end(); ++it)
     {
-
+      std::cout<<"\n";
+      std::cout<<"Finding Xv" << it->first << "P"<<std::endl;
+      
       
       double product=0;
       double sumOfFracVol=0;
@@ -690,7 +707,7 @@ Material::UpdateVolumicValues()
 	
 	if (VolumicFraction!=oldVolumicFraction)
 	{
-	  std::cout<<"Precipitate's type = "<< (*i)->GetPrecipitateType() <<" | VolumicFraction = "<<VolumicFraction<< " | oldVolumicFraction = "<<oldVolumicFraction<<std::endl;
+	  std::cout<<"  Precipitate's type = "<< (*i)->GetPrecipitateType() <<" | VolumicFraction = "<<VolumicFraction<< " | oldVolumicFraction = "<<oldVolumicFraction<<std::endl;
 	};
 	assert ( (VolumicFraction==oldVolumicFraction)&&"Volumic fraction of precipitates must be computed before run method Material::UpdateVolumicValues()");
 	
@@ -700,22 +717,22 @@ Material::UpdateVolumicValues()
 	sumOfFracVol += precipitateFracVol;  // fracVolP1 + fracVolP2 + ... + fracVolPn 
 	
 	//Debug
-	std::cout << "TARATATA: Precipitate type is " << (*i)->GetPrecipitateType() << "\n";
-	std::cout << "TARATATA1: Precipitate frac vol is " << precipitateFracVol << "\n" << " Xv" << it->first << "P : " << elementVolumicConcInPrecipitate << "\n" << " total Xv_i*Vf_i Product is" << product << "\n Sum of frac vol is :" << precipitateFracVol << "\n";
+	std::cout << "  Precipitate type is " << (*i)->GetPrecipitateType() << "\n";
+	std::cout << "  Precipitate frac vol is " << precipitateFracVol << "\n" << "  Xv" << it->first << "P : " << elementVolumicConcInPrecipitate << "\n" << "  total Xv_i*Vf_i Product is" << product << "\n  Sum of frac vol is :" << precipitateFracVol << "\n";
       }
       
     double elementInitialVolumicConcInMaterial=it->second->GetInitialVolumicValue(); //Xv0_i_SS
     
     //debug
-    std::cout << "TARATATA2 Initial COncentration OIbd adress is " << it->second << "\n";
-    std::cout << " Xv0" << it->first << "SS is:" << elementInitialVolumicConcInMaterial << "\n";
+    std::cout << "  Initial Concentration Object adress is " << it->second << "\n";
+    std::cout << "  Xv0" << it->first << "SS is:" << elementInitialVolumicConcInMaterial << "\n";
     
     assert(sumOfFracVol!= 1.);
     assert( ( sumOfFracVol < 1 ) && " Precipitates total volumic fraction must be less than 1" );
     double currentVolumicConc= (elementInitialVolumicConcInMaterial-product)/(1.-sumOfFracVol);
     
     //debug
-    std::cout << "TARATATA3 Current volumic con is then: " << currentVolumicConc << "\n";
+    std::cout << "Current volumic concentration of chemical Element "<<it->first<<" is then: " << currentVolumicConc << "\n";
     
     
     currentConcMap[it->first]->SetVolumicValue(currentVolumicConc);
@@ -725,7 +742,7 @@ Material::UpdateVolumicValues()
   std::cout<<  "=================================================================================================================="<< std::endl;
   std::cout<<  " Updating material current volumic concentration values taking into account the volumic fraction of precipitates " << std::endl;
   std::cout<<  "=================================================================================================================="<< std::endl;
-    
+  std::cout<<"\n"<<std::endl;
  
 }
 
@@ -784,6 +801,11 @@ Material::AddPrecipitate(Precipitate& P)
 void
 Material::SaveMaterialVacancyProperties()
 {
+  std::cout<<"\n";
+  std::cout<<  "===================================="<< std::endl;
+  std::cout<<  " Saving material vacancy properties " << std::endl;
+  std::cout<<  "===================================="<< std::endl;
+  
   std::string ResultsDirectoryPath= computation_.GetResultsDirectory();
   
   std::string fileName= "MaterialVacancyProperties.txt";
@@ -840,6 +862,11 @@ Material::SaveMaterialVacancyProperties()
   std::ostream_iterator<std::string> output_iterator(output_file, "\n");
   std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
   
+  
+  std::cout<<  "===================================="<< std::endl;
+  std::cout<<  " Saving material vacancy properties " << std::endl;
+  std::cout<<  "===================================="<< std::endl;
+  std::cout<<"\n";
 }
 
 

@@ -1334,10 +1334,20 @@ Precipitate::AddSEPolynomialPyCoefs(boost::python::list& pythonCoefList)
 void
 Precipitate::ComputeSurfaceEnergy()
 {
+  std::cout<<"\n";
+  std::cout<<  "======================================================================================="<< std::endl;
+  std::cout<<  " Computing surface energy of Precipitate type <" << this->GetPrecipitateType() << ">"<<std::endl;
+  std::cout<<  "======================================================================================="<< std::endl;
+  
   assert ( (materialPointer_!=0)&&"In ComputeSurfaceEnergy() of Precipitate: Precipitate does not belongs to any material!!!"); 
   double T= materialPointer_->GetTemperature().GetCurrentTemp();
   
   surfaceEnergyCurrentValue_ = surfaceEnergyPolynomial_.ReturnValue(T);
+  
+  std::cout<<  "======================================================================================="<< std::endl;
+  std::cout<<  " Computing surface energy of Precipitate type <" << this->GetPrecipitateType() << ">"<<std::endl;
+  std::cout<<  "======================================================================================="<< std::endl;
+  std::cout<<"\n";
   
 }
 

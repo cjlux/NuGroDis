@@ -247,9 +247,6 @@ Vacancy::ReturnEquilibriumConcentration() const
 
 }
 
-
-
-
 double 
 Vacancy::ReturnConcentrationBeforeQuenching()
 {
@@ -257,41 +254,54 @@ Vacancy::ReturnConcentrationBeforeQuenching()
   double R=ThermoDynamicsConstant::GetR();
   double Xlacavtrempe;
   
-  /////////////////////////////////////////////////////////////////
-  //assert if material current volumic conc is initial volumic conc
-  /////////////////////////////////////////////////////////////////
-  std::map<std::string , Concentration*>::iterator it;
-  
+  ///// compute alpha, for initial concentration values and T=solutionizing Temp  /////
+  std::cout<<"In Vacancy::ReturnConcentrationBeforeQuenching()\n";
+  double sum_alpha_i=0.;
   std::map<std::string, Concentration*> initialConcMap=material_.GetInitialChemicalComposition().GetConcentrationMap();
   
-  std::map<std::string, Concentration*> currentConcMap=material_.GetCurrentChemicalComposition().GetConcentrationMap();
-  
-  for (it=initialConcMap.begin(); it!=initialConcMap.end(); ++it)
+  for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
   {
-    double initialVolumicConc=initialConcMap[it->first]->GetInitialVolumicValue();
+    std::string elementName = (*i)->GetElementName();
+    double initialAtomicConc = initialConcMap[elementName]->GetInitialAtomicValue();
+    const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
+    double Evac=0.;
+    /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
+    if (usingEvac==true)
+    {
+      std::cout<<" Using interaction energy with vacancy"<<std::endl;
+      Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+    }
+    else
+    {
+      std::cout<<" Not using interaction energy with vacancy"<<std::endl;
+      Evac=0. ;
+      //TODO check what is correct between 1. and 0. .Isnt it 0. ? 0 to make sum_alpha_i=0 and then alpha=1
+    };
     
-    double currentVolumicValue= currentConcMap[it->first]->GetVolumicValue();
+    sum_alpha_i += coordinationNumber_*initialAtomicConc*( -1. + std::exp(Evac/(R*solutionisingTemp_)) );  // sum of i= 1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
     
-    assert (  (initialVolumicConc==currentVolumicValue)&&"Cannot return \
-    concentration before quenching before at this moment, initial volumic concentration is not the current volumic concentration" );
+    std::cout<<" Chemical Element <"<<elementName<<">"<<std::endl;
+    std::cout<<"  Initial Atomic concentration : "<<initialAtomicConc<<std::endl;
+    std::cout<<"  Vacancy interaction energy : "<<Evac<<std::endl;
+    std::cout<<"  Coordination Number : "<<coordinationNumber_<<std::endl;
   }
-  // End assert if material current volumic conc is initial volumic conc
-  //////////////////////////////////////////////////////////////////////
+  /*DEBUG*/ std::cout<<" sum_alpha_i :"<<sum_alpha_i<<std::endl;
   
-  
-  
-  const double alpha= this->ReturnAlpha(solutionisingTemp_);
+  const double alpha= 1. + sum_alpha_i;
+  ///////////////////////
   
   
   Xlacavtrempe = alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*solutionisingTemp_));
   
-  assert(Xlacavtrempe>0);
   
-  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() vacCreationEntropy_ is"<<vacCreationEntropy_<<std::endl;
-  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() R is"<<R<<std::endl;
-  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() vacCreationEnthalpy_ is"<<vacCreationEnthalpy_<<std::endl;
-  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() solutionisingTemp_ is"<<solutionisingTemp_<<std::endl;
-  std::cout<<"Vacancy::ReturnConcentrationBeforeQuenching() Xlacavtrempe is"<<Xlacavtrempe<<std::endl;
+  std::cout<<" vacCreationEntropy_ : "<<vacCreationEntropy_<<std::endl;
+  std::cout<<" R : "<<R<<std::endl;
+  std::cout<<" vacCreationEnthalpy_ : "<<vacCreationEnthalpy_<<std::endl;
+  std::cout<<" solutionisingTemp_ : "<<solutionisingTemp_<<std::endl;
+  std::cout<<"Value of 'Xlacavtrempe' computed : "<<Xlacavtrempe<<std::endl;
+  
+  
+  assert(Xlacavtrempe>0);
   
   return Xlacavtrempe;
 }

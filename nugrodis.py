@@ -12,7 +12,7 @@ NuGroDisVersion="1.0"
 
 savePath=""
 
-ComputationParam={            "Type": "Quenching>Hardening", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
+ComputationParam={            "Type": "Quenching>Hardening>ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
                           "Material": "M2024",
                   "initialTimeStep" : (1,"s") #default Time step for the first iteration 
@@ -56,7 +56,8 @@ ThermalLoadingParam={
 ##### Just For example #########
 "loadProfile": ("/home/users/mgado/phd/biblio/Git/NuGroDis/ExampleTK1_CSV","csv"),
 "loadGuinierPrestonDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_GP_RadDis_time_1_","txt"),
-"loadSprimeDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_Sprime_RadDis_time_6425.07_","txt")
+"loadSprimeDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_Sprime_RadDis_time_6425.07_","txt"),
+"maximumTimeStep": (1,"s") #the maximum time step allowed during the thermalLoading
 }
 
 #initialRadiusDistribution={

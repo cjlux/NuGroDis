@@ -123,7 +123,8 @@ SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave
 
 ##########################################
 # Create a C++ object of type Computation:
-c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],SavePath)
+c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],SavePath) # manualMaximumAllowedTimeStep_, manualMaximumAllowedTimeStep_ are optional.
+                                                                          # by default, defineManuallyMaximumAllowedTimeStep_=false ; manualMaximumAllowedTimeStep_=-1  !!!!
 c.Info()
 c.type = nugrodis.ComputationParam["Type"]
 
@@ -217,6 +218,89 @@ lastSaveTextFile.write(ComputationResultsDirectory)
 lastSaveTextFile.close()
 ########### SETTINGS FOR POSTPROCESSING #############
 #####################################################
+
+
+
+
+
+
+#===================== Begin: Read and define computation type =====================
+
+acceptedkeysForComputationType=["Quenching","Hardening","ThermalLoading"]
+
+ComputationList = c.type.split(">")
+
+#================================================================
+SequenceOfPrecipitationComputing=ComputationList # copy of COmputationList
+#modify computationSequenceWithoutQuenching by removing "Quenching"
+while "Quenching" in SequenceOfPrecipitationComputing:
+    SequenceOfPrecipitationComputing.remove("Quenching")
+FirstSequenceOfPrecipitationComputing=SequenceOfPrecipitationComputing[0]
+#================================================================
+
+
+for computation in ComputationList:    
+    
+    ## check if 'computation' key is acceptable    
+    if (computation not in acceptedkeysForComputationType):
+        print("Error with given computation key '"+computation+ "' is not acceptable.\
+ Computation key must be either : ",acceptedkeysForComputationType)        
+    assert (computation in acceptedkeysForComputationType), "Error given computation key is not acceptable"
+    
+    print("  > Processing <"+computation+">")
+    #QUENCHING
+    if computation == "Quenching":
+        # Create an object of type Quenching:
+        exec "Quenching = Quenching(c,"+material+".VacanciesParam['Tsol'][0],\
+                              nugrodis.QuenchingParam['Tfinal'][0],\
+                              nugrodis.QuenchingParam['v'][0])"
+        Quenching.Info();
+    
+    #COmputation is "Hardening or "ThermalLoading
+             
+    #HARDENING
+    if computation == "Hardening":
+        # Create a C++ object of type Hardening:
+        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0], c)
+        CppHardening.Info()
+    
+    ##THERMAL LOADING
+    if computation == "ThermalLoading":  
+
+        ##Create an object of type ThermalLoading:
+        CppThermalLoading=ThermalLoading(c, nugrodis.ThermalLoadingParam["maximumTimeStep"][0])          
+
+        
+        ## TODO!!! : initialize thermalLoading temperature   
+        temperature_Data=ReadFileWithExtension(path=nugrodis.ThermalLoadingParam["loadProfile"][0],\
+                                            extension=nugrodis.ThermalLoadingParam["loadProfile"][1],\
+                                            delimiter=";")
+        
+        temperature_Data=script.ConvertDataInNumpyArrayFloat(temperature_Data)
+        
+        timeList, temperature_List=  list(temperature_Data[:,0]) , list(temperature_Data[:,1]) 
+        
+        
+        CppThermalLoading.ReadTemperatureLoadingFromPythonList(timeList,temperature_List)
+                
+        CppThermalLoading.ReturnTemperatureAtTime(0) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(25) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(192) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(219) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(315.1666666667) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(283) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(535.0523809524) #debug
+        
+        CppThermalLoading.Info() 
+        
+        
+
+
+#===================== End: Read and define computation type =====================
+
+
+
+
 
 # Create a C++ object of type ThermoDynamicsConstant:
 thermoDynConst = ThermoDynamicsConstant(PhysicalConstantsDict['R'][0],
@@ -406,57 +490,7 @@ CppMaterial.InitializeGrains()
 
 
 
-ComputationList = c.type.split(">")
-
-#================================================================
-SequenceOfPrecipitationComputing=ComputationList # copy of COmputationList
-#modify computationSequenceWithoutQuenching by removing "Quenching"
-while "Quenching" in SequenceOfPrecipitationComputing:
-    SequenceOfPrecipitationComputing.remove("Quenching")
-FirstSequenceOfPrecipitationComputing=SequenceOfPrecipitationComputing[0]
-#================================================================
-
-
-
-for computation in ComputationList:
-    print("  > Processing <"+computation+">")
-    #QUENCHING
-    if computation == "Quenching":
-        # Create an object of type Quenching:
-        exec "Quenching = Quenching(c,"+material+".VacanciesParam['Tsol'][0],\
-                              nugrodis.QuenchingParam['Tfinal'][0],\
-                              nugrodis.QuenchingParam['v'][0])"
-        Quenching.Info();
-    
-    #COmputation is "Hardening or "ThermalLoading
-             
-    #HARDENING
-    if computation == "Hardening":
-        # Create a C++ object of type Hardening:
-        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0], c)
-        CppHardening.Info()
-    
-    ##THERMAL LOADING
-    if computation == "ThermalLoading":  
-
-        ##Create an object of type ThermalLoading:
-        CppThermalLoading=ThermalLoading(c)          
-
-
-        ## TODO!!! : initialize thermalLoading temperature   
-        temperature_Data=ReadFileWithExtension(path=nugrodis.ThermalLoadingParam["loadProfile"][0],\
-                                            extension=nugrodis.ThermalLoadingParam["loadProfile"][1],\
-                                            delimiter=";")
-        
-        temperature_Data=script.ConvertDataInNumpyArrayFloat(temperature_Data)
-        
-        timeList, temperature_List=  list(temperature_Data[:,0]) , list(temperature_Data[:,1]) 
-        
-        
-        CppThermalLoading.ReadTemperatureLoadingFromPythonList(timeList,temperature_List)
-                
-        
-        CppThermalLoading.Info()       
+#### old place where computation type is read and define      
         
 
 

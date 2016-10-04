@@ -31,8 +31,9 @@ class Computation
 {
 
 public:
-  // The constructor :
-  Computation(double initialTimeStep, std::string ResultsDirectory="");
+  // The constructor.  resultsDirectory_ , manualMaximumAllowedTimeStep_, are OPTIONAL  !!!!
+  // by default, resultsDirectory_="" ; defineManuallyMaximumAllowedTimeStep_=false ; manualMaximumAllowedTimeStep_=-1  !!!!
+  Computation(double initialTimeStep, std::string ResultsDirectory="", bool defineManuallyMaximumAllowedTimeStep=false ,double manualMaximumAllowedTimeStep=-1);
 
   // The destructor
   ~Computation();
@@ -75,6 +76,10 @@ public:
   
   int GetIncrement() const { return increment_;};
   std::string GetResultsDirectory() const {return resultsDirectory_;};
+  
+  
+  bool CheckIfMaximumAllowedTimeStepHasBeenDefinedManually();
+  double GetManualMaximumAllowedTimeStep();
   
   //Relations
   //setters
@@ -124,7 +129,31 @@ private:
   std::string resultsDirectory_;
   
   
+  double const manualMaximumAllowedTimeStep_;
+  bool const defineManuallyMaximumAllowedTimeStep_;
+  
 };
+
+
+inline bool
+Computation::CheckIfMaximumAllowedTimeStepHasBeenDefinedManually()
+{
+  return defineManuallyMaximumAllowedTimeStep_;
+}
+
+inline double
+Computation::GetManualMaximumAllowedTimeStep()
+{
+  
+  assert( ( this->CheckIfMaximumAllowedTimeStepHasBeenDefinedManually() == true )&& "Cannot get manual maximum allowed time step because it has not been defined during initialization!");
+  
+  
+  assert ((manualMaximumAllowedTimeStep_>0)&&"Cannot get manual time step because it is not strictly positive. There is an error somewhere!!!");
+  
+  
+  return manualMaximumAllowedTimeStep_;
+  
+}
 
 inline void
 Computation::SetType(const std::string & t)

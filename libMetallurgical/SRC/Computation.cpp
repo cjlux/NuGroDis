@@ -30,7 +30,9 @@
 #include "Precipitate.hpp"
 #include "RadiusDistribution.hpp"
 
-Computation::Computation(double initialTimeStep, std::string ResultsDirectory)
+//resultsDirectory_, defineManuallyMaximumAllowedTimeStep_  are OPTIONAL  !!!!
+// by default, resultsDirectory_="" ; defineManuallyMaximumAllowedTimeStep_=false ; manualMaximumAllowedTimeStep_=-1  !!!!
+Computation::Computation(double initialTimeStep, std::string ResultsDirectory, bool defineManuallyMaximumAllowedTimeStep, double manualMaximumAllowedTimeStep )//
   : radiusDistribution_(0),
     quenching_(0),
     hardening_(0),
@@ -41,7 +43,9 @@ Computation::Computation(double initialTimeStep, std::string ResultsDirectory)
     currentTime_(0),
     defaulTimeStep_(initialTimeStep),
     maxTimeStep_(defaulTimeStep_),
-    increment_(1)
+    increment_(1),
+    manualMaximumAllowedTimeStep_(manualMaximumAllowedTimeStep),
+    defineManuallyMaximumAllowedTimeStep_(defineManuallyMaximumAllowedTimeStep)
     
 {  
 std::cout << "   .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-. " << std::endl;
@@ -104,6 +108,18 @@ std::cout << "Building Object <Computation>" << std::endl;
   }
 
 this->CreateResultsDirectory();
+
+
+if (defineManuallyMaximumAllowedTimeStep_ ==true)
+{
+  assert  ((manualMaximumAllowedTimeStep_ > 0)&& "manualMaximumAllowedTimeStep_ has not been defined correctly" );
+  
+  std::cout<<"Manual definition of time step : A maximum allowed time step has been defined manually and setted to <"<<manualMaximumAllowedTimeStep_<<"> [s] \n "<<std::endl;
+}
+else
+{
+  assert (manualMaximumAllowedTimeStep_==-1);
+};
 
 }
 
@@ -181,7 +197,8 @@ Computation::ComputeMaxTimeStep()
   assert (precipitateReallyFoundInMaterial.size()==0);
   
   
-  
+  /////////////////////////////////////////////////////////////
+  // TAKING INTO ACCOUNT PRECIPITATE CRITICAL TIME STEP
   for (unsigned int i=0; i<PrecipitateList.size(); ++i )
   { 
    double SumP = PrecipitateList[i]->GetCurrentRadiusDistribution().ReturnTotNbOfItems();
@@ -215,21 +232,52 @@ Computation::ComputeMaxTimeStep()
     maxTimeStep_= *it;
     
     
+    std::cout<<"crititical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;
     
-    std::cout<<"crtitical Time step for all precipitates is deltatcritique= <<< "<< maxTimeStep_ <<" >>>"<<std::endl;
-    
-    
-    
+  };
+  // TAKING INTO ACCOUNT PRECIPITATE CRITICAL TIME STEP
+  /////////////////////////////////////////////////////////////
+  
+  
+  
+  // GESTION OF TIME STEP AT THE END OF COMPUTATION
+  if ( (currentTime_+maxTimeStep_) > maxComputationTime_)
+  {
+    maxTimeStep_=maxComputationTime_-currentTime_;
   };
   
   
   
   
-  if ( (currentTime_+maxTimeStep_) > maxComputationTime_)
+  ////////////////////////////////////////////////////
+  // TAKING INTO ACCOUNT THERMALLOADING TIME STEP
+  if (thermalLoading_!=0)
   {
-    maxTimeStep_=maxComputationTime_-currentTime_;
-  }
+    double thermalLoadingMaxTimeStep= thermalLoading_->GetMaximumTimeStep();
+    
+    if (thermalLoadingMaxTimeStep<maxTimeStep_)
+    {
+      // thermalLoadingMaxTimeStep is the miniumum, therefore take thermalLoadingMaxTimeStep as the computation time Step
+      maxTimeStep_=thermalLoadingMaxTimeStep;
+    };
+  };
+  // TAKING INTO ACCOUNT THERMALLOADING TIME STEP
+  ////////////////////////////////////////////////////
   
+  
+  /*
+  ///////////////////////////////////////////////////////////////
+  //////// IF MANUAL TIME STEP IS DEFINED, TAKE IT INTO ACCOUNT
+  if ( this->CheckIfMaximumAllowedTimeStepHasBeenDefinedManually() == true)
+  {
+    if (manualMaximumAllowedTimeStep_<maxTimeStep_) 
+    { 
+      maxTimeStep_=manualMaximumAllowedTimeStep_;
+    };
+  };
+  //////// IF MANUAL TIME STEP IS DEFINED, TAKE IT INTO ACCOUNT
+  ///////////////////////////////////////////////////////////////
+  */
 }
 
 
