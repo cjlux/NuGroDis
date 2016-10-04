@@ -7,6 +7,8 @@ from __future__ import division, print_function
 from MetalUtils.PhysicalConstants import Dict as PhysicalConstantsDict
 from MetalUtils.ElementsData import Dict as ElementsDataDict
 
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 NuGroDisVersion="1.0"
 
@@ -54,9 +56,9 @@ ThermalLoadingParam={
 #Do not forget to compute lenght,duration, ... after reading file NP1,NP2, TK1
 
 ##### Just For example #########
-"loadProfile": ("/home/users/mgado/phd/biblio/Git/NuGroDis/ExampleTK1_CSV","csv"),
-"loadGuinierPrestonDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_GP_RadDis_time_1_","txt"),
-"loadSprimeDistribution": ("/home/users/mgado/phd/biblio/Git/NuGroDis/Example_Sprime_RadDis_time_6425.07_","txt"),
+"loadProfile": (dir_path+"/ExampleTK1_CSV","csv"),
+"loadGuinierPrestonDistribution": (dir_path+"/Example_GP_RadDis_time_1_","txt"),
+"loadSprimeDistribution": (dir_path+"/Example_Sprime_RadDis_time_6425.07_","txt"),
 "maximumTimeStep": (1,"s") #the maximum time step allowed during the thermalLoading
 }
 

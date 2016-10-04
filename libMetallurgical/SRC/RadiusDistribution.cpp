@@ -662,7 +662,63 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
 	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
 	  
+	  
+	  /////////////////////////////////////////////////
+	  /////////// do dichotomous on Y for Eq2 /////////
+	  if (Eq2precision > epsilon)
+	  {
+	    std::cout <<"Using dichotomous for Equation 2 \n";
+	    double f1left, f1right, f_left, f_right, half, f_half, solutionToImprove,rightValue, leftValue;
+	    
+	    double dichotomousSolutionPrecision= 1.e-16;
+	  
+	    rightValue= 2*Y;
+	    
+	    leftValue= Y/2. ;
+	    
+	    f1left=leftValue;
+	    f1right=rightValue;
+	    
+	    f_left= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1left)/(XvPj-f1left);
+	    f_right= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1right)/(XvPj-f1right);
+	    
+	    assert ( (f_left*f_right<0)&&"Solution is not in the range compute from given argument leftValue and rightValue");
+	    
+	    while ( (f_left*f_right<0) && ( std::abs(f1right-f1left)>=dichotomousSolutionPrecision ) )
+	    {
+	      half= (f1left+f1right)/2.;
+	      f_half=(XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-half)/(XvPj-half);
+	      
+	      if ( f_half*f_right <0)
+	      {
+		f1left= half;
+		f_left= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1left)/(XvPj-f1left);
+	      }
+	      else
+	      {
+		f1right= half;
+		f_right= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1right)/(XvPj-f1right);
+	      };  
+	    }
+	    
+	    solutionToImprove= f1left;
+	    
+	    /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
+	    
+	    Y=solutionToImprove;
+	  }
+	  ////////////////////////////////////////////
+	  ////////////////////////////////////////////
+	  
+	  
+	  Eq1precision=std::abs(X*Y-f);
+	  Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
+	  
+	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
+	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
+	  
 	  assert ( (Eq1precision<= epsilon) && "Precision for equation X*Y=f is not satisfied" );
+	  
 	  assert ( (Eq2precision<= epsilon) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
 	  
 	  return 1; //There is a solution
