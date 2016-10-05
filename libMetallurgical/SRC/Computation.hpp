@@ -18,7 +18,8 @@
 #include <fstream>
 #include <string>
 #include <cassert>
-
+#include <vector>
+#include <map>
 
 // Forward declarations, avoid including...
 class Hardening;
@@ -81,6 +82,22 @@ public:
   bool CheckIfMaximumAllowedTimeStepHasBeenDefinedManually();
   double GetManualMaximumAllowedTimeStep();
   
+  unsigned int GetRankForSequenceType(std::string sequenceType);
+  
+  void ProcessSequenceKeyTimeVector();
+  
+  bool CheckIfSequenceKeyTimeVectorHasBeenProcessed() {return sequenceKeyTimeVectorHasBeenProcessed_;};
+  
+  double GetAbsoluteInitialTimeForSequenceType(std::string givenSequenceType);
+  
+  double GetAbsoluteFinalTimeForSequenceType(std::string givenSequenceType);
+  
+  void PrintComputationSequenceInfo();
+  
+  void AssertIfGivenTypeIsAdmitted(std::string givenSequenceType);
+  
+  std::string GetCurrentSequenceType();
+  
   //Relations
   //setters
   void SetHardening(Hardening& hardening);
@@ -132,7 +149,49 @@ private:
   double const manualMaximumAllowedTimeStep_;
   bool const defineManuallyMaximumAllowedTimeStep_;
   
+  
+  std::vector<std::string> computationSequence_;
+  std::vector<double> sequenceKeyTimeVector_; // a vector where initial time of computation and final time (t_final) of each sequenceType in the computation sequence are saved;
+  std::map<std::string , unsigned int > sequenceTypeRankMap_;
+  bool sequenceKeyTimeVectorHasBeenProcessed_; //when an object computation is build, by default, this attribute is false
+  
 };
+
+
+
+inline std::string 
+Computation::GetCurrentSequenceType()
+{
+  assert ((this->CheckIfSequenceKeyTimeVectorHasBeenProcessed()==true)&&"sequence key time vector (sequenceKeyTimeVector_) has not been processed yet !");
+  
+  
+  std::string currentSequenceType="";
+  for (unsigned int i=0; i<computationSequence_.size(); ++i)
+  {
+    
+    std::string sequenceType= computationSequence_[i];
+    double t_initial= this->GetAbsoluteInitialTimeForSequenceType(sequenceType);
+    
+    double t_final=  this->GetAbsoluteFinalTimeForSequenceType(sequenceType);
+    
+    if ( (currentTime_>=t_initial) && (currentTime_<=t_final) )
+    {
+      currentSequenceType=sequenceType;
+    }
+  }
+  
+  assert (currentSequenceType!="");
+  
+  return currentSequenceType;
+}
+
+
+inline void 
+Computation::AssertIfGivenTypeIsAdmitted(std::string givenSequenceType)
+{
+  assert( (givenSequenceType=="Hardening") || (givenSequenceType=="ThermalLoading") || (givenSequenceType=="Quenching") );
+}
+
 
 
 inline bool
@@ -181,6 +240,21 @@ Computation::SetHardening(Hardening& hardening)
   
   assert ((hardening_==0)&&"Computation is already linked to a Hardening Object");
   hardening_=&hardening;
+  
+  
+  /////// add in keyWord in computation sequence Vector, and define rank of sequence type in sequenceTypeRankMap_
+  computationSequence_.push_back("Hardening");
+  
+  assert((computationSequence_.size()>=1)&&(computationSequence_.size()<=3)&&"Something is wrong: computationSequence_.size() should be 1, 2 or 3");
+  
+  unsigned int rank = computationSequence_.size(); //always get rank only after push_back
+  
+  sequenceTypeRankMap_["Hardening"]=rank;
+  
+  assert ( (computationSequence_.size() <=3 )&&"Something is wrong! computationSequence_ cannot have more than 3 items.");
+  
+  assert ( (sequenceTypeRankMap_["Hardening"]==computationSequence_.size())&& "Something is wrong with sequence rank. I must always be defined when setting Hardening.");
+  /////////////////
 }
 
 inline void
@@ -188,6 +262,21 @@ Computation::SetQuenching(Quenching& quenching)
 {
   assert ((quenching_==0)&&"Computation is already linked to a Quenching Object");
   quenching_=&quenching;
+  
+  /////// add in keyWord in computation sequence Vector, and define rank of sequence type in sequenceTypeRankMap_
+  computationSequence_.push_back("Quenching");
+  
+  assert((computationSequence_.size()>=1)&&(computationSequence_.size()<=3)&&"Something is wrong: computationSequence_.size() should be 1, 2 or 3");
+  
+  unsigned int rank = computationSequence_.size(); //always get rank only after push_back
+  
+  sequenceTypeRankMap_["Quenching"]=rank;
+  
+  assert ( (computationSequence_.size() <=3 )&&"Something is wrong! computationSequence_ cannot have more than 3 items.");
+  
+  assert ( (sequenceTypeRankMap_["Quenching"]==computationSequence_.size())&& "Something is wrong with sequence rank. I must always be defined when setting Quenching.");
+  
+  /////////////////
 }
 
 inline void
@@ -195,6 +284,21 @@ Computation::SetThermalLoading(ThermalLoading& thermalLoading)
 {
   assert ((thermalLoading_==0)&&"Computation is already linked to a ThermalLoading Object");
   thermalLoading_=&thermalLoading;
+  
+  /////// add in keyWord in computation sequence Vector, and define rank of sequence type in sequenceTypeRankMap_
+  computationSequence_.push_back("ThermalLoading");
+  
+  assert((computationSequence_.size()>=1)&&(computationSequence_.size()<=3)&&"Something is wrong: computationSequence_.size() should be 1, 2 or 3");
+  
+  unsigned int rank = computationSequence_.size(); //always get rank only after push_back
+  
+  sequenceTypeRankMap_["ThermalLoading"]=rank;
+  
+  assert ( (computationSequence_.size() <=3 )&&"Something is wrong! computationSequence_ cannot have more than 3 items.");
+  
+  assert ( (sequenceTypeRankMap_["ThermalLoading"]==computationSequence_.size())&& "Something is wrong with sequence rank. I must always be defined when setting ThermalLoading.");
+  /////////////////
+  
 }
 
 inline RadiusDistribution&

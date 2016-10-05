@@ -26,7 +26,8 @@ Quenching::Quenching(Computation& computation, double Tsol, double Tfinal, doubl
     duration_((solutionizingTemp_ - finalTemp_)/coolingRate_),
     timeStep_(0),
     totIterationNumber_(0),
-    deltaT_(deltaT)
+    deltaT_(deltaT),
+    type_("Quenching")
 {
   std::cout <<  "Building object <Quenching> " << std::endl;
   computation_.SetQuenching(*this);

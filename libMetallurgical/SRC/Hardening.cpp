@@ -18,7 +18,8 @@
 
 Hardening::Hardening(double hardeningDuration, Computation& computation)
   :duration_(hardeningDuration),
-   computation_(computation)
+   computation_(computation),
+   type_("Hardening")
 {
   std::cout <<  "Building object <Hardening> " << std::endl;
   

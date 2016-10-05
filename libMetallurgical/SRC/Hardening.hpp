@@ -35,6 +35,9 @@ public:
   double GetDuration()    const { return duration_;    }; 
   
   Computation& GetComputation() const {return computation_;};
+  
+  
+  std::string GetType() const {return type_ ;};
 
 protected:
 
@@ -45,6 +48,8 @@ private:
     
     //Relations
     Computation& computation_;
+    
+    std::string const type_;
 };
 
 #endif

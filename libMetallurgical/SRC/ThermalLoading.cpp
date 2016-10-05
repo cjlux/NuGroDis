@@ -26,7 +26,8 @@ ThermalLoading::ThermalLoading(Computation& computation, double maximumTimeStepA
    time_(),
    temperature_(0),
    maxTimeStep_(maximumTimeStepAllowedDuringThermalLoading),
-   computation_(computation)
+   computation_(computation),
+   type_("ThermalLoading")
 {
   std::cout <<  "Building object <ThermalLoading> " << std::endl;
   assert ((maxTimeStep_>0)&&"Given value for maximum Time Step Allowed During ThermalLoading must be > 0 ") ;

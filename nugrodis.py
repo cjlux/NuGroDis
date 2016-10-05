@@ -14,7 +14,7 @@ NuGroDisVersion="1.0"
 
 savePath=""
 
-ComputationParam={            "Type": "Quenching>Hardening>ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
+ComputationParam={            "Type": "Hardening>ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
                           "Material": "M2024",
                   "initialTimeStep" : (1,"s") #default Time step for the first iteration 

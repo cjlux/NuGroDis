@@ -59,6 +59,9 @@ public:
     double GetMaximumTimeStep() const { assert ((maxTimeStep_>0)&&"Thermal loading Maximum time step is not > 0 ") ; return maxTimeStep_;};
     
     
+    std::string GetType() const {return type_ ;};
+    
+    
     //void ComputeMaxTimeStep(); // only declaration have been made, TODO ERASE, unusefull ?
     
     //Relations
@@ -83,6 +86,9 @@ private:
     
     //Relations
     Computation& computation_;
+    
+    
+    std::string const type_;
 
 };
 

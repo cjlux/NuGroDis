@@ -123,7 +123,7 @@ SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave
 
 ##########################################
 # Create a C++ object of type Computation:
-c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],SavePath) # manualMaximumAllowedTimeStep_, manualMaximumAllowedTimeStep_ are optional.
+c = Computation(nugrodis.ComputationParam["initialTimeStep"][0],SavePath) # defineManuallyMaximumAllowedTimeStep_, manualMaximumAllowedTimeStep_ are optional.
                                                                           # by default, defineManuallyMaximumAllowedTimeStep_=false ; manualMaximumAllowedTimeStep_=-1  !!!!
 c.Info()
 c.type = nugrodis.ComputationParam["Type"]
@@ -740,7 +740,7 @@ c.ProcessMaxComputationTime()
 
 
 ##############  Begin: BOUCLE TEMPORELLE ########################
-CppMaterial.RunProcess()#RunProcess run the main loop.
+#CppMaterial.RunProcess()#RunProcess run the main loop.
 ##############  End: BOUCLE TEMPORELLE ########################
 c.Run()
 

@@ -36,6 +36,7 @@ public:
   double GetTimeStep() const           { return timeStep_;}
   double GetDeltaT() const             { return deltaT_;}
   double GetSolutionizingTemp() const  { return solutionizingTemp_;}
+  std::string GetType() const {return type_ ;};
 
   //Setters
   void SetTotIterationNumber(double tin);//Set totIterationNumber_  and compute timeStep_ and deltaT_ 
@@ -57,6 +58,8 @@ private:
   double timeStep_;
   double totIterationNumber_;
   double deltaT_;
+  
+  std::string const type_;
 
 };
 
