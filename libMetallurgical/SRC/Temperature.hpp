@@ -34,7 +34,7 @@ public:
     void Info() const;
 
     //Getters
-    double GetCurrentTemp() const {return currentTemp_; };
+    double GetCurrentTemp() const {assert (currentTemp_>0) ;return currentTemp_; };
 
     std::vector<double> & GetTemperatureList() {return temperatureList_; };
     const std::vector<double> & GetTemperatureList() const {return temperatureList_; };

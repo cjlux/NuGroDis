@@ -99,7 +99,8 @@ InterfacialConcentration::GetLeftInterfacialVelocityForClass(unsigned int classI
   n= radiusDistribution_.GetItemsValues().size();
   
   
-  /*debug */ std::cout<<"Element Name is: "<<chemicalElement_.GetElementName()<<" interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<" n+1 "<<n+1<<"\n";
+  /*debug */ //std::cout<<"Element Name is: "<<chemicalElement_.GetElementName()<<" interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<" n+1 "<<n+1<<"\n";
+  
   assert(  (interfacialVelocityList_.size()== (n+1) )&&"In GetLeftInterfacialVelocityForClass(int  classId) : interfacialVelocityList_.size() \
   and radiusDistribution_.GetItemsValues().size() are incompatible!!! interfacialVelocityList_.size() must be = radiusDistribution_.GetItemsValues().size() +1 " );
   assert ( (classId>=1)&&"InterfacialConcentration::GetLeftInterfacialVelocityForClass():   ClassId must be in the range 1 to n");

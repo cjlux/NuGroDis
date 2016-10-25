@@ -16,10 +16,11 @@
 
 #include "Computation.hpp"
 
-Hardening::Hardening(double hardeningDuration, Computation& computation)
+Hardening::Hardening(double hardeningDuration, Computation& computation,double hardeningTemperature)
   :duration_(hardeningDuration),
    computation_(computation),
-   type_("Hardening")
+   type_("Hardening"),
+   hardeningTemperature_(hardeningTemperature)
 {
   std::cout <<  "Building object <Hardening> " << std::endl;
   
@@ -43,5 +44,6 @@ Hardening::Info() const
 {
   std::cout <<  "################################# Hardening::Info ###################################" << std::endl;
   std::cout <<  "                                   duration: " << duration_ << " SI unit" << std::endl;
+  std::cout <<  "                                temperature: " << hardeningTemperature_ << " SI unit" << std::endl;
   std::cout <<  "\n"<<std::endl;
 }

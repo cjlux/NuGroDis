@@ -311,8 +311,18 @@ Vacancy::ReturnConcentrationBeforeQuenching()
 void 
 Vacancy::ComputeConcentrationBeforeQuenching()
 {
-  std::cout<<"############# Vacancy::ComputeConcentrationBeforeQuenching()"<<std::endl;
+
+  std::cout<< "==================================================="<<std::endl; 
+  std::cout<< " Vacancy :Computing Concentration before quenching ";
+  std::cout<< "==================================================="<<std::endl; 
+  
+  assert ((concentrationBeforeQuenching_==0)&&"Concentration before quenching has already been computed !!!");
+  
   concentrationBeforeQuenching_=this->ReturnConcentrationBeforeQuenching();
+  
+  std::cout<< "==================================================="<<std::endl; 
+  std::cout<< " Vacancy :Computing Concentration before quenching "<<std::endl;
+  std::cout<< "==================================================="<<std::endl; 
 }
 
 double
@@ -359,6 +369,7 @@ Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution(double duration, doub
 double 
 Vacancy::GetConcentrationBeforeQuenching() const
 {
+  assert ((concentrationBeforeQuenching_>0)&&"Cocentration befoe quenching has not been computed yet");
   return concentrationBeforeQuenching_;
 }
 
@@ -366,23 +377,28 @@ Vacancy::GetConcentrationBeforeQuenching() const
 void
 Vacancy::SaveQuenchingFinalConcentration(std::string fileName)
 {
+  assert(!"not implemented yet.");
 }
 
 double
 Vacancy::GetQuenchingFinalConcentration(std::string fileName)
 {
+  assert(!"not implemented yet.");
   return 0;
 }
 
 double
 Vacancy::GetHardeningFinalConcentration(std::string fileName)
 {
+  assert(!"not implemented yet.");
   return 0;
 }
 
 double
 Vacancy::SolveConcentrationEvolutionEquation()
 {
+  
+  assert(!"Unuseful?  anyway, it is not implemented yet.");
   return 0;
 }
 

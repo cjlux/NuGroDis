@@ -119,6 +119,9 @@ public:
  void PlotRadiusDistribution();
  
  double GetMinRadius() const { return minRadius_; };
+ 
+ double GetCurrentMaxRadius() const ;
+ 
  int GetInitialClassNumber() const { return initialClassNumber_; }; 
  double GetSpatialStep() const { return spatialStep_; };
  std::vector<double> GetItemsValues() { return itemsValues_; };//Gives values for all items. Values can be the same for all classes or a list of values
@@ -175,6 +178,17 @@ private:
     
 
 };
+
+
+inline double 
+RadiusDistribution::GetCurrentMaxRadius() const
+{
+  unsigned int n = itemsValues_.size();
+  
+  double currentmaxRadius= this->GetRightRadiusForClass(n);
+  
+  return currentmaxRadius;
+}
 
 
 inline double 

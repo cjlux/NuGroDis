@@ -240,8 +240,9 @@ BOOST_PYTHON_MODULE(Metallurgical)
     ;
     
   
-  boost::python::class_<Hardening>("Hardening", boost::python::init<double, Computation& >() )
+  boost::python::class_<Hardening>("Hardening", boost::python::init<double, Computation& , double >() )
     .add_property("duration", &Hardening::GetDuration)
+    .add_property("hardeningTemperature", &Hardening::GetHardeningTemperature)
     .def("Info", &Hardening::Info)
     ;
     

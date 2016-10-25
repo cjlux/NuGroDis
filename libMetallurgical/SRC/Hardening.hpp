@@ -22,7 +22,7 @@ class Computation;
 class Hardening
 {
 public:
-  Hardening(double hardeningDuration, Computation& computation);
+  Hardening(double hardeningDuration, Computation& computation, double hardeningTemperature);
   ~Hardening();
 
   std::string GetInfo();
@@ -38,6 +38,8 @@ public:
   
   
   std::string GetType() const {return type_ ;};
+  
+  double GetHardeningTemperature() const {return hardeningTemperature_;};
 
 protected:
 
@@ -50,6 +52,8 @@ private:
     Computation& computation_;
     
     std::string const type_;
+    
+    double hardeningTemperature_;
 };
 
 #endif

@@ -149,6 +149,12 @@ Material::RunProcess()
   computationDuration=computation_.GetMaxComputationTime();
   std::cout << "Computation Duration is " << computationDuration << "\n" << std::endl;
   
+  
+  vacancy_->ComputeConcentrationBeforeQuenching(); // initializing the concentration before quenching
+  
+  assert (currentTime==0);
+  
+  
   //TODO check later ==> this->UpdateVolumicValues();//in this case, UpdateVolumicValues() Process the initial volumic concentration
   
   
@@ -229,7 +235,7 @@ Material::RunProcess()
     this->ComputePrecipitatesNucleationSiteNb();
     
     
-    
+    std::cout<<"current temp"<< this->GetTemperature().GetCurrentTemp()<<"\n";
     
     if (currentTime>= computationDuration)
     {
@@ -239,7 +245,9 @@ Material::RunProcess()
     //Update all properties that are dependent to temperature
     
     //TODO Update current Temperature
-    /*Just for debug*/this->GetTemperature().SetCurrentTemp(293.15);
+    computation_.UpdateCurrentTemperature();
+    
+    // /*Just for debug*/this->GetTemperature().SetCurrentTemp(293.15);
     
     
     
@@ -359,14 +367,28 @@ void Material::UpdateAtomicDiffusionCoef()
   
   vacancy_->ComputeDiffusionCoefValue();
   vacancy_->ComputeEquilibriumConcentration();
-  if (computation_.GetCurrentTime()==0)
-  {
-    std::cout << "Computing Concentration before quenching\n" << std::endl;
-    vacancy_->ComputeConcentrationBeforeQuenching();
-  }
   
-  std::cout << "MaterialGetConcentrationBeforeQuenching()  " << vacancy_->GetConcentrationBeforeQuenching() << std::endl;
-  vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
+  
+  /*
+   Remember that,at this step, concentration before quenching should have already been computed yet. 
+   In fact, it is computed before the begining of the main loop ( 'while' loop )
+  */
+  
+  
+  if ( computation_.GetCurrentSequenceType() == "Hardening" )
+  {
+    std::cout << "MaterialGetConcentrationBeforeQuenching()  " << vacancy_->GetConcentrationBeforeQuenching() << std::endl;
+    vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
+  }
+  else if ( computation_.GetCurrentSequenceType() == "ThermalLoading" )
+  {
+    double vacancyCurrentConcentrationAtBeginningOfTimeStep =  vacancy_->GetConcentration();
+    vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetMaxTimeStep(), vacancyCurrentConcentrationAtBeginningOfTimeStep);
+  }
+  else
+  {
+    assert (!"This case is not implemented yet");
+  };
   
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
   {
@@ -896,6 +918,8 @@ Material::SaveMaterialCurrentChemicalCompo()
   std::vector<double> ElementVolumicConc;
   std::map<std::string, Concentration*> concMap= currentChemicalComposition_.GetConcentrationMap();
   
+  double currentTemperature= temperature_.GetCurrentTemp();
+  
   
   assert (ElementsName.size()==0);
   for (it=concMap.begin(); it!=concMap.end(); ++it)
@@ -915,6 +939,8 @@ Material::SaveMaterialCurrentChemicalCompo()
       line << "Xv"+ElementsName[i] << "\t";
     } 
     
+    line << "Temperature" << "\t";
+    
     lineStringVector.push_back(line.str());
     assert (lineStringVector.size()==1);
   }
@@ -925,6 +951,8 @@ Material::SaveMaterialCurrentChemicalCompo()
   {
     lineStream << ElementVolumicConc[i] << "\t";
   } 
+  
+  lineStream << currentTemperature << "\t";
   
   lineStringVector.push_back(lineStream.str());
   

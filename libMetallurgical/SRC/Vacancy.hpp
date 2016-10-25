@@ -193,6 +193,7 @@ Vacancy::GetVacancyDiffusionCoef() const
 inline void
 Vacancy::SetConcentrationAfterHardening(double C)
 {
+  assert(!"not implemented yet.");
 }
 
 //Setters

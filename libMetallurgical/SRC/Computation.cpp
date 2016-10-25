@@ -29,6 +29,7 @@
 #include "Material.hpp"
 #include "Precipitate.hpp"
 #include "RadiusDistribution.hpp"
+#include "Temperature.hpp"
 
 //resultsDirectory_, defineManuallyMaximumAllowedTimeStep_  are OPTIONAL  !!!!
 // by default, resultsDirectory_="" ; defineManuallyMaximumAllowedTimeStep_=false ; manualMaximumAllowedTimeStep_=-1  !!!!
@@ -197,6 +198,8 @@ Computation::Run()
   
   
   assert(material_!=0);
+  
+  this->SaveComputationSequenceInfo();
   material_->RunProcess();
     
   
@@ -318,6 +321,35 @@ Computation::UpdateCurrentTime()
 
 
 void
+Computation::UpdateCurrentTemperature()
+{
+  //TODO Update current Temperature of material
+  
+  
+  double updatedTemperature=-1;
+  if ( this->GetCurrentSequenceType() == "Hardening" )
+  {
+    updatedTemperature=hardening_->GetHardeningTemperature();
+  }
+  else if ( this->GetCurrentSequenceType() == "ThermalLoading" )
+  {
+    double durationAfterThebeginningOfThermalLoading =this->GetDurationAfterBeginningOfCurrentSequenceType();
+    updatedTemperature=thermalLoading_->ReturnTemperatureAtTime(durationAfterThebeginningOfThermalLoading);
+  }
+  else
+  {
+    assert (!"This case is not implemented yet");
+  };
+   
+  std::cout<<"Temperature at absolute time "<<currentTime_  << " [s] is :"<<updatedTemperature<<" [SI unit]  \n";
+  assert(updatedTemperature!=-1);
+  
+  material_->GetTemperature().SetCurrentTemp(updatedTemperature);
+}
+
+
+
+void
 Computation::CreateResultsDirectory()
 {  
   
@@ -327,6 +359,7 @@ Computation::CreateResultsDirectory()
   mkdir((resultsDirectory_+"/PrecipitatesAttributes").c_str(),0777);
   mkdir((resultsDirectory_+"/MaterialCurrentCompo").c_str(),0777);
   mkdir((resultsDirectory_+"/PrecipitatesInterfacialProperties").c_str(),0777);
+  mkdir((resultsDirectory_+"/ComputationInfo/").c_str(),0777);
    
    
 }
@@ -523,7 +556,65 @@ Computation::GetRankForSequenceType(std::string sequenceType)
 }
 
 
+void
+Computation::SaveComputationSequenceInfo()
+{
+  std::cout<<"\n";
+  std::cout<<  "========================================="<< std::endl;
+  std::cout<<  " Saving Computation Sequence Information " << std::endl;
+  std::cout<<  "========================================="<< std::endl;
+  
+  
+  
+  std::string fileName= "ComputationSequenceInfo.txt";
+  std::string path=resultsDirectory_+"/ComputationInfo/"+fileName;
+  std::ofstream output_file;
+  output_file.open(path.c_str(), std::ios_base::app);
+  
+  //Check if file is empty
+  std::ifstream in(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+  
+  std::stringstream line;
+  
+  std::vector<std::string> lineStringVector;
+  assert (lineStringVector.size()==0);
+    
+  
+  if ( in.tellg() == 0 /*check if it is empty*/      )
+  {
+    // file is empty
+    line << "SequenceType" << "\t" << "StartingTime" << "\t" << "EndingTime" << "\t";
+    
 
+    
+    lineStringVector.push_back(line.str());
+    assert (lineStringVector.size()==1);
+  }
+  
+  std::stringstream lineStream;
+  
+  
+  for (unsigned int i=0; i<computationSequence_.size(); ++i)
+  {
+    
+    std::string type= computationSequence_[i];
+    lineStream << type << "\t" << this->GetAbsoluteInitialTimeForSequenceType(type) << "\t" << this->GetAbsoluteFinalTimeForSequenceType(type) << "\t";
+    
+    lineStream << "\n";
+
+  }
+  
+  lineStringVector.push_back(lineStream.str());
+  std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+  std::copy(lineStringVector.begin(), lineStringVector.end(), output_iterator);
+  
+  
+  
+  std::cout<<  "========================================="<< std::endl;
+  std::cout<<  " Saving Computation Sequence Information " << std::endl;
+  std::cout<<  "========================================="<< std::endl;
+  std::cout<<"\n";
+}
 
 
 

@@ -98,6 +98,13 @@ public:
   
   std::string GetCurrentSequenceType();
   
+  double GetDurationAfterBeginningOfCurrentSequenceType();
+  
+  
+  void UpdateCurrentTemperature(); // 
+  
+  void SaveComputationSequenceInfo();
+  
   //Relations
   //setters
   void SetHardening(Hardening& hardening);
@@ -184,6 +191,30 @@ Computation::GetCurrentSequenceType()
   
   return currentSequenceType;
 }
+
+
+inline double
+Computation::GetDurationAfterBeginningOfCurrentSequenceType()
+{
+  assert ((this->CheckIfSequenceKeyTimeVectorHasBeenProcessed()==true)&&"sequence key time vector (sequenceKeyTimeVector_) has not been processed yet !");
+  
+  double durationAfterBeginningOfcurrentSequenceType=-1;
+  
+  
+  std::string currentSequenceType = this->GetCurrentSequenceType();
+  
+  double t_initial_currentSequenceType = this->GetAbsoluteInitialTimeForSequenceType(currentSequenceType);
+  
+  
+  durationAfterBeginningOfcurrentSequenceType= currentTime_ - t_initial_currentSequenceType ;
+  
+  assert (durationAfterBeginningOfcurrentSequenceType >= 0. );
+  
+  
+  return durationAfterBeginningOfcurrentSequenceType;
+  
+}
+
 
 
 inline void 

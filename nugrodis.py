@@ -20,10 +20,11 @@ ComputationParam={            "Type": "Hardening>ThermalLoading", #Quenching,Har
                   "initialTimeStep" : (1,"s") #default Time step for the first iteration 
                   } 
 
-TemperatureParam ={ 
-#"T0" : (20,"Celsius degree")#Initial temperature, [Celsius degree] 
-"T0" : (293.15,"K")
-}
+#======== obsolete now. hardening temperature is now define in HardeningParam
+#TemperatureParam ={ 
+#"T0" : (293.15,"K")
+#}
+#===========
 
 QuenchingParam={
 "v": (50,"Celsius degree.s^-1"), # v is the cooling rate
@@ -34,7 +35,8 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (1000,"s") # hardening duration
+"duration": (1000,"s"), # hardening duration
+"temperature": (293.15,"K") #hardening temperature
 #"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
 #"initialClassNumber" : (117, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
@@ -56,7 +58,7 @@ ThermalLoadingParam={
 #Do not forget to compute lenght,duration, ... after reading file NP1,NP2, TK1
 
 ##### Just For example #########
-"loadProfile": (dir_path+"/ExampleTK1_CSV","csv"),
+"loadProfile": (dir_path+"/fichiers_Temperature/39.5mm_axis_advancing side_CSV_KELVIN","csv"),
 "loadGuinierPrestonDistribution": (dir_path+"/Example_GP_RadDis_time_1_","txt"),
 "loadSprimeDistribution": (dir_path+"/Example_Sprime_RadDis_time_6425.07_","txt"),
 "maximumTimeStep": (1,"s") #the maximum time step allowed during the thermalLoading

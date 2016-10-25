@@ -20,6 +20,7 @@ halfSinkDistance, hardening duration')
 parser.add_argument('-g', type=str, help='gammaGP: Surface energy Polynomial Model as a list [a0, a1, ... , aN]  //Unit=[J/m^2]')
 parser.add_argument('-l', type=float, help='half Sink distance  //Unit=[µm]')
 parser.add_argument('-d', type=float, help='Computation duration = hardening duration //Unit=[second]')
+parser.add_argument('-Name', type=str, help='additionnal result directory name')
 parser.add_argument('-D', action='store_true', help='Run in debug mode for C++')
 args = parser.parse_args()
 
@@ -27,6 +28,7 @@ gammaParser=args.g
 halfSinkDParser=args.l
 hardeningDurationParser=args.d
 debug=args.D
+additionalName=args.Name
 ################### END PARSE ARGUMENTS
 
 if not debug:
@@ -106,6 +108,7 @@ exec "gammaGPSave= "+material+".GP['surfaceEnergyPolynomialModel'][0]"
 gammaGPSave= str(gammaGPSave)[1:-1] #to take of "[" and "]"
 durationSave=nugrodis.HardeningParam["duration"][0]
 durationSave=str(durationSave)
+additionalNameSave=str(additionalName)
 
 #######################################
 ##### SETTING RESULT DIRETORY #########
@@ -113,7 +116,7 @@ durationSave=str(durationSave)
 #SavePath=nugrodis.savePath ##Oldversion, M.G.  thinks that this is the way things should be
 
 ##Actual version
-SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave
+SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave+additionalNameSave
 
 ##### SETTING RESULT DIRETORY #########
 #######################################
@@ -145,9 +148,36 @@ if not os.path.exists(backUpDir):
     os.makedirs(backUpDir)
 
 
-##### Step II.2: Create empty files material_save.py and nugrodis_save.py in Back_Up folder   
-newMaterialPyFile=open(backUpDir+'/'+material+'_save.py','w')
-newNugrodisPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+
+#read old files material_DicoCopy and nugrodis_DicoCopy
+oldMaterialPyfile=open(material+"_DicoCopy.py",'r').read()
+oldNugrodisPyfile=open("nugrodis_DicoCopy.py",'r').read()
+
+# =============not needed anymore?
+
+###### Step II.2: Create empty files material_save.py and nugrodis_save.py in Back_Up folder   
+
+#newMaterialPyFile=open(backUpDir+'/'+material+'_save.py','w')
+#newNugrodisPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+
+
+###### Step II.3 (NEW): Copy the content of Old 'pyfile'_DicoCopy.py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
+
+
+#oldMaterialPyfile=open(material+"_DicoCopy.py",'r').read()
+#oldNugrodisPyfile=open("nugrodis_DicoCopy.py",'r').read()
+#for line in oldMaterialPyfile:
+#   newMaterialPyFile.write(line)
+#newMaterialPyFile.close()
+#for line in oldNugrodisPyfile:
+#    newNugrodisPyfile.write(line)
+#newNugrodisPyfile.close()
+
+#oldMaterialPyfile.close()
+#oldNugrodisPyfile.close()
+
+#=============================================
+
 
 
 ##### Step II.3 (OLD): Copy the content of Old .py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
@@ -162,15 +192,7 @@ newNugrodisPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
 
 
 
-##### Step II.3 (NEW): Copy the content of Old 'pyfile'_DicoCopy.py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
-oldMaterialPyfile=open(material+"_DicoCopy.py",'r').read()
-oldNugrodisPyfile=open("nugrodis_DicoCopy.py",'r').read()
-for line in oldMaterialPyfile:
-   newMaterialPyFile.write(line)
-newMaterialPyFile.close()
-for line in oldNugrodisPyfile:
-    newNugrodisPyfile.write(line)
-newNugrodisPyfile.close()
+
 
 if ( (gammaParser!=None) & (halfSinkDParser!=None) & (hardeningDurationParser!=None) ):
     # :::::::   USE PARSED ARGUMENTS FOR THE COMPUTATION AND SAVE CORRECT 'material'.py and nugrodis.py used for Computation  ::::::: #
@@ -180,10 +202,12 @@ if ( (gammaParser!=None) & (halfSinkDParser!=None) & (hardeningDurationParser!=N
 
 
 
-    ##### Check (Assert) single occurence of string to replace: check if Occurence of string to replace is 1. Because, it is not 1,
+    ##### Check (Assert) single occurence of string to replace: check if Occurence of string to replace is 1. Because, if it is not 1,
     # it means something we DONT WANT to change can be modified.
-    materialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','r+')
-    nugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','r+')  
+    
+    # not needed anymore ?
+    #materialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','r+')
+    #nugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','r+')  
 
     assert (oldMaterialPyfile.count(str(oldGammaGPtuple))==1), "old value of argument 'surfaceEnergyPolynomialModel' in dictionary GP can't be set\
 by parsing. It has to be setted manually in file 'material'.py " 
@@ -193,9 +217,15 @@ set by parsing. It has to be setted manually in file 'material'.py"
     assert( oldNugrodisPyfile.count( str(oldHardeningDurationtuple))==1   ),"The old tuple of argument duration in dictionary \
 HardeningParam APPEARS MORE THAN ONE TIME so it can't be set by parsing. It has to be setted manually in file nugrodis.py"
 
+
+    # Create empty files material_save.py and nugrodis_save.py in Back_Up folder
     clearMaterialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','w')
     clearNugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+    
+    
 
+
+    # replace values and write in save file material_save.py and nugrodis_save.py
     for line in oldMaterialPyfile.replace(str(oldGammaGPtuple), str(CurrentValueOfSurfaceEnergyPolynomialTuple)).replace(str(oldLtuple),str(CurrentValueOfHalfSinkDTuple)):
         clearMaterialBackUpPyFile.write(line)
     clearMaterialBackUpPyFile.close()
@@ -261,7 +291,7 @@ for computation in ComputationList:
     #HARDENING
     if computation == "Hardening":
         # Create a C++ object of type Hardening:
-        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0], c)
+        CppHardening=Hardening(nugrodis.HardeningParam["duration"][0], c, nugrodis.HardeningParam["temperature"][0])
         CppHardening.Info()
     
     ##THERMAL LOADING
@@ -280,6 +310,7 @@ for computation in ComputationList:
         
         timeList, temperature_List=  list(temperature_Data[:,0]) , list(temperature_Data[:,1]) 
         
+        thermalLoadingInitialTemperature= float(temperature_List[0])       
         
         CppThermalLoading.ReadTemperatureLoadingFromPythonList(timeList,temperature_List)
                 
@@ -289,7 +320,7 @@ for computation in ComputationList:
         CppThermalLoading.ReturnTemperatureAtTime(219) #debug
         CppThermalLoading.ReturnTemperatureAtTime(315.1666666667) #debug
         CppThermalLoading.ReturnTemperatureAtTime(283) #debug
-        CppThermalLoading.ReturnTemperatureAtTime(535.0523809524) #debug
+        CppThermalLoading.ReturnTemperatureAtTime(535.052380952388) #debug
         
         CppThermalLoading.Info() 
         
@@ -372,9 +403,22 @@ for u in AlloyInitialComposition.items():
     print("CppConc Setted volumic volumic concentration ",InitialCCCpp.GetConcentrationForElement(symbol).volumicValue)
 
 #reading Temperature parameters and Create a C++ object of type Temperature: Initial Temperature
-TempParam=nugrodis.TemperatureParam
-print("  > Found TemperatureParam           : ", TempParam)
-InitialTempCpp=Temperature(TempParam['T0'][0]);
+
+# find initial temperature of the computation
+
+initialTemperature=None # initialization
+if (FirstSequenceOfPrecipitationComputing=="Hardening"):
+    initialTemperature=nugrodis.HardeningParam['temperature'][0]
+elif (FirstSequenceOfPrecipitationComputing=="ThermalLoading"):
+    initialTemperature=thermalLoadingInitialTemperature
+else:
+    assert(0)
+assert (initialTemperature!=None)
+
+
+print("  > Initial temperature              : ", initialTemperature)
+
+InitialTempCpp=Temperature(initialTemperature);
 
 #Create a C++ object of type Material
 CppMaterial=Material(InitialTempCpp,
@@ -523,7 +567,9 @@ for x in pyPD:
     # step0: Create a C++ object of type RadiusDistribution (Required 
     #                                  for building Precipitate CppObject)
     #============================================================ 
-    if computation == "Hardening":   
+        
+    print("tarzan : computation", FirstSequenceOfPrecipitationComputing)
+    if FirstSequenceOfPrecipitationComputing == "Hardening":   
         
         #============================================================ 
         #  Create a C++ object of type RadiusDistribution in case of hardening
@@ -533,7 +579,7 @@ for x in pyPD:
                                                         nugrodis.CellParam['initialClassNumber'][0])
         CppInitialRadDisDict[x].Info()
 
-    if computation == "ThermalLoading":
+    if FirstSequenceOfPrecipitationComputing == "ThermalLoading":
         #============================================================ 
         #   Load GuinierPreston AND/OR Sprime Radius initial distribution for thermalLoading
         #                               & 
@@ -739,11 +785,15 @@ c.ProcessMaxComputationTime()
 #=================================================================================================
 
 
-##############  Begin: BOUCLE TEMPORELLE ########################
-#CppMaterial.RunProcess()#RunProcess run the main loop.
-##############  End: BOUCLE TEMPORELLE ########################
-c.Run()
 
+
+##############  Begin: BOUCLE TEMPORELLE ########################
+
+# now  CppMaterial.RunProcess() is included in CppComputation.run() . 
+#      Cppmaterial.RunProcess() run the main loop.
+
+c.Run()
+##############  End: BOUCLE TEMPORELLE ########################
 
 
 ##CppMaterial.UpdateVolumicValues()

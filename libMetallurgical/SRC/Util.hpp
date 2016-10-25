@@ -43,6 +43,10 @@
 #include <vector>
 #include <boost/python.hpp>
 
+//#include <iostream>
+//#include <limits>
+
+
 namespace Util
   {
   extern  const std::string slash;
@@ -125,12 +129,18 @@ namespace Util
       
       static double modified_deflation(const std::vector<double>& v);
       
+      
+      
+      
       /*
       template <class T>
       static std::vector<T> ConvertPythonListToVector(boost::python::list& pythonList);
       */
       
       static std::vector<double> ConvertPythonListToVector(boost::python::list& pythonList);
+      
+      
+      // void PressEnterToContinue();
     };
     
     /*
@@ -169,6 +179,17 @@ namespace Util
       return vector;
       
     }
+    
+    
+    /*
+    inline void 
+    Util::PressEnterToContinue()
+    {
+      std::cout << "Press ENTER to continue... " ;
+      std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+    }
+    */
+    
 
 }
 

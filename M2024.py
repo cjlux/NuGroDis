@@ -113,7 +113,7 @@ Sprime={
 "deltaCell":(1/100,"m.m^-1") , #difference between precipitate and solid solution cell size , was deltamailleP2
 "wettingAngle":(30*math.pi/180,"rad") # wetting angle of Sprime precipitates on GP precipitates, was thetaP2
 }
-
+#"surfaceEnergyPolynomialModel":([-0.10985+0.1,8.31E-4,-8.71E-7],"J.m^-2")  (origin)
 
 
 

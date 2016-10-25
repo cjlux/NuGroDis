@@ -96,11 +96,12 @@ RadiusDistribution::AddEmptyClass()
 {
   assert ((precipitate_!=0)&&"radiusDistribution does not belong to any precipitate");
   
-  std::cout<<" Adding an empty class to RadiusDistribution of precipitate type <"<<typeid(precipitate_).name()<<"> ; precipitate adress is <"<<precipitate_<<"> "<<std::endl;
+  std::cout<<" Adding an empty class to RadiusDistribution of precipitate type <"<<precipitate_->GetPrecipitateType()<<"> ; precipitate adress is <"<<precipitate_<<"> "<<std::endl;
   unsigned int n= itemsValues_.size();
   itemsValues_.push_back(0);
   assert (itemsValues_.size()== n+1. );
   
+  std::cout<<" Radius distribution class number is now ["<<itemsValues_.size()<<"]. It was ["<<n<<"]"<<std::endl;
   
   
   /*
@@ -655,7 +656,9 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  /////////
 
 	  //Check precision of solutions X,Y found
-	  double epsilon=1e-7;
+	  //double epsilon=1e-8;
+	  double epsilonEq1=1e-8;
+	  double epsilonEq2=1e-3;
 	  double Eq1precision=std::abs(X*Y-f);
 	  double Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
 	  
@@ -665,16 +668,16 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  
 	  /////////////////////////////////////////////////
 	  /////////// do dichotomous on Y for Eq2 /////////
-	  if (Eq2precision > epsilon)
+	  if (Eq2precision > epsilonEq2)
 	  {
 	    std::cout <<"Using dichotomous for Equation 2 \n";
 	    double f1left, f1right, f_left, f_right, half, f_half, solutionToImprove,rightValue, leftValue;
 	    
 	    double dichotomousSolutionPrecision= 1.e-16;
 	  
-	    rightValue= 2*Y;
+	    rightValue= XvPj;
 	    
-	    leftValue= Y/2. ;
+	    leftValue= 0. ;
 	    
 	    f1left=leftValue;
 	    f1right=rightValue;
@@ -682,14 +685,14 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	    f_left= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1left)/(XvPj-f1left);
 	    f_right= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1right)/(XvPj-f1right);
 	    
-	    assert ( (f_left*f_right<0)&&"Solution is not in the range compute from given argument leftValue and rightValue");
+	    assert ( (f_left*f_right<0.)&&"Solution is not in the range compute from given argument leftValue and rightValue");
 	    
-	    while ( (f_left*f_right<0) && ( std::abs(f1right-f1left)>=dichotomousSolutionPrecision ) )
+	    while ( (f_left*f_right<0.) && ( std::abs(f1right-f1left)>=dichotomousSolutionPrecision ) )
 	    {
 	      half= (f1left+f1right)/2.;
 	      f_half=(XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-half)/(XvPj-half);
 	      
-	      if ( f_half*f_right <0)
+	      if ( f_half*f_right <0.)
 	      {
 		f1left= half;
 		f_left= (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-f1left)/(XvPj-f1left);
@@ -702,6 +705,14 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	    }
 	    
 	    solutionToImprove= f1left;
+	    
+	    std::cout<<"f1left "<<f1left<< " f1right "<< f1right << std::endl;
+	    
+	    std::cout<< "(XvSSi-X)/(XvPi-X) "<< (XvSSi-X)/(XvPi-X)<<std::endl;
+	    
+	    std::cout<< "DjOverDi*(XvSSj-f1right)/(XvPj-f1right) "<< DjOverDi*(XvSSj-f1right)/(XvPj-f1right)<<std::endl;
+	    std::cout<< "DjOverDi*(XvSSj-f1left)/(XvPj-f1left) "<<   DjOverDi*(XvSSj-f1left)/(XvPj-f1left)<<std::endl;
+	    std::cout<< "precipitate type "<< precipitate_->GetPrecipitateType()<<std::endl;
 	    
 	    /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
 	    
@@ -717,9 +728,12 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
 	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
 	  
-	  assert ( (Eq1precision<= epsilon) && "Precision for equation X*Y=f is not satisfied" );
 	  
-	  assert ( (Eq2precision<= epsilon) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
+	  // TODO  // assert or not assert?  because x and y have been optimised
+	  assert ( (Eq1precision<= epsilonEq1) && "Precision for equation X*Y=f is not satisfied" );
+	  assert ( (Eq2precision<= epsilonEq2) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
+	  
+	  
 	  
 	  return 1; //There is a solution
 	  

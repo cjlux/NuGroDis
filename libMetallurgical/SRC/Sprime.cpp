@@ -134,15 +134,17 @@ Sprime::ComputeNucleationSiteNb()
   
   nucleationSitesNumber_=numberOfPrecipitateGP-numerOfPrecipitateSprime;
   
+  /*
   if( nucleationSitesNumber_<0)
   {
     std::cout<<"Nuclueation site Number for precipitate type <Sprime> at adress <"<<this<<"> is negative => IT WILL BE SETTED TO ZERO";
     nucleationSitesNumber_=0;
   }
+  */
   
-  
-  assert(nucleationSitesNumber_>=0);
   /*DEBUG*/ std::cout<<"Computed Nucleation sites number For Sprime is : "<<nucleationSitesNumber_<<std::endl;
+  assert((nucleationSitesNumber_>=0)&&"Sprime nucleation site number is negative: numberOfPrecipitateGP < numberOfPrecipitateSprime !!!");
+  
 
 }
 
@@ -154,20 +156,29 @@ Sprime::ReturnVolumicFraction()
   
   assert (n>0);
   
+  
+  std::vector<double> volumicFractionOfClassVector;
+  double sumWithMethod=0;
+  
+  /////////////////////////////////
+  ///////// Normal sum //////////
   double Sum=0;
   for (unsigned int i=1; i<=n; ++i)
   {
     double sum_i;
     double Ri=currentRadiusDistribution_->GetRadiusForClass(i);
     double Ni=currentRadiusDistribution_->GetItemValueForClass(i);
-    sum_i= (4/3 + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
+    sum_i= (4./3. + shapeFactor_)*M_PI*Ni*std::pow(Ri,3);
     assert (sum_i >= 0);
+    volumicFractionOfClassVector.push_back(sum_i);
     Sum +=sum_i;
   }
+  sumWithMethod=Sum;
+  //////////////////////////
   
-  assert(Sum>=0);
+  assert(sumWithMethod>=0);
   
-  return Sum;
+  return sumWithMethod;
 }
 
 

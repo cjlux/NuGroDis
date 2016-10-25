@@ -38,7 +38,7 @@ Temperature::~Temperature()
 void
 Temperature::SetCurrentTemp(const double temp)
 {
-  assert(temp >= 0) ; // unit is Kelvin, 
+  assert(temp > 0) ; // unit is Kelvin, 
   currentTemp_ = temp;
   temperatureList_.push_back(currentTemp_);
 }

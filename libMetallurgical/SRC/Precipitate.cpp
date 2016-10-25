@@ -49,6 +49,9 @@
 
 
 
+#include <limits>
+
+
 namespace ublas  = boost::numeric::ublas;
 namespace lapack = boost::numeric::bindings::lapack;
 
@@ -221,6 +224,8 @@ Precipitate::SavePrecipitateAttributes()
   std::stringstream line;
   double CurrentTime = materialPointer_->GetComputation().GetCurrentTime();
   
+  double CurrentTemperature= materialPointer_->GetTemperature().GetCurrentTemp();
+  
   std::vector<std::string> lineStringVector;
   
   assert (lineStringVector.size()==0);
@@ -252,6 +257,8 @@ Precipitate::SavePrecipitateAttributes()
     // by doing  ===>   line<<"\t"<<"NewAttributeLabelName";
   
     line<<"\t"<<"AverageRadius";
+    
+    line<<"\t"<<"Temperature";
     
     /////////////////////////////////////////////
     /////////////////////////////////////////////
@@ -285,6 +292,8 @@ Precipitate::SavePrecipitateAttributes()
   // by doing  ===>  lineStream<<"\t"<<NewAttributeVariable;
   
   lineStream<<"\t"<<currentRadiusDistribution_->ReturnAverageRadius();
+  
+  lineStream<<"\t"<<CurrentTemperature;
   
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////  
@@ -1617,7 +1626,38 @@ Precipitate::ProcessNucleationRate()
     this->ComputeZeldovichFactor();
     this->ComputeCriticalBeta();
     this->ComputeNucleationRate();
+    
+    ///////////////////////////////////////////////////////////
+    ///////  add classes if  Rmax < R*  ///////////////////////
+    
+    int n=currentRadiusDistribution_->GetItemsValues().size();
+    double maxRadius=currentRadiusDistribution_->GetRadiusForClass(n);
+    double nucleationRadius= criticalRadius_+deltaCriticalRadius_;
+    
+    if (nucleationRadius>maxRadius)
+    {
+      std::cout<< "============================================================================================================"<<std::endl;
+      std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
+      std::cout<< " Retoile > Rmax : Computed nucleation radius (r* + dr*) is superior to the maximum radius of distribution   "<<std::endl;
+      std::cout<< " Empty classes will be added "<<std::endl;
+      while ( nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius() )
+      {
+	currentRadiusDistribution_ ->AddEmptyClass();
+	std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
+      }
+      currentRadiusDistribution_ ->AddEmptyClass(); // add another empty class after the class where the nucleated radius will appear
+    }
+    ///////  add classes if  Rmax < R*  ///////////////////////
+    ///////////////////////////////////////////////////////////////
+    
+    
   };
+  
+  
+  
+
+  
+  
   std::cout<<std::endl;
   std::cout<<"-+-+-+-+-+ ENDING the processing of nucleation rate +-+-+-+-+-+- "<<std::endl;
   std::cout<<std::endl;
@@ -1759,7 +1799,47 @@ Precipitate::AddNucleatedPrecipitates()
        
        
        /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
-       assert ( (nucleationRadius>=minRadius)&&(nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is not in the range of the current RadiusDistribution");
+       
+       //now it is an if statement, warning and press to continue  . Not an assert
+       assert ( (nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is superior to max radius distribution. Not in the range of the current RadiusDistribution");
+       assert ( (nucleationRadius>=minRadius)&&"Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution. Not in the range of the current RadiusDistribution");
+       
+       
+       /*
+       ///////  change the assert with the if  ///////////////////////
+       if (nucleationRadius < minRadius)
+       {
+	 std::cout<< "============================================================================================================"<<std::endl;
+	 std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
+	 std::cout<< " Retoile < Rmin : Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution   "<<std::endl;
+	 /// press any key to continue
+	 std::cout <<"Press ENTER to continue... " ;
+	 std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+	 //////////////
+       };
+       
+       
+       if (nucleationRadius>maxRadius)
+       {
+	 std::cout<< "============================================================================================================"<<std::endl;
+	 std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
+	 std::cout<< " Retoile > Rmax : Computed nucleation radius (r* + dr*) is superior to the maximum radius of distribution   "<<std::endl;
+	 std::cout<< " Empty classes will be added "<<std::endl;
+	 while ( nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius() )
+	 {
+	   currentRadiusDistribution_ ->AddEmptyClass();
+	   std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
+	 }
+	 currentRadiusDistribution_ ->AddEmptyClass(); // add another empty class after the class where the nucleated radius will appear
+       }
+       ///////  change the assert with the if  ///////////////////////
+       ///////////////////////////////////////////////////////////////
+       
+       */
+       
+       
+       
+       
        double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
        unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
        double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
