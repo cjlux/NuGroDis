@@ -1764,9 +1764,10 @@ Precipitate::AddNucleatedPrecipitates()
   
   int n=currentRadiusDistribution_->GetItemsValues().size();
   assert(n>0);
-  double minRadius=currentRadiusDistribution_->GetRadiusForClass(1);
-  double maxRadius=currentRadiusDistribution_->GetRadiusForClass(n);
+  double minRadius=currentRadiusDistribution_->GetLeftRadiusForClass(1);
+  double maxRadius=currentRadiusDistribution_->GetRightRadiusForClass(n);
   double nucleationRadius= criticalRadius_+deltaCriticalRadius_;
+  
   
   /*DEBUG*/std::cout<<"DEBUG  r* "<<criticalRadius_<<" delta r* "<<deltaCriticalRadius_<<"\n";
   
@@ -1774,15 +1775,17 @@ Precipitate::AddNucleatedPrecipitates()
   { 
     std::cout<<"There is no new nucleus for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
   }
-  else if (  (nucleationRadius>0)&&(nucleationRadius<=minRadius)  )
+  else if ( (nucleationRadius<minRadius)  )
   {
+    assert ((nucleationRadius >0)&&"computed real nucleation radius is not strictly positive! ");
+    
     std::cout<<"Computed nucleation radius (r* + dr*) is not in the range between 0 and Rmin of the RadisDistribution"<<std::endl;
     /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
     std::cout<<"Therefore, no new nucleus for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> will be considered "<<std::endl;
   }
   else
   {
-     /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
+     /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<" distribution min Radius (left radius) "<<minRadius<<" distribution maxRadius (right radius)"<<maxRadius<<std::endl;
      
      if (nucleationSitesNumber_==0)
      { 
@@ -1801,7 +1804,7 @@ Precipitate::AddNucleatedPrecipitates()
        /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
        
        //now it is an if statement, warning and press to continue  . Not an assert
-       assert ( (nucleationRadius<=maxRadius)&&"Computed nucleation radius (r* + dr*) is superior to max radius distribution. Not in the range of the current RadiusDistribution");
+       assert ( (nucleationRadius< maxRadius)&&"Computed nucleation radius (r* + dr*) is superior or equal to max radius distribution. Not in the range of the current RadiusDistribution");
        assert ( (nucleationRadius>=minRadius)&&"Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution. Not in the range of the current RadiusDistribution");
        
        

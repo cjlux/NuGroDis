@@ -403,7 +403,10 @@ RadiusDistribution::FindClassForRadius(double r)
   int n=itemsValues_.size();
   assert ((n>=1)&&"initial class number must be > 1 ");
   double MaxRadius=this->GetRightRadiusForClass(n);
-  assert ((r >=minRadius_)&&(r<=MaxRadius)&&"radius given in argument must be in range rmin rmax");
+  double MinRadius=this->GetLeftRadiusForClass(1);
+  
+  assert ((r >= MinRadius)&&"radius given in argument must be superior or equal to in range rmin_left : rmin_left <= givenRadius  ");
+  assert ((r < MaxRadius)&&"radius given in argument must be srictly inferior to rmax_right: givenRadius < rmax_right ");
   
   
   for ( int i=1; i<=n ; ++i )
@@ -411,7 +414,7 @@ RadiusDistribution::FindClassForRadius(double r)
     double leftLimit=GetLeftRadiusForClass(i);
     double rightLimit=GetRightRadiusForClass(i);
   
-    if ( (leftLimit <= r) && (r<= rightLimit) )
+    if ( (leftLimit <= r) && (r< rightLimit) )
     {
       classId=i;  
     }

@@ -59,8 +59,8 @@ ThermalLoadingParam={
 
 ##### Just For example #########
 "loadProfile": (dir_path+"/fichiers_Temperature/39.5mm_axis_advancing side_CSV_KELVIN","csv"),
-"loadGuinierPrestonDistribution": (dir_path+"/Example_GP_RadDis_time_1_","txt"),
-"loadSprimeDistribution": (dir_path+"/Example_Sprime_RadDis_time_6425.07_","txt"),
+"loadGuinierPrestonDistribution": (None,None),
+"loadSprimeDistribution": (None,None),
 "maximumTimeStep": (1,"s") #the maximum time step allowed during the thermalLoading
 }
 

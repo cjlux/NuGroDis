@@ -6,7 +6,6 @@ from matplotlib import rc
 import M2024
 
 
-
 SpecificValues=["-222.222","-111.111","111.111","222.222"] #DO NOT DELETE THIS LINE!!!
 
 
@@ -47,6 +46,74 @@ import time
 
 
 
+
+
+
+def PlotCurveGeneral(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="o",Xcolor="green",Ycolor="red",labelCurve=' ',\
+              returnFig=False, fig=None, ax=None, sizeInches=(None,None), dashedLine=False ):
+    "Plot a curve and save it to the given path"
+        
+    #rc('text', usetex=True)
+    rc('font', family='serif')
+
+    # marker can be 
+            # un-filled markers  ',' , '.', '1' , '2' , '4' , '_' , 'x' , '|' , '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '+'
+            # filled markers 'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd'
+    if fig==None and ax==None:
+        fig, ax = plt.subplots()
+
+    
+    markersList=['o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd',\
+                 ',' , '.', '1' , '2' , '4' , '_' , 'x' , '|' , '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '+']
+
+    previouslyUsedMarkers=[]
+    for line in ax.lines:
+        previouslyUsedMarkers.append(line.get_marker())
+
+    if marker not in previouslyUsedMarkers:
+        pass # do nothing
+    else:
+        for mrkr in markersList:
+            if mrkr not in previouslyUsedMarkers:
+                marker=mrkr
+                break
+
+    if dashedLine==True:
+        marker="--"+marker
+    else:
+        #line is continue
+        marker="-"+marker
+    
+    ax.plot(X,Y,marker,label=labelCurve)
+    ax.grid(True)
+    plt.title(u""+figTitle)
+    ax.set_xlabel(u""+Xlabel,color=Xcolor)
+    ax.set_ylabel(u""+Ylabel,color=Ycolor)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., shadow=True, fancybox=True)
+
+    #### setting fig size ####
+    #  defaut size_inches  (w,h) is (8,6)
+    if sizeInches==(None,None):
+        # dont change the current size of figure  (w,h)
+        sizeInches=fig.get_size_inches() # get the current size of figure  (w,h)
+    else:
+        assert( (sizeInches[0] !=None ) and (sizeInches[1] !=None ) )
+        assert(sizeInches[0]>0) , "Error in PlotCurve: The figure sizeIncheW is not positive"
+        assert(sizeInches[1]>0) , "Error in PlotCurve: The figure sizeIncheH is not positive"
+        fig.set_size_inches(sizeInches[0],sizeInches[1])
+    ##########################
+
+    fig.savefig(saveName, bbox_inches='tight') #saveName or Absolute complete path to saveFile
+    if returnFig==False:    
+        plt.close()
+    if returnFig==True:
+        return fig,ax
+
+
+
+
+
+
 def plotWithSpecificValues(dataY, dataX, specificValueFound, savename, xlabel, ylabel, figTitle, trimcurveinfo, attributeToPlotName=''  ):
     ##################### new; begin 
          #input RealRetoileList or attributeToPlotData or dataY, 
@@ -64,7 +131,7 @@ def plotWithSpecificValues(dataY, dataX, specificValueFound, savename, xlabel, y
     allOccurenceWhereDataisNotDedined= [i for i, x in enumerate(dataY) if x == specificValueFound]
  
     
-    ## range in list, by concecutive index
+    ## range in list, by consecutive index
     consecutiveOccurenceList=[]
     for k, g in groupby(enumerate(allOccurenceWhereDataisNotDedined), lambda (i,x):i-x):
         consecutiveOccurenceList.append(map(itemgetter(1), g))
@@ -73,9 +140,14 @@ def plotWithSpecificValues(dataY, dataX, specificValueFound, savename, xlabel, y
                         Y=returnListAfterExcludeIndex(dataY,allOccurenceWhereDataisNotDedined),\
                         saveName=savename, Xlabel=xlabel,Ylabel=ylabel,figTitle=figTitle,\
                         returnFig=True, trimCurveInfo=trimcurveinfo)
-                                     # ==========checking if one ax or if returned axList is a list of ax
+                                    
+    # ==========checking if one ax or if returned axList is a list of ax
+    
+
+    
+
                         
-    if len(axReturned)==1:
+    if type(axReturned) != list   :    # old condition, check if it is better:   if len(axReturned)==1   :
         ax=axReturned
         for occurence in consecutiveOccurenceList:
             if len(occurence)==1:
@@ -496,8 +568,8 @@ def PostProcessing(plotBySequence=True,\
                                             quenchingTimeStep=quenchingTimeStep)    
     
     
-def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=False,\
-                                            thermalLoadingTimeStep=2,\
+def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=True,\
+                                            thermalLoadingTimeStep=10,\
                                             hardeningTimeStep=3600,\
                                             quenchingTimeStep=1):
     
@@ -532,18 +604,20 @@ def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=False,\
         seqInfo=ReadAndReturnComputationSequenceInfo(path) [1:]
         seqInfoIndex= ReturnComputationSequenceIndex(seqInfo,timeData)
         
-        #OutputMaterialChemicalComposition(path,trimCurveInfo=(True,seqInfoIndex) )
-        #OutputMaterialVacancyProperties(path,trimCurveInfo=(True,seqInfoIndex) )        
+        OutputMaterialChemicalComposition(path,trimCurveInfo=(True,seqInfoIndex) )
+        OutputMaterialVacancyProperties(path,trimCurveInfo=(True,seqInfoIndex) )        
         OutputAttributes(path,plotBySequence=plotBySequence )
 
         
+        listOfTimeToPlot=[]
         for seq in seqInfo:
             
-            listOfTimeToPlot=[]
+            
             
             sequenceName= seq[0]
             startingTime= float(seq[1])
             endingtime  = float(seq[2]) 
+            
             
             
             if (sequenceName=='ThermalLoading'):
@@ -556,33 +630,91 @@ def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=False,\
                 assert(0), "sequenceName should be either 'Quenching' or 'Hardening' or 'ThermalLoading' "
             
             
-            listOfTimeToPlot=list(arange(startingTime,endingtime,sequenceTimeStep))    # Temps par steps de 'timeStep' secondes
+            
+            listOfTimeToPlot += list(arange(startingTime,endingtime,sequenceTimeStep))    # Temps par steps de 'timeStep' secondes
             if endingtime not in listOfTimeToPlot:listOfTimeToPlot.append(endingtime)
             
             
-            #################################
-            #CREATE SEQUENCE SAVE DIRECTORY #
-            #################################
-            sequenceResultDir=path+sequenceName
-            if not os.path.exists(sequenceResultDir):
-                os.makedirs(sequenceResultDir)
-            #################################
-            #CREATE SEQUENCE SAVE DIRECTORY #
-            #################################
             
+        #print('listOfTimeToPlot',listOfTimeToPlot)
+        OutputDistributionCurves(path, timeToPlot=listOfTimeToPlot ) # by default timeStep is 3600 and timeToPlot=[] (see function)  
+        OutputInterfacialDistributionCurves(path, timeToPlot = listOfTimeToPlot)
+        
+
+        ## TODO: sort Distribution curbe by sequence Type ? i.e create folder 'sequenceTypename' for corresponding distribution curve
+        SortCurves(path+'Results/PrecipitatesAttributesCurves/GuinierPreston')
+        SortCurves(path+'Results/PrecipitatesAttributesCurves/Sprime')
             
-            #print('listOfTimeToPlot',listOfTimeToPlot)
-            #OutputDistributionCurves(path, timeToPlot=listOfTimeToPlot ) # by default timeStep is 3600 and timeToPlot=[] (see function)  
-            #OutputInterfacialDistributionCurves(path, timeToPlot = listOfTimeToPlot) 
-            
-        ## TODO: sort Distribution curbe by sequence Type ? i.e create folder 'sequenceTypename'
-            #coresponding distribution curve
-    
     
     Hardness(path)
     
     return
 
+
+
+
+
+def SortCurves(directory):
+    if (directory[-1]!="/"):
+        directory += "/"
+        
+    abspath= os.path.abspath(directory)
+    for filename in os.listdir(abspath):
+        file_abspath=abspath+'/'+filename
+        
+        if filename.endswith("Quenching.pdf"):
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            sequenceResultDir=directory+'Quenching'
+            if not os.path.exists(sequenceResultDir):
+                os.makedirs(sequenceResultDir)
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+
+            os.rename(file_abspath, abspath+'/Quenching/'+filename)
+            
+            
+        if filename.endswith("Hardening.pdf"):
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            sequenceResultDir=directory+'Hardening'
+            if not os.path.exists(sequenceResultDir):
+                os.makedirs(sequenceResultDir)
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            os.rename(file_abspath, abspath+'/Hardening/'+filename)
+            
+        if filename.endswith("ThermalLoading.pdf"):
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            sequenceResultDir=directory+'ThermalLoading'
+            if not os.path.exists(sequenceResultDir):
+                os.makedirs(sequenceResultDir)
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            os.rename(file_abspath, abspath+'/ThermalLoading/'+filename)
+        
+        
+        if filename.endswith("VsTemperature.pdf"):
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            sequenceResultDir=directory+'/VsTemperature'
+            if not os.path.exists(sequenceResultDir):
+                os.makedirs(sequenceResultDir)
+            #################################
+            #CREATE SEQUENCE SAVE DIRECTORY #
+            #################################
+            os.rename(file_abspath, abspath+'/VsTemperature/'+filename)
+            
+        
+    
 
 def CheckIfASpecificValueIsInData(data):
         
@@ -1176,7 +1308,27 @@ def OutputAttributes(path,plotBySequence=False):
 
     AttributesDir=path+"PrecipitatesAttributes/"
     
+    
+    
+    
+    fileMaterialCurrentCompoDir=path+"MaterialCurrentCompo/"
 
+    fileMaterialCurrentCompoName="MaterialChemicalCompo.txt"  
+    
+    
+    RF=OpenFileAndRead(fileMaterialCurrentCompoDir+fileMaterialCurrentCompoName)
+    
+    
+    K_current= array(map(float,RF[1:][:,2])) * array(map(float,RF[1:][:,3]))  # XvCu*XvMg
+    
+    
+    figAllSolvus,axAllSolvus = plt.subplots()
+    AllSolvusSaveName=path+"Results/Material/AllSolubilityCurve.pdf" 
+        
+    #Keq=AttributesDataDict["XvCuEqSS"] * AttributesDataDict["XvMgEqSS"]
+    
+    
+    
         
         
 
@@ -1255,7 +1407,7 @@ def OutputAttributes(path,plotBySequence=False):
 
                     # ListOfAttributeName[0] should be the time, or the value in X coordinate
                     for attributeToPlot,attributeToPlotData in AttributesDataDict.items():
-                        if attributeToPlot != ListOfAttributeName[0]:
+                        if attributeToPlot != ListOfAttributeName[0]: # ListOfAttributeName[0] is time
 
                             #label in Precipitate::SavePrecipitateAttributes() in file Precipitate.cpp are:
                             # time	Vf	DeltaGv	DeltaGe	NuclSiteDensity	gamma
@@ -1596,6 +1748,33 @@ def OutputAttributes(path,plotBySequence=False):
                                 ### thermal evolution : attribute Vs temperature
                                 PlotCurve(temperatureData,attributeToPlotData,saveNameTemperature,Xlabel='Temperature [K]',Ylabel=ylabel,figTitle=figtitleVsTemperature+\
                                 '\ngamma='+str(initialGamma)+'; L='+str(initialHalfSinkD), trimCurveInfo=(plotBySequence,seqInfoIndex))
+                             
+                             
+                    
+                    
+                    ## solubility product
+
+                    saveNameEquilibriumSolvus=ResultsDir+filename[:-15]+'EquilibriumSolvus'+".pdf"
+                    saveNameEquilibriumSolvusTemperature=ResultsDir+filename[:-15]+'EquilibriumSolvus'+"_VsTemperature.pdf" 
+                    saveNameEquilibriumSolvusTemperature_And_SolidSolution_solvus= ResultsDir+filename[:-15]+'EquilibriumSolvus_and_SolidSolution'+"_VsTemperature.pdf" 
+                    
+                    Keq= array(map(float,AttributesDataDict["XvCuEqSS"])) * array(map(float,AttributesDataDict["XvMgEqSS"]))
+                     ### thermal evolution : attribute Vs temperature
+                    PlotCurve(Keq,temperatureData,saveNameEquilibriumSolvusTemperature,Xlabel='Solubility product',Ylabel='Temperature [K]',figTitle='Solubility solvus of '+filename[:-15], trimCurveInfo=(plotBySequence,seqInfoIndex))
+                    # vs time                    
+                    PlotCurve(timeData, Keq,saveNameEquilibriumSolvus,Xlabel='Time [s]',Ylabel='Solubility product',figTitle='Solubility solvus of '+filename[:-15], trimCurveInfo=(plotBySequence,seqInfoIndex))
+                    
+                    
+                    # save solvus of a precipitate +  solidSolutionCurrentSolubility product
+                    figSolvusCurve, axSolvusCurve = PlotCurveGeneral(Keq,temperatureData,saveNameEquilibriumSolvusTemperature_And_SolidSolution_solvus,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Equilibrium Solubility solvus of '+filename[:-15],  returnFig=True )
+                    PlotCurveGeneral(K_current,temperatureData,saveNameEquilibriumSolvusTemperature_And_SolidSolution_solvus,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Solid solution solubility product', fig=figSolvusCurve, ax=axSolvusCurve)
+                    
+                    # save solvus of ALL precipitates +  solidSolutionCurrentSolubility product, part1
+                    figAllSolvus, axAllSolvus = PlotCurveGeneral(Keq,temperatureData,AllSolvusSaveName,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Equilibrium Solubility solvus of '+filename[:-15], fig=figAllSolvus, ax=axAllSolvus,  returnFig=True )
+    
+    # save solvus of ALL precipitates +  solidSolutionCurrentSolubility product, part2
+    PlotCurveGeneral(K_current,temperatureData,AllSolvusSaveName,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Solid solution solubility product', fig=figAllSolvus, ax=axAllSolvus)                    
+                            
                                 
                                 
     return
@@ -1607,6 +1786,38 @@ def ProcessUnfinishedComputation(path):
     OutputMaterialVacancyProperties(path)
 
 
+
+def OutputSolvus(path):
+
+    print("******* POSTPROCESSING MATERIAL CHEMICAL COMPOSITION CURVES *******")    
+    
+    ###########
+    #SAVE PATH#
+    ###########
+    ResultDir=path+"Results/Material/ChemicalComposition"
+    if not os.path.exists(ResultDir):
+        os.makedirs(ResultDir)
+    ###########
+    #SAVE PATH#
+    ###########
+
+    
+    if (path[-1]=="/"):
+        path=path
+    else:
+        path=path+"/"
+    
+    fileDir=path+"MaterialCurrentCompo/"
+
+    filename="MaterialChemicalCompo.txt"  
+    
+    
+    RF=OpenFileAndRead(fileDir+filename)
+    
+    
+    K_current= map(float,RF[1:][:,2]) * map(float,RF[1:][:,3])  # XvCu*XvMg
+    
+    Keq=AttributesDataDict["XvCuEqSS"] * AttributesDataDict["XvMgEqSS"]
 
 
 
