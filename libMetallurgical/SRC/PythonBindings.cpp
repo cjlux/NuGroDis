@@ -335,7 +335,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .def("Info", &ThermoDynamicsConstant::Info)
     ;    
 
-  boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, Material&, boost::python::optional<double> >() )
+  boost::python::class_<Vacancy>("Vacancy", boost::python::init<double, double, double, double, double, double, double, Material&,double >() )
     .add_property("vacCreationEnthalpy", &Vacancy::GetVacCreationEnthalpy, &Vacancy::SetVacCreationEnthalpy)
     .add_property("vacCreationEntropy", &Vacancy::GetVacCreationEntropy, &Vacancy::SetVacCreationEntropy)
     .add_property("migrationEnthalpy", &Vacancy::GetMigrationEnthalpy, &Vacancy::SetMigrationEnthalpy)
@@ -347,6 +347,7 @@ BOOST_PYTHON_MODULE(Metallurgical)
     .add_property("equilibriumConc", &Vacancy::GetEquilibriumConcentration)
     .def("ComputeDiffusionCoefValue", &Vacancy::ComputeDiffusionCoefValue)
     .def("ComputeEquilibriumConcentration", &Vacancy::ComputeEquilibriumConcentration)
+    .def("DefineInitialConcentration", &Vacancy::DefineInitialConcentration )
     .def("Info", &Vacancy::Info)
     ;
 

@@ -18,6 +18,8 @@ import math
 
 #ALL CONCENTRATIONS MUST BE THOSE AFTER SOLUTIONIZING
 
+
+
 AlloyInitialComposition={"Al":(96.7/100,"m^3.m^-3"),# Aluminium initial concentration, in range [0,1]
                   "Cu":(1.22/100,"m^3.m^-3"), # Copper initial concentration, in range [0,1]
                   "Mg":(2.08/100,"m^3.m^-3")# Magnesium initial concentration, in range [0,1]
@@ -40,7 +42,7 @@ VacanciesParam={
 "deltaHM":(62400,"J.mol^-1"), #Enthalpy of vacancy migration 
 "deltaSF": (17,"J.mol^-1.K^-1"), #Entropy of vacancy formation
 "fE": (10**13,"s^-1"), #Frequency of vacancy's jumps
-"halfSinkD": (30E-6,"m"), #Semi-distance between vacancy sinks
+"halfSinkD": (2.8E-6,"m"), #Semi-distance between vacancy sinks
 "Tsol": (495+273.15,"K"), #solutionazingTemp=InitialQuenching Temperature, [°K]
 #"Tsol": (495,"Celsius degree"), #solutionazingTemp=InitialQuenching Temperature, [°C]
 "coordinationNumber": (12,"")#Coordination Number, is the number of near neighbours. For Aluminium structure FCC, it is 12. 
@@ -59,22 +61,28 @@ VacanciesParam["Dlac0"]= (VacanciesParam["fE"][0]*Al["cellSize"][0]**2, Al["cell
 
 
 ##################################################   Diffusion DATA     ##########################################################
+
+#Copper ==> "EVac": (19264,"J.mol^-1")
+
+
 Cu={
              "nature":"DiffusionParam", #Important                  
 "preExpDiffusionCoef": (6.5E-5,"m^2.s^-1"), #Atomic diffusion: initial diffusion value for copper, pre-exponential diffusion coeffcient. Mandatory!               
                   "Q": (135000,"J.mol^-1"), #Atomic diffusion: Activation energy of diffusion for copper.  Mandatory!
-               "EVac": (19264,"J.mol^-1")   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!. Optional: If this parameter is not needed, user must write :==> (None,None)
+               "EVac": (None,None)   #Vacancy diffusion: Copper-Vacancy interaction energy.CHECK!. Optional: If this parameter is not needed, user must write :==> (None,None)
              
 #WARNING: all these keys are mandatory. In case of the key "Evac", If  user don't want to use it, he must give value :==> (None,None)
 #WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) .
   
 }
 
+
+# Magnesium ==> "EVac": (19264,"J.mol^-1")
 Mg={        
              "nature":"DiffusionParam", #Important  
 "preExpDiffusionCoef": (1.2E-4,"m^2.s^-1"), #initial diffusion value for magnesium, pre-exponential diffusion coeffcient                  
                   "Q": (131000,"J.mol^-1"), #Activation energy of diffusion for magnesium
-               "EVac": (19264,"J.mol^-1") #magnesium-Vacancy interaction energy, #CHECK. If this parameter is not needed, user must write :==> (None,None)
+               "EVac": (None,None) #magnesium-Vacancy interaction energy, #CHECK. If this parameter is not needed, user must write :==> (None,None)
 
 #WARNING: User must give at least AtomicDiffusion(Q & preExpDiffusionCoef) . He can also give both VacancyDiffusion(Evac) and AtomicDiffusion(Q & preExpDiffusionCoef)
 }
@@ -90,14 +98,14 @@ GP={
 "preExpTermForSolvus":(0.992,"m^6.m^-6"),  # was KP1
 "molarVolume":(1E-4 ,"m^3.mol^-1"),#volume of one mole of precipitates,
 "solvusActivationEnergy":(36000,"J.mol^-1"), # DeltaHP1
-"surfaceEnergyPolynomialModel":([0.040],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
+"surfaceEnergyPolynomialModel":([0.044],"J.m^-2"), #  for example, if degree of polynom is 3:   ([a0,a1,a2,a3],"J.m^-2")
 "shapeFactor":(0,"m.m^-1"),   #ratio between lenght to radius. If nul, shape is spherical. was alphaP
 "deltaCell":(1/100,"m.m^-1") , # difference between precipitate and solid solution cell size , was deltamailleP ( for example, = |a_ss-a_precipitate|/a_precipitate)
 #REMEMBER: At the moment, molar volume of GuinierPreston precipitates must be define by the user. But, subsequently, it can be computed automatically taking into account the structure of the precipitate.  
 }
 
 
-addGammaSprime=0
+addGammaSprime=0.
 ################################################    Sprime DATA     ##########################################################
 Sprime={
 "nature":"Sprime", #important nature can be:  "GuinierPreston" or "Sprime" . Key words can be found in MetalUtils/Grain.py PrecipitateNatureList

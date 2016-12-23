@@ -105,6 +105,8 @@ public:
   
   void SaveComputationSequenceInfo();
   
+  std::string ReturnComputationFirstSequence() {assert ((computationSequence_.size()>0)&& " Computation sequence has not been defined yet. Size is 0 !!! "); return computationSequence_[0] ;}; 
+  
   //Relations
   //setters
   void SetHardening(Hardening& hardening);

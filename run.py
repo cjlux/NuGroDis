@@ -113,10 +113,22 @@ additionalNameSave=str(additionalName)
 #######################################
 ##### SETTING RESULT DIRETORY #########
 
-#SavePath=nugrodis.savePath ##Oldversion, M.G.  thinks that this is the way things should be
 
-##Actual version
-SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave+additionalNameSave
+if ( nugrodis.savePath == None )  or (nugrodis.savePath==""):
+    
+    ## Save path is not given, so default save path will be created
+    SavePath="gamma_"+gammaGPSave+"_L_"+lSave+"_t_"+durationSave+additionalNameSave
+else:
+    # save path is given
+    SavePath=nugrodis.savePath ##Oldversion, M.G.  thinks that this is the way things should be
+
+
+print("\n\n\n")  
+print ("======================================================================================")
+print ("Computation saving directory will be : " )
+print( "< "+ SavePath + " >" )
+print ("======================================================================================")
+print("\n\n\n")
 
 ##### SETTING RESULT DIRETORY #########
 #######################################
@@ -152,6 +164,30 @@ if not os.path.exists(backUpDir):
 #read old files material_DicoCopy and nugrodis_DicoCopy
 oldMaterialPyfile=open(material+"_DicoCopy.py",'r').read()
 oldNugrodisPyfile=open("nugrodis_DicoCopy.py",'r').read()
+
+
+
+
+
+
+
+
+# Copy the content of Old 'pyfile'_DicoCopy.py files (material.py and nugrodis.py) in empty new .py files (material_save.py and nugrodis_save.py)
+
+## Create empty files material_save.py and nugrodis_save.py in Back_Up folder
+MaterialBackUpPyFile=open(backUpDir+'/'+material+'_save.py','w')
+NugrodisBackUpPyfile=open(backUpDir+'/'+'nugrodis_save.py','w')
+
+## copy values of unmodified .pyfile and write them in save file material_save.py and nugrodis_save.py
+for line in oldMaterialPyfile:
+    MaterialBackUpPyFile.write(line)
+MaterialBackUpPyFile.close()
+for line in oldNugrodisPyfile:
+   NugrodisBackUpPyfile.write(line)
+NugrodisBackUpPyfile.close()
+
+
+
 
 # =============not needed anymore?
 
@@ -453,22 +489,43 @@ CppMaterial.ConvertVolumicToInitialMassicConcentration()	# Convert and set initi
 #Reading Vacancies Parameters and Create a Cpp object Vacancy wich will be automatically setted as the material's vacancy. Remember that creating a vacancy Object  with a given material as argument, also set this vacancy as the material's vacancy
 exec "VacParam="+material+".VacanciesParam"
 print("  > Found dico VacancyParam           : ", VacParam)
+
+
+
 exec "CppVacancy = Vacancy("+material+".VacanciesParam['deltaHF'][0],\
-                 "+material+".VacanciesParam['deltaSF'][0],\
-                 "+material+".VacanciesParam['deltaHM'][0],\
-                 "+material+".VacanciesParam['fE'][0],\
-                 "+material+".VacanciesParam['Dlac0'][0],\
-                 "+material+".VacanciesParam['halfSinkD'][0],\
-                 "+material+".VacanciesParam['Tsol'][0],\
-                 CppMaterial,\
-                 "+material+".VacanciesParam.get('coordinationNumber', [0,""])[0] )"
+             "+material+".VacanciesParam['deltaSF'][0],\
+             "+material+".VacanciesParam['deltaHM'][0],\
+             "+material+".VacanciesParam['fE'][0],\
+             "+material+".VacanciesParam['Dlac0'][0],\
+             "+material+".VacanciesParam['halfSinkD'][0],\
+             "+material+".VacanciesParam['Tsol'][0],\
+             CppMaterial,\
+             "+material+".VacanciesParam.get('coordinationNumber', [0,""])[0] )"
+
+
+if FirstSequenceOfPrecipitationComputing =='ThermalLoading':
+    initialVacancyConcentration= nugrodis.ThermalLoadingParam['initialVacancyConcentration'][0]
+    
+    assert (initialVacancyConcentration>=0) , " initialVacancyConcentration in dictionary ThermalLoadingParam from file nugrodis.py cant be negative !!!"
+    
+    if (initialVacancyConcentration==0):
+        print('WARNING : Vacancy concentration at beginning of thermalLoading is 0 !!! ')
+    
+    CppVacancy.DefineInitialConcentration(initialVacancyConcentration)
+
+    
 CppVacancy.Info();
+# material+".VacanciesParam.get('coordinationNumber', [0,""])[0] )"  means, 
+# if attribute 'coordinationNumber' not exist or is 'None' in dictionary, choose [0,""] instead for value
+
 
 print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ONE')
 
 #after setting material
 #Search for DiffusionParam for solute chemicalElements ( any element different from the main chemical Element)
 #Read dictionaries which have a nature of  DiffusionParam
+
+UsingInteractionWithSoluteBooleanList=[]
 CppDiffusionDict={} # a dictionary of Chemical Elements names as keys with their C++ diffusion Objects associated. {"ChemicalElementSymbol": diffusionCppObject}
 for e in L: 
     if e[0] is not '_':
@@ -486,6 +543,7 @@ for e in L:
                 #assert ( (E.get('preExpDiffusionCoef', None)==None and E.get('Q', None)==None) or (E.get('preExpDiffusionCoef', None)!=None and E.get('Q', None)!=None) ),\
                    #    "Missing attribute  'preExpDiffusionCoef' or 'Q'  in diffusion parameter dico  <{:s}> :  {:s} ".format(e,E)#       assertion failed:  001, 010, 101,110
                 if ( E["EVac"][0]==None):
+		    UsingInteractionWithSoluteBooleanList.append(False)
                     #ONLY ATOMIC DIFFUSION, i.e. no vacancy interaction but Atomic diffusion. Therefore, appropriate C++ constructor for Diffusion must be used
                     print("  > Found diffusion parameters dico <{:s}> with ONLY atomic diffusion and NO vacancies interaction : {:s}".format(e,E))
                     print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
@@ -499,6 +557,7 @@ for e in L:
                     except (ValueError, TypeError):
                         print(" Value ==> "+E["EVac"][0]+" <== for key 'EVac' is not a numeric value , in diffusion parameters dico <{:s}>  : {:s}".format(e,E)  )
                         sys.exit(0)
+                    UsingInteractionWithSoluteBooleanList.append(True)
                     #Found Atomic Diffusion param and Vacancy diffusion param. Therefore, appropriate C++ constructor for Diffusion must be used 
                     print("  > Found diffusion parameters dico <{:s}> with atomic diffusion and  vacancies interaction energy : {:s}".format(e,E))
                     print("         > building C++ Object <Diffusion> for Chemical Element <{:s}>".format(e))
@@ -508,6 +567,16 @@ for e in L:
                                                   E["Q"][0],
                                                   E["EVac"][0])
                 CppDiffusionDict[e].Info()
+
+assert( len(UsingInteractionWithSoluteBooleanList)>0 )   , "UsingInteractionWithSoluteBooleanList lenght must be superior or equal to 1"  
+
+boolToCheck=UsingInteractionWithSoluteBooleanList[0]
+
+for usingEvacBoolean in UsingInteractionWithSoluteBooleanList:
+  assert ( usingEvacBoolean== boolToCheck), "There is a problem: maybe some chemical element have 'Evac' in 'DiffusionParam', some don't.\
+  If you are using 'Evac' all element 'DiffusionParam' must have a given value. \
+  And if you are not using 'Evac'  all elements 'DiffusionParam' must have (None,None) as given param."
+ 
 print("  > C++ Diffusion Objects Dictionary = ",CppDiffusionDict)
 
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& TWO") 

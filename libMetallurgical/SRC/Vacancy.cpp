@@ -23,10 +23,10 @@
 #include "Concentration.hpp"
 #include "ChemicalComposition.hpp"
 
-Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb)
+Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb )
   : vacCreationEnthalpy_(deltaHF), 
     vacCreationEntropy_(deltaSF), 
-    concentration_(0), 
+    concentration_(0.), 
     concentrationBeforeQuenching_(0), 
     halfSinkDistance_(halfSinkD), 
     jumpFrequency_(fE), 
@@ -36,6 +36,7 @@ Vacancy::Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double D
     coordinationNumber_(coordNb),
     vacancyDiffusionCoef_(0),
     equilibriumConc_(0),
+    initialConcentrationHasBeenDefined_(false),
     material_(mat),
     soluteInteractingWithVacList_()
     
@@ -137,13 +138,19 @@ Vacancy::ComputeEquilibriumConcentration()
 // }
 
 
-
+//// WARNING if you change Vacancy::ReturnAlpha, remember to also change Vacancy::ReturnConcentrationBeforeQuenching()
 //return alpha  where alpha is used to compute equilibrium conc. equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
 const double 
 Vacancy::ReturnAlpha(double Temperature) const
 {
+  //// WARNING if you change Vacancy::ReturnAlpha, remember to also change Vacancy::ReturnConcentrationBeforeQuenching()
+  
   double R=ThermoDynamicsConstant::GetR();
   double sum_alpha_i=0.;
+  
+  bool UsingInteractionWithSolute=false;
+  
+  
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
   {
     std::string elementName = (*i)->GetElementName();
@@ -155,26 +162,50 @@ Vacancy::ReturnAlpha(double Temperature) const
     
     if (usingEvac==true)
     {
+      std::cout<<" Using interaction energy with vacancy"<<std::endl;
       Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+      UsingInteractionWithSolute=true;
+      
+      std::cout<<" Chemical Element <"<<elementName<<">"<<std::endl;
+      std::cout<<"  Atomic concentration : "<<atomicConc<<std::endl;
+      std::cout<<"  Vacancy interaction energy (Evac) : "<<Evac<<std::endl;
+      std::cout<<"  Coordination Number : "<<coordinationNumber_<<std::endl;
     }
     else
     {
+      std::cout<<" Not using interaction energy with vacancy"<<std::endl;
       Evac=0. ;
       //TODO check what is correct between 1. and 0. .Isnt it 0. ? 0 to make sum_alpha_i=0 and then alpha=1
     };
     
+   
     sum_alpha_i += coordinationNumber_*atomicConc*( -1. + std::exp(Evac/(R*Temperature)) );  // sum of i=1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
-      /*DEBUG*/ std::cout<<" TOPO TOPO atomicConc "<<atomicConc<<std::endl;
-      /*DEBUG*/ std::cout<<" TOPO TOPO Evac "<<Evac<<std::endl;
-      /*DEBUG*/ std::cout<<" TOPO TOPO coordinationNumber_ "<<coordinationNumber_<<std::endl;
+
   }
-  /*DEBUG*/ std::cout<<" TOPA sum_alpha_i "<<sum_alpha_i<<std::endl;
   
+  
+ 
+  
+  double alpha= 1. + sum_alpha_i;
+  
+  if (UsingInteractionWithSolute==true)
+  {
+    /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
+    /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
+  }
+  else
+  {
+    assert((alpha==1.)&&"There is a problem here because if alpha you are not using interaction with solute!");
     
-    //TODO alpha
-    double alpha= 1. + sum_alpha_i;
+    std::cout<<"Not using interaction between solutes and vacancy"<<std::endl;   
+  };
     
-    return alpha;
+    
+    
+    
+  //// WARNING if you change Vacancy::ReturnAlpha, remember to also change Vacancy::ReturnConcentrationBeforeQuenching()
+    
+  return alpha;
   
 }
 
@@ -247,17 +278,25 @@ Vacancy::ReturnEquilibriumConcentration() const
 
 }
 
+
+//// WARNING if you change Vacancy::ReturnConcentrationBeforeQuenching() remember to also change  Vacancy::ReturnAlpha,
 double 
 Vacancy::ReturnConcentrationBeforeQuenching()
 {
   
+   //// WARNING if you change Vacancy::ReturnConcentrationBeforeQuenching() remember to also change  Vacancy::ReturnAlpha,
+  
   double R=ThermoDynamicsConstant::GetR();
   double Xlacavtrempe;
+  
+  
   
   ///// compute alpha, for initial concentration values and T=solutionizing Temp  /////
   std::cout<<"In Vacancy::ReturnConcentrationBeforeQuenching()\n";
   double sum_alpha_i=0.;
   std::map<std::string, Concentration*> initialConcMap=material_.GetInitialChemicalComposition().GetConcentrationMap();
+  
+  bool UsingInteractionWithSolute=false;
   
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteInteractingWithVacList_.begin(); i != soluteInteractingWithVacList_.end(); ++i)
   {
@@ -270,6 +309,12 @@ Vacancy::ReturnConcentrationBeforeQuenching()
     {
       std::cout<<" Using interaction energy with vacancy"<<std::endl;
       Evac= (*i)->GetDiffusion().GetInteractionEnergyWithVacancy();
+      UsingInteractionWithSolute=true;
+      
+      std::cout<<" Chemical Element <"<<elementName<<">"<<std::endl;
+      std::cout<<"  Atomic concentration : "<<initialAtomicConc<<std::endl;
+      std::cout<<"  Vacancy interaction energy (Evac) : "<<Evac<<std::endl;
+      std::cout<<"  Coordination Number : "<<coordinationNumber_<<std::endl;
     }
     else
     {
@@ -280,14 +325,24 @@ Vacancy::ReturnConcentrationBeforeQuenching()
     
     sum_alpha_i += coordinationNumber_*initialAtomicConc*( -1. + std::exp(Evac/(R*solutionisingTemp_)) );  // sum of i= 1 to number of solute,  z_i*Cb_i*(-1 +exp(Q_i/(R*T))
     
-    std::cout<<" Chemical Element <"<<elementName<<">"<<std::endl;
-    std::cout<<"  Initial Atomic concentration : "<<initialAtomicConc<<std::endl;
-    std::cout<<"  Vacancy interaction energy : "<<Evac<<std::endl;
-    std::cout<<"  Coordination Number : "<<coordinationNumber_<<std::endl;
   }
-  /*DEBUG*/ std::cout<<" sum_alpha_i :"<<sum_alpha_i<<std::endl;
+  
   
   const double alpha= 1. + sum_alpha_i;
+  if (UsingInteractionWithSolute==true)
+  {
+    /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
+    /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
+  }
+  else
+  {
+    assert((alpha==1.)&&"There is a problem here because if alpha you are not using interaction with solute!");
+    
+    std::cout<<"Not using interaction between solutes and vacancy"<<std::endl;   
+  };
+    
+  
+  
   ///////////////////////
   
   
@@ -302,6 +357,9 @@ Vacancy::ReturnConcentrationBeforeQuenching()
   
   
   assert(Xlacavtrempe>0);
+  
+  
+  //// WARNING if you change Vacancy::ReturnConcentrationBeforeQuenching() remember to also change  Vacancy::ReturnAlpha,
   
   return Xlacavtrempe;
 }
@@ -369,7 +427,7 @@ Vacancy::ComputeCurrentConcentrationFromAnalyticalSolution(double duration, doub
 double 
 Vacancy::GetConcentrationBeforeQuenching() const
 {
-  assert ((concentrationBeforeQuenching_>0)&&"Cocentration befoe quenching has not been computed yet");
+  assert ((concentrationBeforeQuenching_>0)&&"Concentration before quenching has not been computed yet");
   return concentrationBeforeQuenching_;
 }
 

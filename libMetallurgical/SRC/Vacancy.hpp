@@ -20,6 +20,9 @@
 #include <vector>
 #include <cassert>
 
+#include "Computation.hpp"
+#include "Material.hpp"
+
 class Material; 
 class ChemicalElement;
 
@@ -29,7 +32,7 @@ class Vacancy
 public:
 
     //The constructor
-    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb=0);
+    Vacancy(double deltaHF,double deltaSF,double deltaHM,double fE,double Dlac0,double halfSinkD,double Tf, Material &mat,double coordNb );
     
     ~Vacancy();
     
@@ -110,6 +113,9 @@ public:
     void SetVacancyDiffusionCoef(const double);
     
     
+    void DefineInitialConcentration(double initialConcentration) ;
+    
+    
     
     
    //RELATIONS
@@ -149,6 +155,8 @@ private:
     //equilibium concentration of vacancies for the current temperature (was Xlaceq)
     double equilibriumConc_;
     
+    bool initialConcentrationHasBeenDefined_;
+    
     
     //RELATIONS
     const Material& material_;
@@ -177,6 +185,11 @@ Vacancy::ReturnBoostFactor() const
   /*DEBUG*/std::cout<<" }}}***************************Xlac***************************}}} "<< concentration_<<std::endl;
   /*DEBUG*/std::cout<<" }}}***************************XlacEq***************************}}} "<< equilibriumConc_<<std::endl;
    std::cout<<"########## END Vacancy::ReturnBoostFactor()"<<std::endl;
+   
+   
+   
+
+   
   
   return lambda;
 }
@@ -200,6 +213,8 @@ Vacancy::SetConcentrationAfterHardening(double C)
 inline void
 Vacancy::SetConcentrationBeforeQuenching(const double cBQ)
 {
+  
+  assert(!"not implemented yet. Maybe not usefull !!!");
   concentrationBeforeQuenching_=cBQ;
 }
 
@@ -304,6 +319,29 @@ Vacancy::GetPreExpDiffusionValue() const
 {
   return preExpDiffusionValue_;
 }
+
+
+
+
+
+inline void 
+Vacancy::DefineInitialConcentration(double initialConcentration)
+{
+  assert ( (initialConcentrationHasBeenDefined_==false) && "Initial concentration of vacancy has already been defined !!!");
+  
+  double curentComputationTime = material_.GetComputation().GetCurrentTime();
+  
+  assert ( (curentComputationTime==0) && "initial concentration of vacancy can be defined only at the beginning of computation , t=0 ");
+  
+  concentration_= initialConcentration;
+  
+  initialConcentrationHasBeenDefined_=true;
+  
+}
+
+
+
+
 
 
 //RELATIONS

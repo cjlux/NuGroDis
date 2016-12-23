@@ -914,6 +914,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	  
 	  
 	  rightRadius=this->GetRightRadiusForClass(classId) ;
+	  
 	
 	  f=K*std::exp(-DeltaH/(R*T))*std::exp( 4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius) + DeltaGe*Vm/(R*T)) ;
 	  
@@ -957,8 +958,8 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	    
 	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n"; 
 	    /*DEBUG */std::cout<<"X is "<<X<<" Y is "<<Y<<"\n"; 
-	    assert (X!=0);
-	    assert(Y!=0);
+	    assert (X>0);
+	    assert(Y>0);
 	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetRightInterfacialConcValueForClass(X, classId);
 	    this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).SetRightInterfacialConcValueForClass(Y, classId);
 	  };

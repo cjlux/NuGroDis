@@ -152,6 +152,27 @@ Material::RunProcess()
   
   vacancy_->ComputeConcentrationBeforeQuenching(); // initializing the concentration before quenching
   
+  
+  std::string computationFirstSequence = computation_.ReturnComputationFirstSequence();
+  
+  ///////////////////////////////////////////////////////////////////////
+  ///////////// define initial concentration of Vacancy /////////////////
+  
+  if (computationFirstSequence== "Hardening" )
+  {
+    double concentrationBeforeQuenching = vacancy_->GetConcentrationBeforeQuenching();
+    vacancy_->DefineInitialConcentration(concentrationBeforeQuenching);
+  };
+  
+  if (computationFirstSequence== "Quenching" )
+  {
+    // Define initial concentration of at the beginning of Quenching
+    assert (!"This case has not been implemented yet");
+  };
+  
+  ///////////// define initial concentration of Vacancy /////////////////
+  ///////////////////////////////////////////////////////////////////////
+  
   assert (currentTime==0);
   
   
@@ -191,7 +212,7 @@ Material::RunProcess()
     
     this->ComputePrecipitatesInterfacialVelocityList();
       
-    this->ComputeCriticalInterfacialConcentration();
+    // this->ComputeCriticalInterfacialConcentration(); //Critical interfacial concentration is not needed here, CHECK to be sure !
       
     this->ProcessComputationMaxTimeStep();
     
@@ -358,6 +379,7 @@ Material::RunProcess()
 
 
 
+
 void Material::UpdateAtomicDiffusionCoef()
 {
   std::cout<<"\n";
@@ -375,20 +397,70 @@ void Material::UpdateAtomicDiffusionCoef()
   */
   
   
-  if ( computation_.GetCurrentSequenceType() == "Hardening" )
+  
+  double CurrentVacancyConcentrationWichIsComputedAtPreviousTimeStep =  vacancy_->GetConcentration();
+  
+  double dt=0; // dt =  ( t_i - t_(i-1) ) , ie the last value of timeStep , ie the timeStep used to compute the current time , ie the timeStep computed at the end of the previous incrementation !!! 
+  
+  
+  if (computation_.GetCurrentTime()==0)
+  {
+    dt = 0; // because we are at the begining of the computation, no timeStep has been used to find the current time which is equal to 0 second.
+  }
+  else
+  {
+    
+    //equal the timeStep used to compute the current time , ie the timeStep computed at the end of the previous incrementation !!!  dt =  ( t_i - t_(i-1) )
+    
+    dt = computation_.GetMaxTimeStep() ;// because the timeStep must have been (allways) computed at the end of the previous iteration !!!   
+  };
+  
+
+  // miw way, between old way, and new way. Normally, after Testinf new way, we should use new way.
+  if ( (computation_.GetCurrentSequenceType() == "Hardening" ) &&  (computation_.ReturnComputationFirstSequence() == "Hardening") )
   {
     std::cout << "MaterialGetConcentrationBeforeQuenching()  " << vacancy_->GetConcentrationBeforeQuenching() << std::endl;
     vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
   }
   else if ( computation_.GetCurrentSequenceType() == "ThermalLoading" )
   {
-    double vacancyCurrentConcentrationAtBeginningOfTimeStep =  vacancy_->GetConcentration();
-    vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetMaxTimeStep(), vacancyCurrentConcentrationAtBeginningOfTimeStep);
+    vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(dt, CurrentVacancyConcentrationWichIsComputedAtPreviousTimeStep);
   }
   else
   {
     assert (!"This case is not implemented yet");
-  };
+  }
+  
+    
+
+///////// new way, the way it should be. IN TEST for now  
+//   if ( computation_.GetCurrentSequenceType() == "Hardening" || computation_.GetCurrentSequenceType() == "ThermalLoading" )
+//   {
+//     vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(dt, CurrentVacancyConcentrationWichIsComputedAtPreviousTimeStep);
+//   }
+//   else
+//   {
+//     assert (!"This case is not implemented yet");
+//   }
+///////////////
+  
+  
+
+// Old way, wich is like in v21.7  
+//   if ( computation_.GetCurrentSequenceType() == "Hardening" )
+//   {
+//     std::cout << "MaterialGetConcentrationBeforeQuenching()  " << vacancy_->GetConcentrationBeforeQuenching() << std::endl;
+//     vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(computation_.GetCurrentTime(), vacancy_->GetConcentrationBeforeQuenching());
+//   }
+//   else if ( computation_.GetCurrentSequenceType() == "ThermalLoading" )
+//   {
+//     vacancy_->ComputeCurrentConcentrationFromAnalyticalSolution(dt, CurrentVacancyConcentrationWichIsComputedAtPreviousTimeStep);
+//   }
+//   else
+//   {
+//     assert (!"This case is not implemented yet");
+//   };
+  
   
   for( std::vector<const ChemicalElement*>::const_iterator i = soluteList_.begin(); i != soluteList_.end(); ++i)
   {

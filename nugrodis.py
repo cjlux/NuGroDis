@@ -12,9 +12,23 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 NuGroDisVersion="1.0"
 
-savePath=""
 
-ComputationParam={            "Type": "Hardening>ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
+#savePath=None  or savePath=""
+
+#savePath="Tk1_NoHardeningBefore_L_hardening3.5e-6_L_thermalLoading_3.5e-6_gammaGP_0.0315_gammaSprime_Origin_withVacancyConcentrationAfterHardening_new" # if it None or "", it means default save path
+
+#savePath="Hardening200000_TK1_gammaGP3.5e-6_gammaSprime_Origin_new" # if it None or "", it means default save path
+
+# NotInteractionWith_Hardening_200000_gammaGP0.0485_L3.5_NotInteractionWithSolute
+
+# "NotInteractionWith_ThermalLoadingTK1_200000_gammaGP0.048_L4_NotInteractionWithSolute_SprimeGamma_origin"
+
+
+# NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute
+
+savePath= "NotInteractionWith_ThermalLoadingTK1_gammaGP0.044_L2.8_NotInteractionWithSolute_SprimeGamma_origin"
+
+ComputationParam={            "Type": "ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
                           "Material": "M2024",
                   "initialTimeStep" : (1,"s") #default Time step for the first iteration 
@@ -35,8 +49,8 @@ QuenchingParam={
 }
 
 HardeningParam={
-"duration": (1000,"s"), # hardening duration
-"temperature": (293.15,"K") #hardening temperature
+"duration": (200000,"s"), # hardening duration
+"temperature": (293.15,"K") #hardening temperature  #296.39 is Tk1_T0, ie , T0_TK1 = 296.39
 #"initialClassNumber" : (20, "") # Initial number for hardening radiusDistribution Class , unitless.
 #"initialClassNumber" : (117, "") # Initial number for hardening radiusDistribution Class , unitless. 
 }
@@ -59,9 +73,17 @@ ThermalLoadingParam={
 
 ##### Just For example #########
 "loadProfile": (dir_path+"/fichiers_Temperature/39.5mm_axis_advancing side_CSV_KELVIN","csv"),
-"loadGuinierPrestonDistribution": (None,None),
-"loadSprimeDistribution": (None,None),
-"maximumTimeStep": (1,"s") #the maximum time step allowed during the thermalLoading
+"loadGuinierPrestonDistribution": (dir_path+'/NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute__Tue_Nov_22_17hr_27min_50s_2016/RadDisFiles/GuinierPreston/RadDis_time_200000_','txt'),
+"loadSprimeDistribution": (dir_path+'/NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute__Tue_Nov_22_17hr_27min_50s_2016/RadDisFiles/Sprime/RadDis_time_200000_','txt'),
+"maximumTimeStep": (1,"s"), #the maximum time step allowed during the thermalLoading
+"initialVacancyConcentration": (1.03806E-12,"SI") # to have lambda=1, because XlacEq = 1.03806E-12 , at end of  293.15 K
+
+
+#"initialVacancyConcentration": (1.43089e-07,"SI") # can be vacancy concentration at end of hardening or quenching
+#                                                 # is usefull when thermalLoading is the first sequence
+
+
+#"initialVacancyConcentration": (1.03806E-12,"SI") # to have lambda=1, because XlacEq = 1.03806E-12 , at end of  293.15 K
 }
 
 #initialRadiusDistribution={
