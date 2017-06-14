@@ -125,14 +125,14 @@ public:
     Material& GetMaterial() const ;
     Material* GetMaterialPointer() const 
     {
-      /*test*/std::cout<<"In GetMaterialPointer of CC, material pointer is "<<materialPointer_<<std::endl;
+//       /*test*/ /*debug*/std::cout<<"In GetMaterialPointer of CC, material pointer is "<<materialPointer_<<std::endl;
       return materialPointer_;
     };
     
     Grain& GetGrain() const;
     Grain* GetGrainPointer() //TODO reput const==>  Grain* GetGrainPointer() const
     {
-      /*test*/std::cout<<"In GetGrainPointer of CC, grain pointer is "<<grainPointer_<<std::endl;
+//       /*test*/ /*debug*/std::cout<<"In GetGrainPointer of CC, grain pointer is "<<grainPointer_<<std::endl;
         
       /*
       //TEST begin
@@ -247,7 +247,7 @@ ChemicalComposition::GetGrain() const
   assert( (grainPointer_!=0)&&"In ChemicalComposition: Cannnot Get Grain object  because chemical composition does\
   not belongs to any Grain (pointer is 0) " ); 
   
-  /*test*/std::cout<<"In GetGrain of CC, grain pointer is "<<grainPointer_<<std::endl;
+//   /*test*/ /*debug*/ std::cout<<"In GetGrain of CC, grain pointer is "<<grainPointer_<<std::endl;
   
   
     return *grainPointer_;   
@@ -259,7 +259,7 @@ ChemicalComposition::GetMaterial() const
   assert( (materialPointer_!=0)&&"In ChemicalComposition: Cannnot Get Material object  because chemical composition does\
   not belongs to any material (pointer is 0) " ); 
   
-  /*test*/std::cout<<"In GetMaterial of CC, material object adress is "<<&(*materialPointer_)<<std::endl;
+//   /*test*/ /*debug*/std::cout<<"In GetMaterial of CC, material object adress is "<<&(*materialPointer_)<<std::endl;
     return *materialPointer_; 
 
 }

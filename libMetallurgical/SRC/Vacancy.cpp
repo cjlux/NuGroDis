@@ -90,7 +90,7 @@ Vacancy::ComputeEquilibriumConcentration()
       std::cout<<"Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl;
   equilibriumConc_=this->ReturnEquilibriumConcentration();
   
-  /*DEBUG */std::cout<<"Equilibrium concentration for vacancy is"<<equilibriumConc_<<"\n";
+//   /*DEBUG */std::cout<<"Equilibrium concentration for vacancy is"<<equilibriumConc_<<"\n";
   std::cout<<"##########  END Vacancy::ComputeEquilibriumConcentration() ==> Computing Equilibrium concentration"<<std::endl; 
   
 
@@ -158,7 +158,7 @@ Vacancy::ReturnAlpha(double Temperature) const
     const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
     double Evac=0.;
     
-    /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
+//     /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
     
     if (usingEvac==true)
     {
@@ -190,8 +190,10 @@ Vacancy::ReturnAlpha(double Temperature) const
   
   if (UsingInteractionWithSolute==true)
   {
-    /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
-    /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
+    /*DEBUG*/ std::cout<<" You are using UsingInteractionWithSolute (UsingInteractionWithSolute=True) "<<std::endl;
+    
+//     /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
+//     /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
   }
   else
   {
@@ -269,8 +271,7 @@ Vacancy::ReturnEquilibriumConcentration() const
   double equilibriumConcValue=alpha*std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T));
   assert ( (equilibriumConcValue>0)&&"In ReturnEquilibriumConcentration: Returned value is not positive");
   
-  /*DEBUG*/ std::cout<<" TOPO TOPO std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T)) "<<std::exp(vacCreationEntropy_/R - vacCreationEnthalpy_/(R*T))<<std::endl;
-  /*DEBUG*/ std::cout<<" TOPO TOPO vacCreationEntropy_   "<<vacCreationEntropy_<<"R "<<R<<"T "<<T<<" vacCreationEnthalpy_ "<<vacCreationEnthalpy_<<  std::endl;
+  
   std::cout<<"############ equilibriumConcValue = "<<equilibriumConcValue<<std::endl;
   std::cout<<"################## END  Vacancy::ReturnEquilibriumConcentration() "<<std::endl;
 
@@ -304,7 +305,7 @@ Vacancy::ReturnConcentrationBeforeQuenching()
     double initialAtomicConc = initialConcMap[elementName]->GetInitialAtomicValue();
     const bool usingEvac= ! ((*i)->GetDiffusion().AssertInteractionEnergyWithVacancyValue(-2) );//Evac is interaction with vacancy. Also remember that -2 means unused. Do not change -2!!!
     double Evac=0.;
-    /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
+//     /*DEBUG*/ std::cout<<" usingEvac "<<usingEvac<<std::endl;
     if (usingEvac==true)
     {
       std::cout<<" Using interaction energy with vacancy"<<std::endl;
@@ -331,8 +332,9 @@ Vacancy::ReturnConcentrationBeforeQuenching()
   const double alpha= 1. + sum_alpha_i;
   if (UsingInteractionWithSolute==true)
   {
-    /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
-    /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
+    /*DEBUG*/ std::cout<<" You are using UsingInteractionWithSolute (UsingInteractionWithSolute=True) "<<std::endl;
+//     /*DEBUG*/ std::cout<<" sum_alpha_i "<<sum_alpha_i<<std::endl;
+//     /*DEBUG*/ std::cout<<" alpha "<<alpha<<std::endl;
   }
   else
   {
@@ -396,20 +398,20 @@ Vacancy::ReturnCurrentConcentrationFromAnalyticalSolution(double duration, doubl
   
   double Tau=std::pow( halfSinkDistance_/2/M_PI ,2)/vacancyDiffusionCoef_;
   
-  /*DEBUG*/ std::cout<<"Tau "<<Tau << std::endl;
-  /*DEBUG*/ std::cout<<"halfSinkDistance_ "<<halfSinkDistance_ << std::endl;
-  /*DEBUG*/ std::cout<<"vacancyDiffusionCoef_ "<<vacancyDiffusionCoef_ << std::endl;
+//   /*DEBUG*/ std::cout<<"Tau "<<Tau << std::endl;
+//   /*DEBUG*/ std::cout<<"halfSinkDistance_ "<<halfSinkDistance_ << std::endl;
+//   /*DEBUG*/ std::cout<<"vacancyDiffusionCoef_ "<<vacancyDiffusionCoef_ << std::endl;
   
   assert ( (equilibriumConc_!=0)&&"In ReturnCurrentConcentrationFromAnalyticalSolution: equilibriumConc_ must\
   be different from 0 . It has not been computed yet!");
   
   double Xlac=(initialEquilibriumConc-equilibriumConc_)*std::exp(-duration/Tau) + equilibriumConc_;
   
-  /*DEBUG*/ std::cout<<"initialEquilibriumConc is "<<initialEquilibriumConc << std::endl;
-  /*DEBUG*/ std::cout<<"equilibriumConc_ is "<<equilibriumConc_ << std::endl;
-  /*DEBUG*/ std::cout<<"duration is "<<duration << std::endl;
-  /*DEBUG*/ std::cout<<"Tau is "<<Tau << std::endl;
-  /*DEBUG*/ std::cout<<"Xlac is "<<Xlac << std::endl;
+//   /*DEBUG*/ std::cout<<"initialEquilibriumConc is "<<initialEquilibriumConc << std::endl;
+//   /*DEBUG*/ std::cout<<"equilibriumConc_ is "<<equilibriumConc_ << std::endl;
+//   /*DEBUG*/ std::cout<<"duration is "<<duration << std::endl;
+//   /*DEBUG*/ std::cout<<"Tau is "<<Tau << std::endl;
+//   /*DEBUG*/ std::cout<<"Xlac is "<<Xlac << std::endl;
   
   return Xlac;
 }

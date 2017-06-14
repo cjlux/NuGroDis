@@ -77,7 +77,7 @@ def GetEquilibriumSolvusDicos(path):
     
     
 
-    T=linspace(273.15,273.15+500, 10000)
+    T=np.linspace(273.15,273.15+500, 10000)
     R= 8.314472
     
     precipitateSolvusDico={}
@@ -92,7 +92,7 @@ def GetEquilibriumSolvusDicos(path):
                     precipitateSolvusDico["GuinierPrestonDico"]= {}
                     precipitateSolvusDico["GuinierPrestonDico"]["K0"]= K0_GP
                     precipitateSolvusDico["GuinierPrestonDico"]["deltaH"]=deltaH_GP
-                    Keq= K0_GP*exp(-deltaH_GP/(R*T))
+                    Keq= K0_GP*np.exp(-deltaH_GP/(R*T))
                     precipitateSolvusDico["GuinierPrestonDico"]["tuple_Keq_T"]=(Keq,T)
                     
                 if nature == "Sprime":
@@ -101,7 +101,7 @@ def GetEquilibriumSolvusDicos(path):
                     precipitateSolvusDico["SprimeDico"]= {}
                     precipitateSolvusDico["SprimeDico"]["K0"]= K0_Sprime
                     precipitateSolvusDico["SprimeDico"]["deltaH"]=deltaH_Sprime    
-                    Keq= K0_Sprime*exp(-deltaH_Sprime/(R*T))
+                    Keq= K0_Sprime*np.exp(-deltaH_Sprime/(R*T))
                     precipitateSolvusDico["SprimeDico"]["tuple_Keq_T"]= (Keq,T)
       
 

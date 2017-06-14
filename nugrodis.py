@@ -26,7 +26,11 @@ NuGroDisVersion="1.0"
 
 # NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute
 
-savePath= "NotInteractionWith_ThermalLoadingTK1_gammaGP0.044_L2.8_NotInteractionWithSolute_SprimeGamma_origin"
+
+#savePath= "NotInteractionWith_ThermalLoadingTK1_gammaGP0.044_L2.8_NotInteractionWithSolute_SprimeGamma_origin"
+
+
+savePath="VALIDATION_TESTS/cycle_218_start_at_20/"
 
 ComputationParam={            "Type": "ThermalLoading", #Quenching,Hardening,ThermalLoading or mix(example: Quenching>Hardening)
                                                  #Hardening=maturation or tempering
@@ -72,7 +76,7 @@ ThermalLoadingParam={
 #Do not forget to compute lenght,duration, ... after reading file NP1,NP2, TK1
 
 ##### Just For example #########
-"loadProfile": (dir_path+"/fichiers_Temperature/39.5mm_axis_advancing side_CSV_KELVIN","csv"),
+"loadProfile": (dir_path+"/fichiers_Temperature/cycle_218C_convertInKelvin_startAt20","csv"),
 "loadGuinierPrestonDistribution": (dir_path+'/NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute__Tue_Nov_22_17hr_27min_50s_2016/RadDisFiles/GuinierPreston/RadDis_time_200000_','txt'),
 "loadSprimeDistribution": (dir_path+'/NotInteractionWith_Hardening_200000_gammaGP0.044_L2.8_NotInteractionWithSolute__Tue_Nov_22_17hr_27min_50s_2016/RadDisFiles/Sprime/RadDis_time_200000_','txt'),
 "maximumTimeStep": (1,"s"), #the maximum time step allowed during the thermalLoading

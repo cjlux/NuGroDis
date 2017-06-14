@@ -40,7 +40,7 @@ ChemicalElement::ChemicalElement(double density,
    diffusion_(0)
 {
   std::cout <<  "building an ChemicalElement Object <" << elementName_<<"> which has no diffusion parameters" << std::endl;
-  /*debug*/std::cout <<  "In Chemical Elemnt constructor. Adress of ChemElem is" << this<<"> which has no diffusion parameters" << std::endl;
+//   /*debug*/std::cout <<  "In Chemical Elemnt constructor. Adress of ChemElem is" << this<<"> which has no diffusion parameters" << std::endl;
   std::cout <<  std::endl;
 }
 

@@ -101,7 +101,7 @@ RadiusDistribution::AddEmptyClass()
   itemsValues_.push_back(0);
   assert (itemsValues_.size()== n+1. );
   
-  std::cout<<" Radius distribution class number is now ["<<itemsValues_.size()<<"]. It was ["<<n<<"]"<<std::endl;
+//   /*debug*/std::cout<<" Radius distribution class number is now ["<<itemsValues_.size()<<"]. It was ["<<n<<"]"<<std::endl;
   
   
   /*
@@ -127,7 +127,7 @@ RadiusDistribution::AddEmptyClass()
   std::map<std::string , InterfacialConcentration*>::iterator it;
   for (it=interfConcentrationObjectMap_.begin(); it!=interfConcentrationObjectMap_.end(); ++it )
   {
-    std::cout<<"Incrementing with empty value the InterfacialConcentration Object for Element "<<it->first<<";InterfacialConcentration Object Adress is :"<<it->second<<std::endl;
+//     /*debug*/std::cout<<"Incrementing with empty value the InterfacialConcentration Object for Element "<<it->first<<";InterfacialConcentration Object Adress is :"<<it->second<<std::endl;
     it->second->IncrementWithEmptyValues();
   }
   
@@ -508,7 +508,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
   
   if (nbOfSol==2)
   {
-    std::cout<<"DEBUG solution1= "<<solution1<<" ; solution2 ="<<solution2<<std::endl;
+//     std::cout<<"DEBUG solution1= "<<solution1<<" ; solution2 ="<<solution2<<std::endl;
     if ( (solution1.real())==0 && (solution2.real())==0 )
       assert("Error: No solutions , X=Y=0 ");
     if ( solution1.real()*solution2.real()<0 )
@@ -548,7 +548,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
       }
       else
       {
-	/*DEBUG*/std::cout<<" solution1.real() "<<solution1.real()<<" solution2.real() "<<solution2.real()<< "XvPi "<<XvPi<<std::endl;
+// 	/*DEBUG*/std::cout<<" solution1.real() "<<solution1.real()<<" solution2.real() "<<solution2.real()<< "XvPi "<<XvPi<<std::endl;
 	std::cout<<" There is no solutions. The 2 roots are not in the range 0 to XvPi ]0;"<< XvPi<<"]"<<std::endl;
 	
 	//assert (!("TO DO. case 4: This case has not been implemented yet"));
@@ -569,8 +569,8 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	assert( X > 0);
 	assert( X < XvPi);
 	
-	/*DEBUG:*/std::cout<<"DEBUG: Value Found using discriminant is"<<X<<"\n";
-	/*DEBUG*/std::cout<<" P(X) with discriminant= "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+// 	/*DEBUG:*/std::cout<<"DEBUG: Value Found using discriminant is"<<X<<"\n";
+// 	/*DEBUG*/std::cout<<" P(X) with discriminant= "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
 	////////////// Use dichotomous ////////////// 
 	
 	
@@ -620,7 +620,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	assert( X != -constantD/constantC );// because denominator of Y must be different from 0
 	//Y = (constantA*X +constantB)/(constantC*X +constantD);  
 	Y=f/X;
-	/*DEBUG*/std::cout<<"DEBUG if Y = (AX+B)/(CX+D) then Y= "<< (constantA*X + constantB)/(constantC*X + constantD)<<"\n";
+// 	/*DEBUG*/std::cout<<"DEBUG if Y = (AX+B)/(CX+D) then Y= "<< (constantA*X + constantB)/(constantC*X + constantD)<<"\n";
 	assert ( (Y!=-1 )&&"Solution Y may have not been computed" );
 	
 	
@@ -645,13 +645,13 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	{
 	  assert( Y>0);
 	  assert( Y < XvPj);
-	  std::cout<<"value solution X is: "<<X<<std::endl;
-	  std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
-	  std::cout<<"value solution Y is: "<<Y<<std::endl;
-	  std::cout<<"X*Y = : "<<X*Y<<std::endl;
-	  std::cout<<"f = : "<<f<<std::endl;
-	  std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
-	  std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+// 	  /*DEBUG:*/std::cout<<"value solution X is: "<<X<<std::endl;
+// 	  /*DEBUG:*/std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+// 	  /*DEBUG:*/std::cout<<"value solution Y is: "<<Y<<std::endl;
+// 	  /*DEBUG:*/std::cout<<"X*Y = : "<<X*Y<<std::endl;
+// 	  /*DEBUG:*/std::cout<<"f = : "<<f<<std::endl;
+// 	  /*DEBUG:*/std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+// 	  /*DEBUG:*/std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
 	  
 	  
 	  ////////
@@ -674,6 +674,10 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  if (Eq2precision > epsilonEq2)
 	  {
 	    std::cout <<"Using dichotomous for Equation 2 \n";
+	    
+	    
+	    //////////////////////////////////////////////////////////////
+	    /////// begin: dichotomous method for equation 2 /////////////
 	    double f1left, f1right, f_left, f_right, half, f_half, solutionToImprove,rightValue, leftValue;
 	    
 	    double dichotomousSolutionPrecision= 1.e-16;
@@ -708,16 +712,18 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	    }
 	    
 	    solutionToImprove= f1left;
+	    /////// end: dichotomous method for equation 2 /////////////
+	    ///////////////////////////////////////////////////////////
 	    
-	    std::cout<<"f1left "<<f1left<< " f1right "<< f1right << std::endl;
+// 	    /*DEBUG:*/std::cout<<"f1left "<<f1left<< " f1right "<< f1right << std::endl;
+// 	    
+// 	    /*DEBUG:*/std::cout<< "(XvSSi-X)/(XvPi-X) "<< (XvSSi-X)/(XvPi-X)<<std::endl;
+// 	    
+// 	    /*DEBUG:*/std::cout<< "DjOverDi*(XvSSj-f1right)/(XvPj-f1right) "<< DjOverDi*(XvSSj-f1right)/(XvPj-f1right)<<std::endl;
+// 	    /*DEBUG:*/std::cout<< "DjOverDi*(XvSSj-f1left)/(XvPj-f1left) "<<   DjOverDi*(XvSSj-f1left)/(XvPj-f1left)<<std::endl;
+// 	    /*DEBUG:*/std::cout<< "precipitate type "<< precipitate_->GetPrecipitateType()<<std::endl;
 	    
-	    std::cout<< "(XvSSi-X)/(XvPi-X) "<< (XvSSi-X)/(XvPi-X)<<std::endl;
-	    
-	    std::cout<< "DjOverDi*(XvSSj-f1right)/(XvPj-f1right) "<< DjOverDi*(XvSSj-f1right)/(XvPj-f1right)<<std::endl;
-	    std::cout<< "DjOverDi*(XvSSj-f1left)/(XvPj-f1left) "<<   DjOverDi*(XvSSj-f1left)/(XvPj-f1left)<<std::endl;
-	    std::cout<< "precipitate type "<< precipitate_->GetPrecipitateType()<<std::endl;
-	    
-	    /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
+// 	    /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
 	    
 	    Y=solutionToImprove;
 	  }
@@ -728,7 +734,7 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  Eq1precision=std::abs(X*Y-f);
 	  Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
 	  
-	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
+ 	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
 	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
 	  
 	  
@@ -837,7 +843,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
       
 	// BEGIN: Compute gamma, DeltaGe, and CHECK IF they have been updated before//
 	
-	/*DEBUG*/ std::cout<<"In RadiusDis, adress of precipitate P is "<<P<<std::endl;
+// 	/*DEBUG*/ std::cout<<"In RadiusDis, adress of precipitate P is "<<P<<std::endl;
 	double oldGamma=P->GetSurfaceEnergyCurrentValue();
 	double oldDeltaGe=P->GetDistorsionEnergy();
 	P->ComputeDistorsionEnergy(); //compute another value of distorsionEnergy_
@@ -919,10 +925,10 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	  f=K*std::exp(-DeltaH/(R*T))*std::exp( 4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius) + DeltaGe*Vm/(R*T)) ;
 	  
 
-	  std::cout<<"4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius)+ DeltaGe*Vm/(R*T) " <<4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius)+ DeltaGe*Vm/(R*T)<<std::endl;
+// 	  /*debug*/std::cout<<"4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius)+ DeltaGe*Vm/(R*T) " <<4./3.*(alphaP+2)/(4./3.+alphaP)*Vm*gamma/(R*T*rightRadius)+ DeltaGe*Vm/(R*T)<<std::endl;
 	  
 	  
-	  std::cout<<"DeltaGe*Vm"<<DeltaGe*Vm<<std::endl;
+	  /*debug*/std::cout<<"Delt/*a*/Ge*Vm"<<DeltaGe*Vm<<std::endl;
 	  std::cout<<" ClassId <"<<classId<<"> right interface"<<std::endl;
 	  //solving system of equation:  (XvSSi-solX)/(XvPi-solX)= DjOverDi *(XvSSj-solY)/(XvPj-solY) AND   X*Y= f 
 	  //with unknown variables solX>0 , solY>0   
@@ -934,7 +940,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 						  XvPj,
 						  solX,
 						  solY);
-	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<" solution case is "<<solutionCase<<"\n"<<std::endl;
+// 	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<" solution case is "<<solutionCase<<"\n"<<std::endl;
 	  
 	  if (solutionCase==1)
 	  {
@@ -950,14 +956,14 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 	    //In this case, we take right interfacial concentration of class (i+1)
 	    double X = this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1);
 	    double Y = this->GetInterfConcentrationObjectForElement(soluteList[1]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1);
-	    /*DEBUG */std::cout<<"X of Class Id + 1 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1)<<"\n"; 
+// 	    /*DEBUG */std::cout<<"X of Class Id + 1 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 1)<<"\n"; 
 	    
-	    /*DEBUG */std::cout<<"X of Class Id + 2 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 2)<<"\n"; 
+// 	    /*DEBUG */std::cout<<"X of Class Id + 2 is "<<this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).GetRightInterfacialConcValueForClass(classId + 2)<<"\n"; 
 	    
-	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n";
+// 	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n";
 	    
-	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n"; 
-	    /*DEBUG */std::cout<<"X is "<<X<<" Y is "<<Y<<"\n"; 
+// 	    /*DEBUG */std::cout<<"Class Id is "<<classId<<"\n"; 
+// 	    /*DEBUG */std::cout<<"X is "<<X<<" Y is "<<Y<<"\n"; 
 	    assert (X>0);
 	    assert(Y>0);
 	    this->GetInterfConcentrationObjectForElement(soluteList[0]->GetElementName()).SetRightInterfacialConcValueForClass(X, classId);
@@ -986,7 +992,7 @@ RadiusDistribution::ComputeAllInterfacialConcentrations()
 						  solY);
 	
 	
-	/*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<"\n"<<std::endl;
+// 	/*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<"\n"<<std::endl;
 	
 	if (solutionCase==1)
 	{
@@ -1135,7 +1141,7 @@ RadiusDistribution::ComputeCriticalInterfacialConcentration()
 	  // BEGIN: Compute criticalradius and CHECK IF it has been updated before. criticalradius will be used to compute criticalInterfacialConcentrationRadius
 	  double oldCriticalRadius= P->GetCriticalRadius();
 	  double criticalRadius = P->ReturnCriticalRadius();
-	  /*DEBUG*/ std::cout<<"oldCriticalRadius is <<"<<oldCriticalRadius<<" new critical radius computed is "<<criticalRadius<<std::endl;
+// 	  /*DEBUG*/ std::cout<<"oldCriticalRadius is <<"<<oldCriticalRadius<<" new critical radius computed is "<<criticalRadius<<std::endl;
 	  assert ( (oldCriticalRadius==criticalRadius)&&"may be criticalradius_ has not been computed before\
 	  running method ComputeCriticalInterfacialConcentration()");
 	  // END:  Compute criticalradius and CHECK IF it has been updated before
@@ -1158,7 +1164,7 @@ RadiusDistribution::ComputeCriticalInterfacialConcentration()
 						    solX,
 						    solY);
 	  
-	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<std::endl;
+// 	  /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<std::endl;
 	  
 	  if (solutionCase==1)
 	  {
@@ -1260,7 +1266,7 @@ RadiusDistribution::ReturnCriticalInterfacialVelocity()
   for (unsigned int i=0; i<elementsCriticalVelocityList.size()-1; ++i)
   {
     
-    /*DEBUG*/std::cout<<"elementsCriticalVelocityList[i] = "<<elementsCriticalVelocityList[i]<<"\n elementsCriticalVelocityList[i+1] = "<<elementsCriticalVelocityList[i+1]<<"\n\n"<<std::endl;
+//     /*DEBUG*/std::cout<<"elementsCriticalVelocityList[i] = "<<elementsCriticalVelocityList[i]<<"\n elementsCriticalVelocityList[i+1] = "<<elementsCriticalVelocityList[i+1]<<"\n\n"<<std::endl;
     //The critical velocities must be the same whatever the element choose!!!
     //TODO assert ( elementsCriticalVelocityList[i]==elementsCriticalVelocityList[i+1] );
   }
@@ -1303,7 +1309,7 @@ RadiusDistribution::Info() const
   std::cout <<  "                                spatialStep: " << spatialStep_<< " SI unit" << std::endl;
   std::cout <<  "                                     adress: " << &(*this)<< " SI unit" << std::endl;
   std::cout <<  "                                                                 " 	<< std::endl;
-  this->CoutRadiusDistribution();
+//    /*debug, not necessary*/this->CoutRadiusDistribution();
   std::cout <<  "                                                                 " 	<< std::endl;
 }
 

@@ -461,7 +461,7 @@ Precipitate::SavePrecipitateInterfacialVelocities()
     std::stringstream lineStream;
     unsigned int NumberOfClass = currentRadiusDistribution_->GetItemsValues().size();
     
-    //TODO debug std::cout<<"NumberOfClass toto"<<NumberOfClass<<" IntConcObjUsed size " <<IntConcObjUsed->GetInterfacialVelocityList().size();
+//     //TODO debug std::cout<<"NumberOfClass toto"<<NumberOfClass<<" IntConcObjUsed size " <<IntConcObjUsed->GetInterfacialVelocityList().size();
     unsigned int toto= IntConcObjUsed->GetInterfacialVelocityList().size();
     
     std::cout<<"Type : "<<this->GetPrecipitateType()<<"\n";
@@ -550,6 +550,7 @@ Precipitate::AddEmptyClassForCurrentRadiusDistributionWithCondition()
     std::cout<<"precipitate typme is "<<this->GetPrecipitateType()<<"\n";
     currentRadiusDistribution_->AddEmptyClass();
   }
+  std::cout<<" Radius distribution class number is now ["<<currentRadiusDistribution_->GetItemsValues().size()<<"]. It was ["<<n<<"]"<<std::endl;
   
 }
 
@@ -597,7 +598,7 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
   if (nbOfSol==2)
   {
     
-    std::cout<<"DEBUG solution1= "<<solution1<<" ; solution2 ="<<solution2<<std::endl;
+//     std::cout<<"DEBUG solution1= "<<solution1<<" ; solution2 ="<<solution2<<std::endl;
     if ( (solution1.real())==0 && (solution2.real())==0 )
       assert("Error: No solutions , X=Y=0 ");
     if ( solution1.real()*solution2.real()<0 )
@@ -659,15 +660,15 @@ Precipitate::SolveEquilibriumConcentrationsEquations(double f,
   
   
   //DEBUG    
-  std::cout<<"Xveq value solution X is: "<<X<<std::endl;
-  std::cout<<"value solution Y is: "<<Y<<std::endl;
-  
-  std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
-  std::cout<<"value solution Y is: "<<Y<<std::endl;
-    std::cout<<"X*Y = : "<<X*Y<<std::endl;
-    std::cout<<"f = : "<<f<<std::endl;
-    std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
-    std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
+//   /*DEBUG*/std::cout<<"Xveq value solution X is: "<<X<<std::endl;
+//   /*DEBUG*/std::cout<<"value solution Y is: "<<Y<<std::endl;
+//   
+//   /*DEBUG*/std::cout<<" Ax2 +bx +c =0 ? "<< constantA*X*X + (constantB-f*constantC)*X + -f*constantD<<std::endl;
+//   /*DEBUG*/std::cout<<"value solution Y is: "<<Y<<std::endl;
+//     /*DEBUG*/std::cout<<"X*Y = : "<<X*Y<<std::endl;
+//     /*DEBUG*/std::cout<<"f = : "<<f<<std::endl;
+//     /*DEBUG*/std::cout<<" (XvSSi-X)/(XvPi-X) =  "<<(XvSSi-X)/(XvPi-X)<<std::endl;
+//     /*DEBUG*/std::cout<<"DjOverDi *(XvSSj-Y)/(XvPj-Y) = "<<DjOverDi *(XvSSj-Y)/(XvPj-Y)<<std::endl;
     
     
      ////////
@@ -900,8 +901,8 @@ Precipitate::ComputeEquilibriumConcentrations()
 					      solX,
 					      solY);
       
-      /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<std::endl; 
-      /*Debug*/ std::cout<<"get diffusion coef "<<soluteList[1]->GetDiffusion().GetAtomicDiffusionCoef()<<std::endl;
+//       /*Debug*/ std::cout<<"f: "<<f<<" XvSSi: "<<XvSSi<<" XvPi: "<<XvPi<<" DjOverDi: "<<DjOverDi<<" XvPj: "<<XvPj<<" XvSSj: "<<XvSSj<<" solX"<<solX<<" solY"<<solY<<std::endl; 
+//       /*Debug*/ std::cout<<"get diffusion coef "<<soluteList[1]->GetDiffusion().GetAtomicDiffusionCoef()<<std::endl;
       
       
       //Remember: XvSSeq for soluteList[0] is X or i and XvSSeq for soluteList[1] is Y or j
@@ -968,7 +969,7 @@ Precipitate::CheckIfPrecipitationIsPossible() const
   
   //If IsPrecipitationPossible== true then precipitation is possible
   
-  /*DEbug*/ std::cout<<"IsPrecipitationPossible "<<IsPrecipitationPossible<<"\n";
+//   /*DEbug*/ std::cout<<"IsPrecipitationPossible "<<IsPrecipitationPossible<<"\n";
   
   return IsPrecipitationPossible;
 }
@@ -982,7 +983,7 @@ Precipitate::ComputeDistorsionEnergy()
   
   distorsionEnergy_=1000000*(materialPointer_->GetYoungModulus())/(1-materialPointer_->GetPoissonCoeff())*(deltaCell_)*(deltaCell_);
   
-  /*DEBUG */std::cout<<"Deistorsion energy is "<<distorsionEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
+//   /*DEBUG */std::cout<<"Deistorsion energy is "<<distorsionEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
 }
 
 
@@ -1019,7 +1020,7 @@ Precipitate::ComputePhaseChangeVolumicEnergy()
 	    std::cout<<"XvSS = "<<XvSS<<std::endl;
 	    std::cout<<"stoiCoef = "<<stoiCoef<<std::endl;
 	    std::cout<<"XvEq = "<<XvEq<<std::endl;
-	    /*DEBUG*/ std::cout<<"XvEq/XvSS "<<XvEq/XvSS<<"\n"; 
+// 	    /*DEBUG*/ std::cout<<"XvEq/XvSS "<<XvEq/XvSS<<"\n"; 
 	    
 	    assert ( (XvSS>0)&&"Current volumic concentration in material must be superior to 0");
 	    product*=std::pow( XvEq/XvSS,stoiCoef);  
@@ -1032,14 +1033,14 @@ Precipitate::ComputePhaseChangeVolumicEnergy()
 	
 	phaseChangeVolumiqueEnergy_=R*T/molarVolume_*std::log(product);
 	
-	/*DEBUG*/std::cout<<"DELTA Gv is "<<phaseChangeVolumiqueEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
+// 	/*DEBUG*/std::cout<<"DELTA Gv is "<<phaseChangeVolumiqueEnergy_<<"For precipitate type <"<<typeid(*this).name()<<"> "<<std::endl;
 	
 	
 	//post conditions
 	assert( (phaseChangeVolumiqueEnergy_ !=1)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): phaseChangeVolumiqueEnergy_ may have not been computed!!!" );
 	
 	//assert if computed value is negative. phaseChangeVolumiqueEnergy_ must always be negative
-	/*DEBUG*/ std::cout<<"product "<<product<<" \n";
+// 	/*DEBUG*/ std::cout<<"product "<<product<<" \n";
 	assert( (phaseChangeVolumiqueEnergy_ <= 0)&&"In Precipitate.ComputePhaseChangeVolumicEnergy(): value computed for phaseChangeVolumiqueEnergy_ is not negative!!!" );
   }
   else //  IsPrecipitationPossible==false, precipitation is not possible
@@ -1221,13 +1222,13 @@ Precipitate::ReturnCriticalBeta()
 	  assert (currentAtomicConc>0);
 	  sum += 1./(Dcoef*currentAtomicConc);
 	  
-	  /*DEBUG*/std::cout<<"Elementname "<<it->first<<std::endl;
-	  /*DEBUG*/std::cout<<"DCoef "<<Dcoef<<std::endl;
-	  /*DEBUG*/std::cout<<"currentAtomicConc "<<currentAtomicConc<<std::endl;
-	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
-	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ 1./(currentAtomicConc*Dcoef) = "<<1./(currentAtomicConc*Dcoef)<<"\n\n\n\n\n\n\n\n"<<std::endl;
-	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ currentAtomicConc = "<<currentAtomicConc<<"\n"<<std::endl;
-	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ Dcoef = "<<Dcoef<<"\n"<<std::endl;
+// 	  /*DEBUG*/std::cout<<"Elementname "<<it->first<<std::endl;
+// 	  /*DEBUG*/std::cout<<"DCoef "<<Dcoef<<std::endl;
+// 	  /*DEBUG*/std::cout<<"currentAtomicConc "<<currentAtomicConc<<std::endl;
+// 	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
+// 	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ 1./(currentAtomicConc*Dcoef) = "<<1./(currentAtomicConc*Dcoef)<<"\n\n\n\n\n\n\n\n"<<std::endl;
+// 	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ currentAtomicConc = "<<currentAtomicConc<<"\n"<<std::endl;
+// 	  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ Dcoef = "<<Dcoef<<"\n"<<std::endl;
 	};
       }
       
@@ -1236,12 +1237,12 @@ Precipitate::ReturnCriticalBeta()
     
   }
   
-  /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
+//   /*DEBUG */std::cout<<"@@@@@@@@@@@@@@@@@@@@@ sum = "<<sum<<"\n\n\n\n\n\n\n\n"<<std::endl;
   assert( (sum!=0)&&(latticeParam!=0) );
   double beta=4.*M_PI*std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)/sum;
   
-  std::cout<<"latticeParam                "<<latticeParam<<" sum "<<sum<<std::endl;
-  /*DEBUG*/std::cout<<"DEBUG beta , std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)"<<std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)<<"\n\n\n"<<std::endl;
+//   /*DEBUG*/std::cout<<"latticeParam                "<<latticeParam<<" sum "<<sum<<std::endl;
+//   /*DEBUG*/std::cout<<"DEBUG beta , std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)"<<std::pow((criticalRadius_+deltaCriticalRadius_), 2.)/std::pow(latticeParam,4.)<<"\n\n\n"<<std::endl;
   
   return beta;
 }
@@ -1268,14 +1269,14 @@ Precipitate::ReturnNucleationRate()
   
   
   double J=Z*currentNucleationSiteNb*beta*std::exp(-DeltaG/(kB*T));
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Precipitatate type @@@@@@@@@@@@@@@@@ <"<<typeid(*this).name()<<"> \n\n\n"<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ J @@@@@@@@@@@@@@@@@"<<J<<"\n\n\n"<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ currentNucleationSiteNb @@@@@@@@@@@@@@@@@"<<currentNucleationSiteNb<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Z @@@@@@@@@@@@@@@@@"<<Z<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ beta @@@@@@@@@@@@@@@@@"<<beta<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ DeltaG @@@@@@@@@@@@@@@@@"<<DeltaG<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ kB @@@@@@@@@@@@@@@@@"<<kB<<std::endl;
-  /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ T @@@@@@@@@@@@@@@@@"<<T<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Precipitatate type @@@@@@@@@@@@@@@@@ <"<<typeid(*this).name()<<"> \n\n\n"<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ J @@@@@@@@@@@@@@@@@"<<J<<"\n\n\n"<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ currentNucleationSiteNb @@@@@@@@@@@@@@@@@"<<currentNucleationSiteNb<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ Z @@@@@@@@@@@@@@@@@"<<Z<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ beta @@@@@@@@@@@@@@@@@"<<beta<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ DeltaG @@@@@@@@@@@@@@@@@"<<DeltaG<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ kB @@@@@@@@@@@@@@@@@"<<kB<<std::endl;
+//   /*DEBUG*/std::cout<<"@@@@@@@@@@@@@@@@@ T @@@@@@@@@@@@@@@@@"<<T<<std::endl;
   
   //post assertions?
   
@@ -1582,8 +1583,8 @@ Precipitate::ProcessNucleationRate()
   this->ComputeEquilibriumConcentrations();
   this->ComputeSurfaceEnergy();
   this->ComputePhaseChangeVolumicEnergy();
-  /*DEBUG*/std::cout<<"Phase change Volumic Energy"<<phaseChangeVolumiqueEnergy_<<std::endl;
-  /*DEBUG*/std::cout<<"distorsionEnergy_"<<distorsionEnergy_<<std::endl;
+//   /*DEBUG*/std::cout<<"Phase change Volumic Energy"<<phaseChangeVolumiqueEnergy_<<std::endl;
+//   /*DEBUG*/std::cout<<"distorsionEnergy_"<<distorsionEnergy_<<std::endl;
   
   
   // Preconditions!!!
@@ -1618,11 +1619,11 @@ Precipitate::ProcessNucleationRate()
   else
   {
     this->ComputeCriticalRadius();
-    /*DEBUG*/std::cout<<"criticalRadius_"<<criticalRadius_<<std::endl;
+//     /*DEBUG*/std::cout<<"criticalRadius_"<<criticalRadius_<<std::endl;
     /*DEBUG*/this->ComputeDeltaCriticalRadius();
-    /*DEBUG*/std::cout<<"deltaCriticalRadius_"<<deltaCriticalRadius_<<std::endl;
+//     /*DEBUG*/std::cout<<"deltaCriticalRadius_"<<deltaCriticalRadius_<<std::endl;
     this->ComputeCriticalTotalEnergy();
-    /*DEBUG*/std::cout<<"criticalTotalEnergy_"<<criticalTotalEnergy_<<std::endl;
+//     /*DEBUG*/std::cout<<"criticalTotalEnergy_"<<criticalTotalEnergy_<<std::endl;
     this->ComputeZeldovichFactor();
     this->ComputeCriticalBeta();
     this->ComputeNucleationRate();
@@ -1640,10 +1641,10 @@ Precipitate::ProcessNucleationRate()
       std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
       std::cout<< " Retoile > Rmax : Computed nucleation radius (r* + dr*) is superior to the maximum radius of distribution   "<<std::endl;
       std::cout<< " Empty classes will be added "<<std::endl;
-      while ( nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius() )
+      while ( (nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius()) and (nucleationRate_>0) )
       {
 	currentRadiusDistribution_ ->AddEmptyClass();
-	std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
+// 	/*debug*/std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
       }
       currentRadiusDistribution_ ->AddEmptyClass(); // add another empty class after the class where the nucleated radius will appear
     }
@@ -1669,7 +1670,7 @@ Precipitate::ComputeAllInterfacialConcentrations()
 {
   assert ((currentRadiusDistribution_!=0)&&"Precipitate is not linked to any current Radius distribution");
   
-  /*DEBUG*/ std::cout<<"precipitate adress is : "<<this<<std::endl;
+//   /*DEBUG*/ std::cout<<"precipitate adress is : "<<this<<std::endl;
   
   std::cout<<"+-+-+-+- BEGIN: Running precipitate::ComputeAllInterfacialConcentrations() +-+-+-+-"<<std::endl;
   currentRadiusDistribution_->ComputeAllInterfacialConcentrations();
@@ -1740,13 +1741,13 @@ Precipitate::ReturnCriticalTimeStep()
   
     criticaltimeStepP= deltar/2/criticalV;
     
-    /*debug*/std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
+//     /*debug*/std::cout<<"criticalV toto "<<criticalV<<"  "<<typeid(*this).name()<<"\n";
     
   };
   
 
   
-    /*TODO erase*/ std::cout<<"criticaltimeStepP toto "<<criticaltimeStepP<< "  "<<typeid(*this).name()<<"\n";
+//     /*TODO erase*/ /*DEBUG*/std::cout<<"criticaltimeStepP toto "<<criticaltimeStepP<< "  "<<typeid(*this).name()<<"\n";
 
   
   assert  (criticaltimeStepP>0);
@@ -1769,7 +1770,7 @@ Precipitate::AddNucleatedPrecipitates()
   double nucleationRadius= criticalRadius_+deltaCriticalRadius_;
   
   
-  /*DEBUG*/std::cout<<"DEBUG  r* "<<criticalRadius_<<" delta r* "<<deltaCriticalRadius_<<"\n";
+//   /*DEBUG*/std::cout<<"DEBUG  r* "<<criticalRadius_<<" delta r* "<<deltaCriticalRadius_<<"\n";
   
   if ( (criticalRadius_==-111.111)&&(deltaCriticalRadius_==-111.111) ) // -111.111 means "ne s'applique pas"
   { 
@@ -1780,83 +1781,83 @@ Precipitate::AddNucleatedPrecipitates()
     assert ((nucleationRadius >0)&&"computed real nucleation radius is not strictly positive! ");
     
     std::cout<<"Computed nucleation radius (r* + dr*) is not in the range between 0 and Rmin of the RadisDistribution"<<std::endl;
-    /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
+//     /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<"minRadius "<<minRadius<<" maxRadius"<<maxRadius<<std::endl;
     std::cout<<"Therefore, no new nucleus for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> will be considered "<<std::endl;
+  }
+  else if (nucleationSitesNumber_==0)
+  {
+    std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<" does not have any available nucleationSiteNumber (Ns=0), thus AddNucleatedPrecipitates() will do nothing"<<std::endl;
+  }
+  else if (nucleationRate_ ==0 )
+  {
+    std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<" does not have nucleation rate (J=0), thus AddNucleatedPrecipitates() will do nothing"<<std::endl;
   }
   else
   {
-     /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<" distribution min Radius (left radius) "<<minRadius<<" distribution maxRadius (right radius)"<<maxRadius<<std::endl;
+//      /*DEBUG*/std::cout<<"nucleationRadius "<<nucleationRadius<<" distribution min Radius (left radius) "<<minRadius<<" distribution maxRadius (right radius)"<<maxRadius<<std::endl;
      
-     if (nucleationSitesNumber_==0)
-     { 
-       
-       std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<" does not have any available nucleationSiteNumber (Ns=0), thus AddNucleatedPrecipitates() will do nothing"<<std::endl;
-     }
-     else //nucleationSitesNumber_!=0
-     {
-       //nucleationSitesNumber_!=0
-       
-       /*DEBUG*/std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> \n";
-       /*DEBUG*/ std::cout<<"DEBUG: nucleationSitesNumber_ "<<nucleationSitesNumber_<<"\n";
-       /*DEBUG*/ std::cout<<"DEBUG: computation currentTime is  "<<materialPointer_->GetComputation().GetCurrentTime() <<"\n";
-       
-       
-       /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
-       
-       //now it is an if statement, warning and press to continue  . Not an assert
-       assert ( (nucleationRadius< maxRadius)&&"Computed nucleation radius (r* + dr*) is superior or equal to max radius distribution. Not in the range of the current RadiusDistribution");
-       assert ( (nucleationRadius>=minRadius)&&"Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution. Not in the range of the current RadiusDistribution");
-       
-       
-       /*
-       ///////  change the assert with the if  ///////////////////////
-       if (nucleationRadius < minRadius)
-       {
-	 std::cout<< "============================================================================================================"<<std::endl;
-	 std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
-	 std::cout<< " Retoile < Rmin : Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution   "<<std::endl;
-	 /// press any key to continue
-	 std::cout <<"Press ENTER to continue... " ;
-	 std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
-	 //////////////
-       };
-       
-       
-       if (nucleationRadius>maxRadius)
-       {
-	 std::cout<< "============================================================================================================"<<std::endl;
-	 std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
-	 std::cout<< " Retoile > Rmax : Computed nucleation radius (r* + dr*) is superior to the maximum radius of distribution   "<<std::endl;
-	 std::cout<< " Empty classes will be added "<<std::endl;
-	 while ( nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius() )
-	 {
-	   currentRadiusDistribution_ ->AddEmptyClass();
-	   std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
-	 }
-	 currentRadiusDistribution_ ->AddEmptyClass(); // add another empty class after the class where the nucleated radius will appear
-       }
-       ///////  change the assert with the if  ///////////////////////
-       ///////////////////////////////////////////////////////////////
-       
-       */
-       
-       
-       
-       
-       double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
-       unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
-       double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
+    
+      //nucleationSitesNumber_!=0
+      
+//        /*DEBUG*/std::cout<<"Precipitate type"<<typeid(*this).name()<<">> at adress <"<<this<<"> \n";
+//        /*DEBUG*/ std::cout<<"DEBUG: nucleationSitesNumber_ "<<nucleationSitesNumber_<<"\n";
+//        /*DEBUG*/ std::cout<<"DEBUG: computation currentTime is  "<<materialPointer_->GetComputation().GetCurrentTime() <<"\n";
+      
+      
+      /*DEBUG*/ // The if is just for debbugging, normally it is an assert not an if satatement
+      
+      //now it is an if statement, warning and press to continue  . Not an assert
+      assert ( (nucleationRadius< maxRadius)&&"Computed nucleation radius (r* + dr*) is superior or equal to max radius distribution. Not in the range of the current RadiusDistribution");
+      assert ( (nucleationRadius>=minRadius)&&"Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution. Not in the range of the current RadiusDistribution");
+      
+      
+      /*
+      ///////  change the assert with the if  ///////////////////////
+      if (nucleationRadius < minRadius)
+      {
+	std::cout<< "============================================================================================================"<<std::endl;
+	std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
+	std::cout<< " Retoile < Rmin : Computed nucleation radius (r* + dr*) is inferior to the minimum radius of distribution   "<<std::endl;
+	/// press any key to continue
+	std::cout <<"Press ENTER to continue... " ;
+	std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+	//////////////
+      };
+      
+      
+      if (nucleationRadius>maxRadius)
+      {
+	std::cout<< "============================================================================================================"<<std::endl;
+	std::cout<< "WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! "<<std::endl;
+	std::cout<< " Retoile > Rmax : Computed nucleation radius (r* + dr*) is superior to the maximum radius of distribution   "<<std::endl;
+	std::cout<< " Empty classes will be added "<<std::endl;
+	while ( nucleationRadius >= currentRadiusDistribution_->GetCurrentMaxRadius() )
+	{
+	  currentRadiusDistribution_ ->AddEmptyClass();
+	  std::cout<< "   current max radius is now  ===> "<< currentRadiusDistribution_->GetCurrentMaxRadius()<<std::endl;
+	}
+	currentRadiusDistribution_ ->AddEmptyClass(); // add another empty class after the class where the nucleated radius will appear
+      }
+      ///////  change the assert with the if  ///////////////////////
+      ///////////////////////////////////////////////////////////////
+      
+      */
+      
+      
+      
+      
+      double deltat= materialPointer_->GetComputation().GetMaxTimeStep();
+      unsigned int nucleatedClassId=currentRadiusDistribution_->FindClassForRadius(nucleationRadius);
+      double oldN= currentRadiusDistribution_->GetItemValueForClass(nucleatedClassId);
+      
+      assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
+      
+      std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
+      currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
+//        /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;
 	
-       assert ((nucleationRate_>=0)&&"Nucleation can't be negative");
-	
-       std::cout<<"Adding new Nucleus of radius : "<<nucleationRadius<< " in Radius Distribution class [ "<<nucleatedClassId<<" ] for Precipitate type <<"<<typeid(*this).name()<<">> at adress <"<<this<<"> "<<std::endl;
-       currentRadiusDistribution_->SetItemValueForClass(nucleatedClassId, oldN + nucleationRate_*deltat  );
-       /*DEBUG*/std::cout<<"oldN "<<oldN<<"nucleationRate_"<<nucleationRate_<<"nucleationRate_*deltat"<<nucleationRate_*deltat<<"oldN + nucleationRate_*deltat "<<oldN + nucleationRate_*deltat<<std::endl;
-	 
-       
-       
-
-     };
+      
+      
      
      
      
@@ -1914,15 +1915,15 @@ Precipitate::SolveCineticLinearSytem()
   Vright1=IConcObjPtr->GetRightInterfacialVelocityForClass(1);
   
   //debug:begin
-  std::cout<<"CLass Id is <<"<<1<<">>\n";
-	
-  std::cout<<"Vleft :"<<Vleft1<<" ; Vright :"<<Vright1<<"\n";	
-  std::cout<<"Class 1 left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(1)<<"\n";
-  std::cout<<"Class 1 Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(1)<<"\n";
-
-  std::cout<<"Class 1 Radius is :" << currentRadiusDistribution_->GetRadiusForClass(1)<<"\n";
-  std::cout<<"Class 1 Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(1)<<"\n";
-  std::cout<<"Class 1 Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(1)<<"\n";
+//   /*debug*/std::cout<<"CLass Id is <<"<<1<<">>\n";
+// 	
+//   /*debug*/std::cout<<"Vleft :"<<Vleft1<<" ; Vright :"<<Vright1<<"\n";	
+//   /*debug*/std::cout<<"Class 1 left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(1)<<"\n";
+//   /*debug*/std::cout<<"Class 1 Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(1)<<"\n";
+// 
+//   /*debug*/std::cout<<"Class 1 Radius is :" << currentRadiusDistribution_->GetRadiusForClass(1)<<"\n";
+//   /*debug*/std::cout<<"Class 1 Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(1)<<"\n";
+//   /*debug*/std::cout<<"Class 1 Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(1)<<"\n";
   //debug:end
   
   
@@ -1958,15 +1959,15 @@ Precipitate::SolveCineticLinearSytem()
   Vrightn=IConcObjPtr->GetRightInterfacialVelocityForClass(n);
   
   //debug:begin
-  std::cout<<"CLass Id is <<"<<n<<">>\n";
-	
-  std::cout<<"Vleft :"<<Vleftn<<" ; Vright :"<<Vrightn<<"\n";	
-  std::cout<<"Class n left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(n)<<"\n";
-  std::cout<<"Class n Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(n)<<"\n";
-
-  std::cout<<"Class n Radius is :" << currentRadiusDistribution_->GetRadiusForClass(n)<<"\n";
-  std::cout<<"Class n Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(n)<<"\n";
-  std::cout<<"Class n Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(n)<<"\n";
+//   /*DEBUG:*/std::cout<<"CLass Id is <<"<<n<<">>\n";
+// 	
+//   /*DEBUG:*/std::cout<<"Vleft :"<<Vleftn<<" ; Vright :"<<Vrightn<<"\n";	
+//   /*DEBUG:*/std::cout<<"Class n left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(n)<<"\n";
+//   /*DEBUG:*/std::cout<<"Class n Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(n)<<"\n";
+// 
+//   /*DEBUG:*/std::cout<<"Class n Radius is :" << currentRadiusDistribution_->GetRadiusForClass(n)<<"\n";
+//   /*DEBUG:*/std::cout<<"Class n Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(n)<<"\n";
+//   /*DEBUG:*/std::cout<<"Class n Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(n)<<"\n";
   //debug:end
   
   
@@ -2007,80 +2008,80 @@ Precipitate::SolveCineticLinearSytem()
       
       if ( Vright>0 && Vleft>0 )
       {
-	std::cout<<"case 1"<<std::endl;
+// 	/*DEBUG*/std::cout<<"case 1"<<std::endl;
 	A(i,i)=deltar/deltat +Vright;
 	A(i,i+1)=0;
 	A(i,i-1)= -Vleft;
 	
 	//debug:begin
-	std::cout<<"CLass Id is <<"<<classId<<">>\n";
-	
-	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
-	
-	
-	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"CLass Id is <<"<<classId<<">>\n";
+// 	
+// 	/*DEBUG*/std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+// 	
+// 	
+// 	/*DEBUG*/std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
 	//debug:end
       }
       else if( Vright>0 && Vleft<0 )
       {
-	std::cout<<"case 2"<<std::endl;
+// 	/*DEBUG*/std::cout<<"case 2"<<std::endl;
 	A(i,i)= deltar/deltat + Vright - Vleft;
 	A(i,i+1)=0;
 	A(i,i-1)=0;
 	
 	//debug:begin
-	std::cout<<"CLass Id is <<"<<classId<<">>\n";
-	
-	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
-	
-	
-	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"CLass Id is <<"<<classId<<">>\n";
+// 	
+// 	/*DEBUG*/std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+// 	
+// 	
+// 	/*DEBUG*/std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
 	//debug:end
 	
       }
       else if ( Vright<0 && Vleft<0 )
       {	
-	std::cout<<"case 3"<<std::endl;
+// 	/*DEBUG*/std::cout<<"case 3"<<std::endl;
 	A(i,i)= deltar/deltat -Vleft;
 	A(i,i+1)= Vright;
 	A(i,i-1)=0;
 	
 	//debug:begin
-	std::cout<<"CLass Id is <<"<<classId<<">>\n";
-	
-	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
-	
-	
-	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"CLass Id is <<"<<classId<<">>\n";
+// 	
+// 	/*DEBUG*/std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+// 	
+// 	
+// 	/*DEBUG*/std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
 	//debug:end
       }
       else // ( Vright<0 && Vleft>0 ) //impossible case ??? 
       {
 	//Normally this is impossible case ???
-	std::cout<<"case 4"<<std::endl;
+// 	/*DEBUG*/std::cout<<"case 4"<<std::endl;
 	
-	std::cout<<"CLass Id is <<"<<classId<<">>\n";
-	
-	std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
-	
-	
-	std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
-	std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
-	std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"CLass Id is <<"<<classId<<">>\n";
+// 	
+// 	/*DEBUG*/std::cout<<"Vleft :"<<Vleft<<" ; Vright :"<<Vright<<"\n";
+// 	
+// 	
+// 	/*DEBUG*/std::cout<<"Class left Interfacial Concentration is :" << IConcObjPtr->GetLeftInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Interfacial Concentration is :" << IConcObjPtr->GetRightInterfacialConcValueForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Radius is :" << currentRadiusDistribution_->GetRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Left Radius R-  is :" << currentRadiusDistribution_->GetLeftRadiusForClass(classId)<<"\n";
+// 	/*DEBUG*/std::cout<<"Class Right Radius R+  is :" << currentRadiusDistribution_->GetRightRadiusForClass(classId)<<"\n";
 	
 	
 	
@@ -2090,13 +2091,13 @@ Precipitate::SolveCineticLinearSytem()
 	A(i,i+1)= Vright;
 	A(i,i-1)= -Vleft;
       }  
-      std::cout<<"deltar  "<<deltar<<std::endl;
-      std::cout<<"deltat "<<deltat<<std::endl;
-      std::cout<<"Vright "<<Vright<<std::endl;
-      std::cout<<"Vleft "<<Vleft<<std::endl;
-      std::cout<<"A(i,i) "<<A(i,i)<<std::endl;
-      std::cout<<"A(i,i+1) "<<A(i,i+1)<<std::endl;
-      std::cout<<"A(i,i-1) "<<A(i,i-1)<<"\n"<<std::endl;
+//       /*DEBUG*/std::cout<<"deltar  "<<deltar<<std::endl;
+//       /*DEBUG*/std::cout<<"deltat "<<deltat<<std::endl;
+//       /*DEBUG*/std::cout<<"Vright "<<Vright<<std::endl;
+//       /*DEBUG*/std::cout<<"Vleft "<<Vleft<<std::endl;
+//       /*DEBUG*/std::cout<<"A(i,i) "<<A(i,i)<<std::endl;
+//       /*DEBUG*/std::cout<<"A(i,i+1) "<<A(i,i+1)<<std::endl;
+//       /*DEBUG*/std::cout<<"A(i,i-1) "<<A(i,i-1)<<"\n"<<std::endl;
     }
 /////////////////////////////////////////////////// End: MATRIX FEEDING  ///////////////////////////////////////////////////////////
   Acopy=A; /*Just for verification*/
@@ -2137,7 +2138,7 @@ Precipitate::SolveCineticLinearSytem()
       //Set solutions for currentRadiusDistribution values
       for(int i=0; i<n; ++i)
       {
-	/*DEBUG*/ std::cout<<"B(i,j) is "<<B(i,0)<<std::endl;
+// 	/*DEBUG*/ std::cout<<"B(i,j) is "<<B(i,0)<<std::endl;
 	int clId= i+1;
 	assert( (B(i,0)>=0)&&"A Solution found when solving linear system is negative. (N<0) " );
 	currentRadiusDistribution_->SetItemValueForClass(clId, B(i,0) );

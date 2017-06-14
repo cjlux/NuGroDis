@@ -60,9 +60,9 @@ InterfacialConcentration::~InterfacialConcentration()
 void 
 InterfacialConcentration::IncrementWithEmptyValues()
 {
-  /*debug*/ std::cout<<"Precipoitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
-  /*Debug */ std::cout<<"interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<"\n";
-  /*Debug */ std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<"\n";
+//   /*debug*/ std::cout<<"Precipoitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+//   /*Debug */ std::cout<<"interfacialVelocityList_.size() "<<interfacialVelocityList_.size()<<"\n";
+//   /*Debug */ std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<"\n";
   
   assert ( (interfacialConcentrationValuesList_.size()==interfacialVelocityList_.size())&&"Before incrementing with empty values, Interfacial concentration list and Interfacial Velocity list does not have the same size ! there is a problem" );
   
@@ -76,14 +76,14 @@ InterfacialConcentration::IncrementWithEmptyValues()
   
   assert ( (current_n==previous_n+1)&&"Whhen radius sistribution size is incremented, InterfacialConcentration must be incremented to. It means the difference of size must be only 1 " );
   
-  /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
+//   /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
   
   interfacialConcentrationValuesList_.push_back(0);
   
   interfacialVelocityList_.push_back(0);
   
-  /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
-  std::cout<<" previous_n "<<previous_n << "current_n "<<current_n<<std::endl;
+//   /*DEBUg */std::cout<<"interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<std::endl;
+//   std::cout<<" previous_n "<<previous_n << "current_n "<<current_n<<std::endl;
   assert ( (int)interfacialConcentrationValuesList_.size() == (current_n+1) );
   
   
@@ -168,7 +168,7 @@ void
 InterfacialConcentration::SetLeftInterfacialConcValueForClass(double value, unsigned int classId)
 {
   
-  /*debug*/ std::cout<<"Value is :" <<value<<"\n";
+//   /*debug*/ std::cout<<"Value is :" <<value<<"\n";
   
   
   assert ((value>0)&&"SetLeftInterfacialConcValueForClass(value, classId) : given value must be positive");
@@ -197,12 +197,12 @@ InterfacialConcentration::SetRightInterfacialConcValueForClass(double value,unsi
   unsigned int n;
   
   n= radiusDistribution_.GetItemsValues().size();
-  /*DEBUG*/ std::cout<<"Element is"<<chemicalElement_.GetElementName()<<"\n";
+//   /*DEBUG*/ std::cout<<"Element is"<<chemicalElement_.GetElementName()<<"\n";
   
 
   
-  /*DEBUG*/ std::cout<<"Precipitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
-  /*DEBUG*/ std::cout<< "interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<" AND n "<< n<<std::endl;
+//   /*DEBUG*/ std::cout<<"Precipitate type is "<<radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+//   /*DEBUG*/ std::cout<< "interfacialConcentrationValuesList_.size() "<<interfacialConcentrationValuesList_.size()<<" AND n "<< n<<std::endl;
   assert(  (interfacialConcentrationValuesList_.size()== n+1)&&"In SetRightInterfacialConcValueForClass(int  classId) : interfacialConcentrationValuesList_.size() \
   and radiusDistribution_.GetItemsValues().size() are incompatible!!! interfacialConcentrationValuesList_.size() must be = radiusDistribution_.GetItemsValues().size() +1 " );
   
@@ -317,11 +317,11 @@ InterfacialConcentration::ReturnCriticalInterfacialVelocity() const
     assert( (rEtoile==-111.111)&&"rEtoile is not equal to -111.111 which means 'ne s'applique pas' ");
     // Si  retoile ne s'applique pas, on utilise la première vitesse d'interface comme vitesse critique.
     
-    /*debug */std::cout<<" size of interfacialVelocityList_ "<<interfacialVelocityList_.size()<<"\n";
-    std::cout<<"TPOTOTOTOTOTOTOTTO3\n";
+//     /*debug */std::cout<<" size of interfacialVelocityList_ "<<interfacialVelocityList_.size()<<"\n";
+//     std::cout<<"TPOTOTOTOTOTOTOTTO3\n";
     
-    /*DEBUG*/std::cout<<"precipitate Type "<< radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
-    /*DEBUG*/std::cout<<"Elemenent name"<<chemicalElement_.GetElementName() <<"\n";
+//     /*DEBUG*/std::cout<<"precipitate Type "<< radiusDistribution_.GetPrecipitate().GetPrecipitateType()<<"\n";
+//     /*DEBUG*/std::cout<<"Elemenent name"<<chemicalElement_.GetElementName() <<"\n";
     
     
     radiusDistribution_.CheckIfInterfacialConcentrationObjectUsedHasBeenChosen()==true;
@@ -335,7 +335,7 @@ InterfacialConcentration::ReturnCriticalInterfacialVelocity() const
     //Normally,  interfacialVelocities must be the same for a precipitate, not depending from the choosen alloying element 
     // So, chemicalElementList_[0] or chemicalElementList_[1] (if it exists) must lead to the same result, But We have arbitrarily choosen to considered chemicalElementList_[0]
     
-    /*DEBUG*/std::cout<<"TPOTOTOTOTOTOTOTTO4\n";
+//     /*DEBUG*/std::cout<<"TPOTOTOTOTOTOTOTTO4\n";
     assert (criticalVint!=0);
   };
 

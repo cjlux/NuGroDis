@@ -93,14 +93,14 @@ namespace Util
                                   std::complex<double> & x2,bool complexSolution)
   {
     
-    /*DEBUG*/ std::cout<<"Solving Second Order Degree Equation with A="<<a<<" B="<<b<<" C="<<c<<"\n";
+//     /*DEBUG*/ std::cout<<"Solving Second Order Degree Equation with A="<<a<<" B="<<b<<" C="<<c<<"\n";
     if (a == 0)
       return SolveFirstDegreeEquation(b, c, x1);
 
     const double delta = b*b-4.*a*c;
     const double oneOver2a = 1./(2.*a);
     
-     /*DEBUG*/ std::cout<<"sqrt(delta) = "<<sqrt(delta)<<"\n";
+//      /*DEBUG*/ std::cout<<"sqrt(delta) = "<<sqrt(delta)<<"\n";
 
     if (delta>=0)   // 2 real roots
       {
@@ -494,7 +494,7 @@ namespace Util
 	assert((alpha>0)&&(alpha<=1));
 	
 	//debug
-	std::cout<<"Solution to imporve by dichotomous method is ------> "<<solutionToImprove<<"\n";
+// 	std::cout<<"Solution to imporve by dichotomous method is ------> "<<solutionToImprove<<"\n";
 	
 	double f_solutionToImprove= a*solutionToImprove*solutionToImprove + b*solutionToImprove + c;
 	
@@ -513,8 +513,8 @@ namespace Util
 	  if (f1right>rightValue)
 	  {f1right=rightValue;}
 	  
-	  /*DEBUG*/ std::cout<<"In Util::DichotomousMethodForSecondDegreeEquation(): \n ";
-	  /*DEBUG*/std::cout<<" delta is "<<delta<<"left value is "<<f1left<<" right value is "<< f1right <<"\n";
+// 	  /*DEBUG*/ std::cout<<"In Util::DichotomousMethodForSecondDegreeEquation(): \n ";
+// 	  /*DEBUG*/std::cout<<" delta is "<<delta<<"left value is "<<f1left<<" right value is "<< f1right <<"\n";
 
 
 	  
@@ -561,15 +561,15 @@ namespace Util
 	  solutionToImprove= f1left; //or f1right, it is the same
 	  //End: dicho
 	  
-	  //debug
-	  std::cout<<"Dicho. solution is now "<<solutionToImprove<<"\n";
+	  
+//  	  /*debug*/std::cout<<"Dicho. solution is now "<<solutionToImprove<<"\n";
 	  
 	};
 
 
     
-    /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
-    std::cout<< "P(solutionToImprove)= "<< a*solutionToImprove*solutionToImprove +b*solutionToImprove + c <<"\n";
+//     /*DEBUG:*/std::cout<<"Improved Value Found using dichotomous is ---> "<<solutionToImprove<<" <---\n";
+//     /*DEBUG:*/std::cout<< "P(solutionToImprove)= "<< a*solutionToImprove*solutionToImprove +b*solutionToImprove + c <<"\n";
     return solutionToImprove;
   }
   

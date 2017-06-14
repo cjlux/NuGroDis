@@ -44,7 +44,7 @@ ChemicalComposition::ChemicalComposition(std::string formula)
        //Maybe constructor can be modified to receive a list of ChemicalElement to initialize chemecalElementList_???
 
   
-  /*debug*/std::cout<<   "adress of the ChemicalCompo built is"<<this<<std::endl;
+//   /*debug*/std::cout<<   "adress of the ChemicalCompo built is"<<this<<std::endl;
   std::cout<<   "Exit ChemicalComposition constructor"<<std::endl;
 }
 
@@ -196,12 +196,12 @@ std::map<std::string, Concentration*>&
 ChemicalComposition::GetConcentrationMap()
 {
   //begin debug
-  std::map<std::string , Concentration*>::iterator it;
-  std::cout<<"In Get ConcentartionMap. C++ Condentration adresses in Map are "<<std::endl;
-  for (it=concentrationMap_.begin(); it!=concentrationMap_.end(); ++it )
-  {
-    std::cout<<"Element Name: "<<it->first<<"; Adress is :"<<it->second<<std::endl;
-  }
+//   std::map<std::string , Concentration*>::iterator it;
+//   std::cout<<"In Get ConcentartionMap. C++ Condentration adresses in Map are "<<std::endl;
+//   for (it=concentrationMap_.begin(); it!=concentrationMap_.end(); ++it )
+//   {
+//     std::cout<<"Element Name: "<<it->first<<"; Adress is :"<<it->second<<std::endl;
+//   }
   //end debug
   
   
@@ -289,8 +289,8 @@ ChemicalComposition::AddChemicalElements(ChemicalElement& CE, Concentration& C )
   //preconditions
  assert( (chemicalElementList_.size()==concentrationMap_.size())&&"ChemicalElementList and Concentration List must have the same size" );
  
- /*this line is debug, delete after */std::cout<<"In AddChemicalElement:  Adress of concentration added is: "<<&C<<std::endl;
- /*this line is debug, delete after */std::cout<<"In AddChemicalElement:  Adress of ChemicalComposition is: "<<this<<std::endl;
+//  /*this line is debug, delete after */std::cout<<"In AddChemicalElement:  Adress of concentration added is: "<<&C<<std::endl;
+//  /*this line is debug, delete after */std::cout<<"In AddChemicalElement:  Adress of ChemicalComposition is: "<<this<<std::endl;
  
  
  
