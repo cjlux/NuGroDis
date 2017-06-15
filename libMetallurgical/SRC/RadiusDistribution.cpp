@@ -664,10 +664,13 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  double epsilonEq2=1e-3;
 	  double Eq1precision=std::abs(X*Y-f);
 	  double Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
+	  double Y_oldValue= Y;
 	  
 	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
 	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
 	  
+	  
+	  assert ( (Eq1precision<= epsilonEq1) && "Precision for equation X*Y=f is not satisfied" );
 	  
 	  /////////////////////////////////////////////////
 	  /////////// do dichotomous on Y for Eq2 /////////
@@ -731,16 +734,26 @@ RadiusDistribution::SolveInterfacialConcentrationsEquations(double f,
 	  ////////////////////////////////////////////
 	  
 	  
-	  Eq1precision=std::abs(X*Y-f);
-	  Eq2precision=std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
+	  double new_Eq1precision_After_second_dicho= std::abs(X*Y-f);
+	  double new_Eq2precision_After_second_dicho= std::abs( (XvSSi-X)/(XvPi-X) - DjOverDi*(XvSSj-Y)/(XvPj-Y) );
 	  
- 	  std::cout<<"Precision for equation 1: X*Y=f is "<<Eq1precision<<"\n";
-	  std::cout<<"Precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<Eq2precision<<"\n";
+ 	  std::cout<<"New precision for equation 1: X*Y=f is "<<new_Eq1precision_After_second_dicho<<"\n";
+	  std::cout<<"New precision for equation 2: (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y) is "<<new_Eq2precision_After_second_dicho<<"\n";
 	  
 	  
 	  // TODO  // assert or not assert?  because x and y have been optimised
-	  assert ( (Eq1precision<= epsilonEq1) && "Precision for equation X*Y=f is not satisfied" );
-	  assert ( (Eq2precision<= epsilonEq2) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
+	  
+	  assert ( (new_Eq1precision_After_second_dicho<= epsilonEq1) && "Precision for equation X*Y=f is not satisfied" );
+	  
+	  if  (new_Eq2precision_After_second_dicho > Eq2precision)
+	  {
+	    // Take olfd value of Y
+	    std::cout<< "Take old value of Y : new precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied "<<std::endl;
+	    Y=Y_oldValue;
+	  };
+	  
+	  
+	  //assert ( (new_Eq2precision_After_second_dicho<= Eq2precision) && "Precision for equation (XvSSi-X)/(XvPi-X) = DjOverDi *(XvSSj-Y)/(XvPj-Y)  is not satisfied " );
 	  
 	  
 	  
