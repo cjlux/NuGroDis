@@ -46,6 +46,39 @@ import time
 
 
 
+
+
+
+def getTimeData(resultDirectory):
+
+    if (resultDirectory[-1]=="/"):
+        path=resultDirectory
+    else:
+        path=resultDirectory+"/"
+    
+    timeData=loadtxt(path+"MaterialCurrentCompo/MaterialChemicalCompo.txt", skiprows=1)[:,0]
+    
+    return timeData
+
+
+
+def getTemperatureData(resultDirectory):
+
+    if (resultDirectory[-1]=="/"):
+        path=resultDirectory
+    else:
+        path=resultDirectory+"/"
+    
+    temperatureData=loadtxt(path+"MaterialCurrentCompo/MaterialChemicalCompo.txt", skiprows=1)[:,4]
+    
+    return temperatureData
+
+
+
+
+
+
+
 def GetEquilibriumSolvusDicos(path):
     """ """
     
@@ -76,8 +109,9 @@ def GetEquilibriumSolvusDicos(path):
     
     
     
-
-    T=np.linspace(273.15,273.15+500, 10000)
+    T=getTemperatureData(path)
+    
+    T=np.linspace(min(T), max(T), 10000)
     R= 8.314472
     
     precipitateSolvusDico={}
@@ -752,7 +786,7 @@ def PostProcessing(plotBySequence=True,\
 def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=True,\
                                             thermalLoadingTimeStep=10,\
                                             hardeningTimeStep=3600,\
-                                            quenchingTimeStep=1):
+                                            quenchingTimeStep=1,precipitateType=None):
     
     if (resultDirectory[-1]=="/"):
         path=resultDirectory
@@ -772,11 +806,11 @@ def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=True,\
     if (plotBySequence==False):
         
         #plot normally
-        OutputAttributes(path)
+        OutputAttributes(path,precipitateType=precipitateType)
         OutputMaterialChemicalComposition(path)
         OutputMaterialVacancyProperties(path)
-        OutputDistributionCurves(path, timeStep=3600, timeToPlot=[]) # by default timeStep is 3600 and timeToPlot=[] (see function)  
-        OutputInterfacialDistributionCurves(path, timeStep=3600, timeToPlot=[]) # by default timeStep is 3600 and timeToPlot=[] (see function)  
+        OutputDistributionCurves(path, timeStep=3600, timeToPlot=[],precipitateType=precipitateType) # by default timeStep is 3600 and timeToPlot=[] (see function)  
+        OutputInterfacialDistributionCurves(path, timeStep=3600, timeToPlot=[],precipitateType=precipitateType) # by default timeStep is 3600 and timeToPlot=[] (see function)  
          
     
         
@@ -787,7 +821,7 @@ def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=True,\
         
         OutputMaterialChemicalComposition(path,trimCurveInfo=(True,seqInfoIndex) )
         OutputMaterialVacancyProperties(path,trimCurveInfo=(True,seqInfoIndex) )        
-        OutputAttributes(path,plotBySequence=plotBySequence )
+        OutputAttributes(path,plotBySequence=plotBySequence,precipitateType=precipitateType)
 
         
         listOfTimeToPlot=[]
@@ -818,8 +852,8 @@ def PostProcessGivenResultDirectory(resultDirectory,plotBySequence=True,\
             
             
         #print('listOfTimeToPlot',listOfTimeToPlot)
-        OutputDistributionCurves(path, timeToPlot=listOfTimeToPlot ) # by default timeStep is 3600 and timeToPlot=[] (see function)  
-        OutputInterfacialDistributionCurves(path, timeToPlot = listOfTimeToPlot)
+        OutputDistributionCurves(path, timeToPlot=listOfTimeToPlot,precipitateType=precipitateType) # by default timeStep is 3600 and timeToPlot=[] (see function)  
+        OutputInterfacialDistributionCurves(path, timeToPlot = listOfTimeToPlot,precipitateType=precipitateType)
         
 
         ## TODO: sort Distribution curbe by sequence Type ? i.e create folder 'sequenceTypename' for corresponding distribution curve
@@ -1089,12 +1123,13 @@ def OutputDistributionCurves(path,Retoile=True ,timeToPlot=[], timeStep=3600,pre
                             criticalRadius=realCriticalRadiusList[currentTimeIndex]
                             #print("critical radius is",criticalRadius, "current time", radDisCurrentTime ,"index", currentTimeIndex)
                             
-                            if criticalRadius!="-222.222": # retoile existe
-                                ax.axvline(x=criticalRadius,linestyle='--', linewidth=1, color='blue',label=u"Position")
+                            if criticalRadius not in ["-222.222", -222.222, float(-222.222)]: # retoile existe
+                                ax.axvline(x=str(criticalRadius),linestyle='--', linewidth=1, color='blue',label=u"Position")
                                 ax.legend([subdirName+' distribution', 'Critical radius $r^{*}$'],\
                                           fancybox=True, shadow=False ,framealpha=0.5)
                             else: #criticalRadius=="-222.222" , retoile n'existe pas
-                                ax.legend([subdirName+' distribution;\n(CriticalRadius does not exist)'],\
+                                criticalRadius="-"
+                                ax.legend([subdirName+' distribution;\n(Critical radius does not exist)'],\
                                           fancybox=True, shadow=False,framealpha=0.5 )
 
                         currentGamma= gammaList[currentTimeIndex]
@@ -1126,6 +1161,214 @@ def OutputDistributionCurves(path,Retoile=True ,timeToPlot=[], timeStep=3600,pre
                         plt.savefig(saveName)
                         plt.close()
 
+            SortCurves(ResultsDir)
+    return         
+    
+    
+    
+def OutputGivenDistributionOnSamePlot(path,timeToPlot, Retoile=True ,precipitateType=None, numberOfDistributionPerFigure=3):
+    
+    if (numberOfDistributionPerFigure >=3):
+        print("****WARNING***** There will be more than 3 distributions on a same curve !!! given 'numberOfDistributionPerFigure'  list 'numberOfDistributionPerFigure' function <OutputGivenDistributionOnSamePlot()> is greater than 3!")
+
+    
+    assert (type(timeToPlot)==list)
+    
+    
+    assert(0), "work in progress"
+
+    return
+    
+    
+    
+def OutputGivenDistributionCurvesOnSamePlot(path,timeToPlot, Retoile=True ,precipitateType=None):
+    """Save distribution Curves"""
+    
+    from itertools import cycle
+    
+    
+    assert (type(timeToPlot)==list)
+    
+    assert (len(timeToPlot)>=2), "Given list 'timeToPlot' for function <OutputGivenDistributionCurvesOnSamePlot()> must have at least 2 values. You nned at least 2 to make a comparison !!! "    
+    
+    if (len(timeToPlot) >=3):
+        print("****WARNING using function <OutputGivenDistributionCurvesOnSamePlot()> ***** There will be more than 3 distributions on a same curve !!! ")    
+    
+    
+    
+    timeToPlot.sort()
+
+    print("******* POSTPROCESSING SOME DISTRIBUTION CURVES ON SAME PLOT *******")
+
+    if (path[-1]=="/"):
+        path=path
+    else:
+        path=path+"/"
+        
+    RadDisDir=path+"RadDisFiles/"  
+    
+    
+    
+    foundPrecipitateDir=[]
+    for subdirectoryName in os.listdir(RadDisDir):
+        if subdirectoryName !=".directory":  
+            foundPrecipitateDir.append(subdirectoryName)
+            
+
+    if (precipitateType!=None):
+        assert ( precipitateType in foundPrecipitateDir ), "given precipitateType has not been found"
+    
+    PrecipitateDirToProcess=[]
+    if (precipitateType == None):
+        PrecipitateDirToProcess=foundPrecipitateDir
+    else:
+        PrecipitateDirToProcess.append(precipitateType)
+            
+
+    #print ("os.listdir(RadDisDir)",os.listdir(RadDisDir))
+    for subdirName in PrecipitateDirToProcess:
+        if subdirName !=".directory":
+            
+            print("Found directory for precipitate ", subdirName)
+
+            ###########
+            #SAVE PATH#
+            ###########
+            ResultsDir=path+"Results/DistributionsCurves/"+subdirName+"/"
+            if not os.path.exists(ResultsDir):
+                os.makedirs(ResultsDir)
+            ###########
+            #SAVE PATH#
+            ###########
+
+            #print ("subdir Name is ",subdirName )
+            RadDisFilesDir=RadDisDir+subdirName+"/"
+
+            attributeFileName=subdirName+"_Attributes_.txt"
+            AttributesFileDir=path+"PrecipitatesAttributes/"+subdirName+"/"
+            
+            ##Read file Precipitate atrtribute and get information
+        
+            PrecipitateAttributeData=loadtxt(fname=AttributesFileDir+attributeFileName,skiprows=1)
+
+            
+            timeList=list(PrecipitateAttributeData[:,0])
+            
+            
+            gammaList=list(PrecipitateAttributeData[:,5])
+            temperatureList=list(PrecipitateAttributeData[:,17])
+            volumicFractionList=list(PrecipitateAttributeData[:,1])
+            averageRadiusList=list(PrecipitateAttributeData[:,16])
+            initialGamma=gammaList[0]
+            initialHalfSinkD=GetInitialHalfSinkD(path)
+            
+            
+            
+            assert(timeToPlot!=[]) # here timeToPlot should not be = []
+            assert (type(timeToPlot)==list) , " 'timeToPlot' should be a list "
+
+            closestTimeList,closestTimeindexList=  ValeurlaPlusProche(timeToPlot,timeList) 
+            del closestTimeindexList # it will be unusefull here, and because we sort later, delete it is preferable to avoid bad using!
+            closestTimeList.sort()
+                
+            
+            
+            if Retoile==True:
+                ##From file Precipitate atrtribute, get information on real critical radius (r* + dr* )>>> >>> >>> 
+
+                realCriticalRadiusList=[]
+                realCriticalRadiusList=list(PrecipitateAttributeData[:,8])
+                ##
+            
+            
+
+
+            print("RadDisFilesDir", RadDisFilesDir)
+            print("Time list to process is ", closestTimeList)
+            rc('font', family='serif')
+            
+            fig, ax = plt.subplots()
+            ax.set_xlabel(r'Radius [$m$]',color='green')
+            ax.set_ylabel(r'Precipitates number per volume unit [$N_p/m^3$] ',color='red') 
+            titleOfFigure= subdirName+ " distribution"
+            ax.set_title(titleOfFigure, fontsize=16) # r""+figTitle
+            saveName=ResultsDir+str(timeToPlot).replace(',','_')[1:-1]+".pdf" # name which will be used to save the figure file !
+            
+            markersList= cycle(('o', 'v', 'd', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', '.',\
+            '^', '1' , '2' , '4' , '_' , 'x' , '|' , '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '+'))
+            
+            
+            ### search file to process according to given timeToPlot
+            fileNameToProcessList=[]
+            for filename in os.listdir(RadDisFilesDir):
+                if filename.endswith(".txt"):
+                    radDisCurrentTime=float(filename[12:-5])
+                    if radDisCurrentTime in closestTimeList:
+                        fileNameToProcessList.append(filename)
+                        
+                        
+            SortedfileNameToProcessList= sorted(fileNameToProcessList, key=lambda fname: float(fname[12:-5]))
+            
+            for filename in SortedfileNameToProcessList:
+                radDisCurrentTime=float(filename[12:-5])
+                                
+                print ("PostProcessing file: <",filename, ">")
+                ReadFile=OpenFileAndRead(RadDisFilesDir+filename)
+                        
+                Data=ReadFile[1:]
+                RR=[]
+                NP=[]
+                for data in Data:
+                    RR.append(data[1])
+                    NP.append(data[2])
+                
+                currentTimeIndex=timeList.index(radDisCurrentTime)
+                criticalRadius=realCriticalRadiusList[currentTimeIndex]
+                
+                
+                valueOfSringIfcriticalradiusDoesnotExist='--'
+                if criticalRadius in ["-222.222", -222.222, float(-222.222)]:
+                    # retoile n'existe pas, criticalRadius=="-222.222"
+                    criticalRadius=valueOfSringIfcriticalradiusDoesnotExist
+
+                currentGamma= gammaList[currentTimeIndex]
+                currentTemperature=temperatureList[currentTimeIndex]
+                currentVf=volumicFractionList[currentTimeIndex]
+                currentRmean=averageRadiusList[currentTimeIndex]
+                
+                
+                textBox= r'$t= '+str(radDisCurrentTime)+'\ [s]$;\n'+\
+                '$\gamma|_{t=t_0}= '+str(initialGamma)+'\ [J/m^2]$;\n'+\
+                '$\gamma= '+str(currentGamma)+'\ [J/m^2]$;\n'+\
+                '$L='+str(initialHalfSinkD)+ '\ [m]$;\n'+\
+                '$T= '+ str(currentTemperature) + '\ [K]$;\n'+\
+                '$r^{*} = '+str(criticalRadius)+'\ [m]$;\n'+\
+                '$V_f= '+str(currentVf*100)+ '\ [\%]$;\n'+\
+                '$r_{average}= '+str(currentRmean)+ '\ [m]$;'
+                
+                                        
+                ax.plot(RR,NP,'-'+markersList.next(), label= textBox+"\n\n")                       
+                ax.grid(True)                        
+                
+                
+                if Retoile==True and criticalRadius != valueOfSringIfcriticalradiusDoesnotExist:
+                    # draw a vertical line x=retoile
+                    ax.axvline(x=float(criticalRadius),linestyle='-.', linewidth=1.5, color=ax.lines[-1].get_color()) #,label=r"Critical radius $r^{*}$" ) 
+                    
+                    
+                       
+                        
+            
+            ax.legend(bbox_to_anchor=(1.05, 1), fontsize=9, loc=2, borderaxespad=0., shadow=False, fancybox=True,framealpha=0.5)
+            fig.savefig(saveName,bbox_inches='tight')
+            plt.close()
+            
+
+            
+    return       
+
+
+    
 
 def PlotCurve(X,Y,saveName,Xlabel="",Ylabel="",figTitle="",marker="r-o",Xcolor="green",Ycolor="red", returnFig=False, labelCurve=' ', trimCurveInfo=(False,[]), saveSequenceCurveSeparately=True ):
     "Plot a curve and save it to the given path,  sequenceNameStartEndTriplet=(SequenceName,StartingIndex,EndingEndex)="
@@ -1348,32 +1591,86 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
 
     ####################################################################
     ##########   Specific values of Ylabel and figTitle   ###############
+#    if attributeToPlot=="Vf":
+#        Ylabel="$Vf$ $[Nb/m^3]$ "
+#        figTitle="Temporal evolution of volumic fraction"
+#
+#    if attributeToPlot=="DeltaGv":
+#        Ylabel="Phase change volumic Energy [J/m^3]"
+#        figTitle="Temporal evolution of Phase change volumique Energy"
+#
+#    if attributeToPlot=="DeltaGe":
+#        Ylabel="Elastique distorsion volumique Energy [J/m^3]"
+#        figTitle="Temporal evolution of distorsion volumique Energy"
+#
+#    if attributeToPlot=="NuclSiteDensity":
+#        Ylabel="Nucleation site density [Number of Site per volumic unit]"
+#        figTitle="Temporal evolution of Nucleation site density"
+#
+#    if attributeToPlot=="gamma":
+#        Ylabel="Surface energy [J/m^2]"
+#        figTitle="Temporal evolution of Surface energy"
+#
+#    if attributeToPlot=="rEtoile":
+#        Ylabel="Critical radius [m]"
+#        figtitle="Temporal evolution of critical radius (r*) "
+#
+#    if attributeToPlot=="delta_rEtoile":
+#        Ylabel="Delta critical radius [m]"
+#        figTitle="Temporal evolution of Delta critical radius (dr*_kT)"
+#
+#    if attributeToPlot=="Real_rEtoile":
+#        Ylabel="Real critical radius [m]"
+#        figTitle="temporal evolution of the critical radius (r* + dr*)"
+#
+#    if attributeToPlot=="Delta_GEtoile":
+#        Ylabel="Total critical germination volumic Energy [J/m^3]"
+#        figTitle="Temporal evolution of critical germination total"
+#
+#    if attributeToPlot=="Z":
+#        Ylabel="Zeldovich factor"
+#        figTitle="Temporal evolution of Zeldovich factor"
+#        
+#    if attributeToPlot=="BetaEtoile":
+#        Ylabel=" Beta* (Beta for critical radius) "
+#        figTitle="Temporal evolution of Beta* "
+#
+#    if attributeToPlot=="JEtoile":
+#        Ylabel="Nucleation Rate [NbPrecipitates/m^3/s]"
+#        figTitle="Temporal evolution of nucleation rate"
+#
+#    if attributeToPlot=="XvCuEqSS":
+#        Ylabel="XvCuEqSS"
+#        figTitle="Copper equilibrium conc. in Solid Solution(with infinite radius prec.)"
+#        
+#    if attributeToPlot=="XvMgEqSS":
+#        Ylabel="XvMgEqSS"
+#        figTitle="Magnesium equilibrium conc. in Solid Solution(with infinite radius prec.)"
+
     if attributeToPlot=="Vf":
-        Ylabel="Volumic Fraction [Nb/m^3] "
+        Ylabel="$V_f$ [$Nb/m^3$] "
         figTitle="Temporal evolution of volumic fraction"
 
     if attributeToPlot=="DeltaGv":
-        Ylabel="Phase change volumic Energy [J/m^3]"
+        Ylabel="$\Delta G_v$ [$J.m^{3}$]"
         figTitle="Temporal evolution of Phase change volumique Energy"
 
     if attributeToPlot=="DeltaGe":
-        Ylabel="Elastique distorsion volumique Energy [J/m^3]"
+        Ylabel="$\Delta G_{el}$ [$J.m^{-3}$]"
         figTitle="Temporal evolution of distorsion volumique Energy"
 
     if attributeToPlot=="NuclSiteDensity":
-        Ylabel="Nucleation site density [Number of Site per volumic unit]"
-        figTitle="Temporal evolution of Nucleation site density"
+        Ylabel="Nsites [Number per volumic unit]"
 
     if attributeToPlot=="gamma":
-        Ylabel="Surface energy [J/m^2]"
-        figTitle="Temporal evolution of Surface energy"
+        Ylabel="Surface energy [$J.m^{-2}$]"
 
     if attributeToPlot=="rEtoile":
         Ylabel="Critical radius [m]"
-        figtitle="Temporal evolution of critical radius (r*) "
+        figTitle="Temporal evolution of critical radius (r*) "
 
     if attributeToPlot=="delta_rEtoile":
-        Ylabel="Delta critical radius [m]"
+        Ylabel=" $\delta r{*}_{kT}$ [$m$]"
         figTitle="Temporal evolution of Delta critical radius (dr*_kT)"
 
     if attributeToPlot=="Real_rEtoile":
@@ -1381,7 +1678,7 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
         figTitle="temporal evolution of the critical radius (r* + dr*)"
 
     if attributeToPlot=="Delta_GEtoile":
-        Ylabel="Total critical germination volumic Energy [J/m^3]"
+        Ylabel="$\Delta G^{*}$ [$J.m^{3}$]"
         figTitle="Temporal evolution of critical germination total"
 
     if attributeToPlot=="Z":
@@ -1393,17 +1690,34 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
         figTitle="Temporal evolution of Beta* "
 
     if attributeToPlot=="JEtoile":
-        Ylabel="Nucleation Rate [NbPrecipitates/m^3/s]"
+        Ylabel="Nucleation Rate $[NbPrecipitates.m^{3}.s^{-1}]$"
         figTitle="Temporal evolution of nucleation rate"
 
     if attributeToPlot=="XvCuEqSS":
         Ylabel="XvCuEqSS"
-        figTitle="Copper equilibrium conc. in Solid Solution(with infinite radius prec.)"
-        
+        figTitle="Copper equilibrium concentration in Solid Solution\n(with infinite radius prec.)"
+
     if attributeToPlot=="XvMgEqSS":
         Ylabel="XvMgEqSS"
-        figTitle="Magnesium equilibrium conc. in Solid Solution(with infinite radius prec.)"
+        figTitle="Magnesium equilibrium concentration in Solid Solution\n(with infinite radius prec.)"    
+        
+        
+    if attributeToPlot=="T":
+        Ylabel="T [$K$]"
+        figTitle=""       
+
+    if attributeToPlot=="Temperature":
+        Ylabel="Temperature [$K$]"
+        figTitle=""
+        
+    if Xlabel=="time":
+        Xlabel="time [$s$]"
+        
     ##########   Specific values of Ylabel and figTitle   ###############
+        
+   
+        
+        
         
     savePath=saveDirPath+"/"+saveFigName+".pdf"
     
@@ -1471,7 +1785,7 @@ def OutputMaterialChemicalComposition(path,trimCurveInfo=(False,[]) ):
     
     RF=OpenFileAndRead(fileDir+filename)
     for dataToPlotIndex in range(1, len(RF[0]) ):  
-        PlotFromReadData(ReadFile=RF,saveDirPath=ResultDir,Xindex=0, Yindex=dataToPlotIndex,trimCurveInfo=trimCurveInfo)# saveFigName=None,Xindex=0,Xlabel=None,Ylabel=None, figTitle="" 
+        PlotFromReadData(ReadFile=RF,saveDirPath=ResultDir,Xindex=0, Xlabel=r'time $[s]$', Yindex=dataToPlotIndex,trimCurveInfo=trimCurveInfo)# saveFigName=None,Xindex=0,Xlabel=None,Ylabel=None, figTitle="" 
         PlotFromReadData(ReadFile=RF,saveDirPath=ResultDir,Xindex=4, Yindex=dataToPlotIndex,trimCurveInfo=trimCurveInfo) # Xindex=4, temperature
 
 def OutputMaterialVacancyProperties(path, trimCurveInfo=(False,[]) ):
@@ -1501,12 +1815,20 @@ def OutputMaterialVacancyProperties(path, trimCurveInfo=(False,[]) ):
     
     filename="MaterialVacancyProperties.txt"
 
-    
+    # Plot vs time
     RF=OpenFileAndRead(fileDir+filename)
     for dataToPlotIndex in range(1, len(RF[0]) ):  
         PlotFromReadData(ReadFile=RF,saveDirPath=ResultDir,Yindex=dataToPlotIndex,trimCurveInfo=trimCurveInfo)#,saveFigName=None,Xindex=0,Xlabel=None,Ylabel=None, figTitle="" )
 
     
+    # Plot vs temperature
+
+    temperatureData=getTemperatureData(path)
+    
+    ReadData=loadtxt(fileDir+filename,skiprows=1)
+    for dtToPlotIndex in range(0, len(ReadData[0]) ):
+        # temperatureData lenght actually takes the last value of temperature, but MaterialVacancyProperties doesnt, so ==> must use temperatureData[:-1]
+        PlotCurve(temperatureData[:-1],ReadData[:,dtToPlotIndex],saveName=ResultDir+"/"+RF[0][dtToPlotIndex]+"Vs_temperature.pdf",Xlabel='Time [s]',Ylabel=RF[0][dtToPlotIndex]  ,figTitle="", trimCurveInfo=trimCurveInfo)
 
 
 def OutputMaterialSaveFile(path, trimCurveInfo=(False,[]) ):
@@ -1714,7 +2036,7 @@ def OutputAttributes(path,plotBySequence=False,precipitateType=None, onlyAttribu
 
                         if (attributeToPlot in specificAttribute):
                             if attributeToPlot=="Vf":
-                                ylabel="Volumic Fraction [Nb/m^3] "
+                                ylabel="$V_f$ [$Nb/m^3$] "
                                 figtitle="Temporal evolution of volumic fraction"
                                 figtitleVsTemperature="Thermal evolution of volumic fraction"
 
@@ -1764,12 +2086,12 @@ def OutputAttributes(path,plotBySequence=False,precipitateType=None, onlyAttribu
                                 figtitleVsTemperature="Thermal evolution of Zeldovich factor"
                                 
                             if attributeToPlot=="BetaEtoile":
-                                ylabel=" Beta* (Beta for critical radius) "
+                                ylabel=" $Beta^*$"
                                 figtitle="Temporal evolution of Beta* "
                                 figtitleVsTemperature="Thermal evolution of Beta*"
 
                             if attributeToPlot=="JEtoile":
-                                ylabel=r"Nucleation Rate [NbPrecipitates.m^{3}.s^{-1}]"
+                                ylabel="Nucleation Rate $[Nb_p m^{3} s^{-1}]$"
                                 figtitle="Temporal evolution of nucleation rate"
                                 figtitleVsTemperature="Thermal evolution of nucleation rate"
 
@@ -1782,6 +2104,17 @@ def OutputAttributes(path,plotBySequence=False,precipitateType=None, onlyAttribu
                                 ylabel="XvMgEqSS"
                                 figtitle="Magnesium equilibrium concentration in Solid Solution\n(with infinite radius prec.)"
                                 figtitleVsTemperature="Thermal evolution of in Solid Solution\n(with infinite radius prec.)"
+
+                            if attributeToPlot=="T":
+                                ylabel="T [K]"
+                                figtitle=""
+                                figtitleVsTemperature=""                               
+
+                            if attributeToPlot=="Temperature":
+                                ylabel="Temperature [K]"
+                                figtitle=""
+                                figtitleVsTemperature=""                            
+                                
                             
                         else:
                             ylabel=attributeToPlot
@@ -2072,11 +2405,14 @@ def OutputAttributes(path,plotBySequence=False,precipitateType=None, onlyAttribu
                 
                 # save solvus of ALL precipitates +  solidSolutionCurrentSolubility product, part1
                 figAllSolvus, axAllSolvus = PlotCurveGeneral(Keq,Temperature_Keq,AllSolvusSaveName,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Equilibrium Solubility solvus of '+filename[:-15], fig=figAllSolvus, ax=axAllSolvus,  returnFig=True )
+
     
+        SortCurves(ResultsDir)    
+        
     # save solvus of ALL precipitates +  solidSolutionCurrentSolubility product, part2
     PlotCurveGeneral(K_current,temperatureData,AllSolvusSaveName,Xlabel='Solubility product',Ylabel='Temperature [K]', labelCurve='Solid solution solubility product', fig=figAllSolvus, ax=axAllSolvus)                    
                             
-                                
+                                    
                                 
     return
 
@@ -2122,7 +2458,7 @@ def OutputSolvus(path):
 
 
 
-def OutputInterfacialDistributionCurves(path, timeToPlot=[], timeStep=3600):
+def OutputInterfacialDistributionCurves(path, timeToPlot=[], timeStep=3600, precipitateType=None):
     """Save Precipitates Interfacial Distribution Curves"""
     
     
@@ -2134,7 +2470,19 @@ def OutputInterfacialDistributionCurves(path, timeToPlot=[], timeStep=3600):
     RadDisDir=path+"RadDisFiles/"  
     
     
+    foundPrecipitateDir=[]
+    for subdirectoryName in os.listdir(RadDisDir):
+        if subdirectoryName !=".directory":  
+            foundPrecipitateDir.append(subdirectoryName)
+
+    if (precipitateType!=None):
+        assert ( precipitateType in foundPrecipitateDir ), "given precipitateType has not been found"
     
+    PrecipitateDirToProcess=[]
+    if (precipitateType == None):
+        PrecipitateDirToProcess=foundPrecipitateDir
+    else:
+        PrecipitateDirToProcess.append(precipitateType)    
     
     
     
