@@ -1292,7 +1292,7 @@ def OutputGivenDistributionCurvesOnSamePlot(path,timeToPlot, Retoile=True ,preci
             ax.set_ylabel(r'Precipitates number per volume unit [$N_p/m^3$] ',color='red') 
             titleOfFigure= subdirName+ " distribution"
             ax.set_title(titleOfFigure, fontsize=16) # r""+figTitle
-            saveName=ResultsDir+str(timeToPlot).replace(',','_')[1:-1]+".pdf" # name which will be used to save the figure file !
+            saveName=ResultsDir+'RadDis_times_'+str(timeToPlot).replace(',','_')[1:-1]+".pdf" # name which will be used to save the figure file !
             
             markersList= cycle(('o', 'v', 'd', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', '.',\
             '^', '1' , '2' , '4' , '_' , 'x' , '|' , '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '+'))
@@ -1593,7 +1593,7 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
     ##########   Specific values of Ylabel and figTitle   ###############
 #    if attributeToPlot=="Vf":
 #        Ylabel="$Vf$ $[Nb/m^3]$ "
-#        figTitle="Temporal evolution of volumic fraction"
+#        figTitle="Temporal evolution of volume fraction"
 #
 #    if attributeToPlot=="DeltaGv":
 #        Ylabel="Phase change volumic Energy [J/m^3]"
@@ -1648,8 +1648,8 @@ def PlotFromReadData(ReadFile,saveDirPath,Yindex,saveFigName=None,Xindex=0,Xlabe
 #        figTitle="Magnesium equilibrium conc. in Solid Solution(with infinite radius prec.)"
 
     if attributeToPlot=="Vf":
-        Ylabel="$V_f$ [$Nb/m^3$] "
-        figTitle="Temporal evolution of volumic fraction"
+        Ylabel="Volume fraction $f_v$ "
+        figTitle="Temporal evolution of volume fraction"
 
     if attributeToPlot=="DeltaGv":
         Ylabel="$\Delta G_v$ [$J.m^{3}$]"
@@ -2036,9 +2036,9 @@ def OutputAttributes(path,plotBySequence=False,precipitateType=None, onlyAttribu
 
                         if (attributeToPlot in specificAttribute):
                             if attributeToPlot=="Vf":
-                                ylabel="$V_f$ [$Nb/m^3$] "
-                                figtitle="Temporal evolution of volumic fraction"
-                                figtitleVsTemperature="Thermal evolution of volumic fraction"
+                                ylabel="Volume fraction $f_v$"
+                                figtitle="Temporal evolution of volume fraction"
+                                figtitleVsTemperature="Thermal evolution of volume fraction"
 
                             if attributeToPlot=="DeltaGv":
                                 ylabel="$\Delta G_v$ [$J.m^{3}$]"
@@ -2755,8 +2755,8 @@ def ReadFileAndPlotOldVersion(fileName,fileDirPath,saveDirPath,Yindex,Xindex=0):
     attributeToPlotData= AttributesDataDict[attributeToPlot]
 
     if attributeToPlot=="Vf":
-        ylabel="Volumic Fraction [Nb/m^3] "
-        figtitle="Temporal evolution of volumic fraction"
+        ylabel="Volume fraction $f_v$"
+        figtitle="Temporal evolution of volume fraction"
 
     elif attributeToPlot=="DeltaGv":
         ylabel="Phase change volumic Energy [J/m^3]"
